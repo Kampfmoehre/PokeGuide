@@ -9,5 +9,10 @@
         public int CaptureRate { get; set; }
         public int BaseHappiness { get; set; }
         public int HatchCounter { get; set; }
+        public Ability Ability1 { get; set; }
+        public Ability Ability2 { get; set; }
+        public Ability HiddenAbility { get; set; }
+        public EggGroup EggGroup1 { get; set; }
+        public EggGroup EggGroup2 { get; set; }
     }
 }

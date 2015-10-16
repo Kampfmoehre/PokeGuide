@@ -14,7 +14,7 @@ namespace PokeGuide.ManualTester
         static void Main(string[] args)
         {
             var fooBar = new FooBar();
-            Task.Factory.StartNew(fooBar.DoAction);
+            Task.Factory.StartNew(() => fooBar.DoAction());
             Console.ReadLine();
         }        
     }
@@ -31,8 +31,9 @@ namespace PokeGuide.ManualTester
                     //List<GameVersion> list = await dl.LoadGamesAsync(6, source.Token);
                     //List<EggGroup> eggGroups = await dl.LoadEggGroupsAsync(6, source.Token);
                     ////List<ElementType> types = await dl.LoadTypesAsync(6, source.Token);
-                    Pokemon pokemon = await dl.LoadPokemonAsync(66, 6, source.Token);
-                    //List<Ability> abilities = await dl.LoadAbilitiesAsync(7, 6, source.Token);
+                    //Ability ability = await dl.LoadAbilityAsync(53, 7, 6, source.Token);
+                    //Pokemon pokemon = await dl.LoadPokemonAsync(1, 25, 6, source.Token);
+                    List<Ability> abilities = await dl.LoadAbilitiesAsync(7, 6, source.Token);
                     //foreach (GameVersion game in list)
                     //{
                     //    Console.WriteLine(game.Name);
