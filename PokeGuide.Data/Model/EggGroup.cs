@@ -2,6 +2,5 @@
 {
     public class EggGroup : ModelBase
     {
-        public string Name { get; set; }
     }
 }

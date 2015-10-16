@@ -200,6 +200,27 @@ namespace PokeGuide.Data
             return mapper.MapFromQuery(reader, mapping);
         }
 
+        public async Task<List<Pokemon>> LoadAllPokemonAsync(int version, int language, CancellationToken token)
+        {
+            string sql = String.Format("SELECT ps.id, psn.name FROM pokemon_v2_pokemonspecies as ps\n");
+            sql = String.Format("{0} LEFT JOIN\n(SELECT def.pokemon_species_id AS id, IFNULL(curr.name, def.name) AS name, IFNULL(curr.genus, def.genus) AS genus FROM pokemon_v2_pokemonspeciesname def\n", sql);
+            sql = String.Format("{0} LEFT JOIN pokemon_v2_pokemonspeciesname curr ON def.pokemon_species_id = curr.pokemon_species_id AND def.language_id = 9 AND curr.language_id = {1}\n", sql, language);
+            sql = String.Format("{0} GROUP BY def.pokemon_species_id)\nAS psn ON ps.id = psn.id\n", sql);
+            sql = String.Format("{0} LEFT JOIN pokemon_v2_pokemonform pf ON ps.id = pf.pokemon_id\n", sql);
+            sql = String.Format("{0} WHERE pf.version_group_id = (SELECT version_group_id FROM pokemon_v2_version WHERE id = {1})\n", sql, version);
+            sql = String.Format("{0} order by ps.id", sql);
+            DbDataReader reader = await ExecuteReaderAsync(sql, token);
+
+            var mapping = new List<Mapping>
+            {
+                new Mapping { Column = 0, PropertyName = "Id", TypeToCast = typeof(Int32) },
+                new Mapping { Column = 1, PropertyName = "Name", TypeToCast = typeof(String) }
+            };
+
+            var mapper = new DatabaseMapper<Pokemon>();
+            return mapper.MapFromQuery(reader, mapping);
+        }
+
         public async Task<Pokemon> LoadPokemonAsync(int id, int version, int language, CancellationToken token)
         {
             string sql = String.Format("SELECT * FROM pokemon_v2_pokemon WHERE id = {0}", id);

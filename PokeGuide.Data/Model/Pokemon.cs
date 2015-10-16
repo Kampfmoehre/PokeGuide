@@ -2,7 +2,6 @@
 {
     public class Pokemon : ModelBase
     {
-        public string Name { get; set; }
         public double Height { get; set; }
         public double Weight { get; set; }
         public string Genus { get; set; }
