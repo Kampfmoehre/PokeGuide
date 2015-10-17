@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
@@ -60,15 +59,10 @@ namespace PokeGuide.Data
         {
             string sql = String.Format("SELECT v.id, vn.name FROM pokemon_v2_version as v INNER JOIN pokemon_v2_versionname as vn on v.id = vn.version_id where vn.language_id = {0}", language);
 
-            var mapping = new List<Mapping>
-            {
-                new Mapping { PropertyName = "Id", Column = 0, TypeToCast = typeof(Int32) },
-                new Mapping { PropertyName = "Name", Column = 1, TypeToCast = typeof(String) }
-            };
             var mapper = new DatabaseMapper<GameVersion>();
             DbDataReader reader = await ExecuteReaderAsync(sql, token);
 
-            return mapper.MapFromQuery(reader, mapping);
+            return mapper.MapFromQuery(reader);
         }
 
         /// <summary>
@@ -94,17 +88,8 @@ namespace PokeGuide.Data
             sql = String.Format("{0} GROUP BY def.id)\nAS af ON a.id = af.id\nWHERE af.version IS NOT NULL", sql);
             DbDataReader reader = await ExecuteReaderAsync(sql, token);
 
-            var mapping = new List<Mapping>
-            {
-                new Mapping { Column = 0, PropertyName = "Id", TypeToCast = typeof(Int32) },
-                new Mapping { Column = 1, PropertyName = "Name", TypeToCast = typeof(String) },
-                new Mapping { Column = 2, PropertyName = "Effect", TypeToCast = typeof(String) },
-                new Mapping { Column = 3, PropertyName = "Description", TypeToCast = typeof(String) },
-                new Mapping { Column = 4, PropertyName = "FlavorText", TypeToCast = typeof(String) }
-            };
-
             var mapper = new DatabaseMapper<Ability>();
-            return mapper.MapFromQuery(reader, mapping);
+            return mapper.MapFromQuery(reader);
         }
 
         public async Task<Ability> LoadAbilityAsync(int id, int version, int language, CancellationToken token)
@@ -122,16 +107,9 @@ namespace PokeGuide.Data
             sql = String.Format("{0} LEFT JOIN pokemon_v2_abilityflavortext curr ON def.ability_id = curr.ability_id AND def.language_id = 9 AND curr.language_id = {1}\n", sql, language);
             sql = String.Format("{0} GROUP BY def.id)\nAS af ON a.id = af.id\nWHERE a.id = {1} AND af.version IS NOT NULL", sql, id);
             DbDataReader reader = await ExecuteReaderAsync(sql, token);
-            var mapping = new List<Mapping>
-            {
-                new Mapping { Column = 0, PropertyName = "Id", TypeToCast = typeof(Int32) },
-                new Mapping { Column = 1, PropertyName = "Name", TypeToCast = typeof(String) },
-                new Mapping { Column = 2, PropertyName = "Effect", TypeToCast = typeof(String) },
-                new Mapping { Column = 3, PropertyName = "Description", TypeToCast = typeof(String) },
-                new Mapping { Column = 4, PropertyName = "FlavorText", TypeToCast = typeof(String) }
-            };
+
             var mapper = new DatabaseMapper<Ability>();
-            return await mapper.MapSingleObject(reader, mapping);
+            return await mapper.MapSingleObject(reader, token);
         }
 
         /// <summary>
@@ -148,14 +126,8 @@ namespace PokeGuide.Data
             sql = String.Format("{0} GROUP BY def.egg_group_id)\nAS en ON e.id = en.id", sql);
             DbDataReader reader = await ExecuteReaderAsync(sql, token);
 
-            var mapping = new List<Mapping>
-            {
-                new Mapping { Column = 0, PropertyName = "Id", TypeToCast = typeof(Int32) },
-                new Mapping { Column = 1, PropertyName = "Name", TypeToCast = typeof(String) }
-            };
-
             var mapper = new DatabaseMapper<EggGroup>();
-            return mapper.MapFromQuery(reader, mapping);
+            return mapper.MapFromQuery(reader);
         }
 
         public async Task<EggGroup> LoadEggGroupAsync(int id, int language, CancellationToken token)
@@ -166,14 +138,8 @@ namespace PokeGuide.Data
             sql = String.Format("{0} GROUP BY def.egg_group_id)\nAS en ON e.id = en.id\nWHERE e.id = {1}", sql, id);
             DbDataReader reader = await ExecuteReaderAsync(sql, token);
 
-            var mapping = new List<Mapping>
-            {
-                new Mapping { Column = 0, PropertyName = "Id", TypeToCast = typeof(Int32) },
-                new Mapping { Column = 1, PropertyName = "Name", TypeToCast = typeof(String) }
-            };
-
             var mapper = new DatabaseMapper<EggGroup>();
-            return await mapper.MapSingleObject(reader, mapping);
+            return await mapper.MapSingleObject(reader, token);
         }
 
         /// <summary>
@@ -190,14 +156,21 @@ namespace PokeGuide.Data
             sql = String.Format("{0} GROUP BY def.type_id)\nAS tn ON t.id = tn.id", sql);
             DbDataReader reader = await ExecuteReaderAsync(sql, token);
 
-            var mapping = new List<Mapping>
-            {
-                new Mapping { Column = 0, PropertyName = "Id", TypeToCast = typeof(Int32) },
-                new Mapping { Column = 1, PropertyName = "Name", TypeToCast = typeof(String) }
-            };
+            var mapper = new DatabaseMapper<ElementType>();
+            return mapper.MapFromQuery(reader);
+        }
+
+        public async Task<ElementType> LoadTypeAsync(int id, int language, CancellationToken token)
+        {
+            string sql = String.Format("SELECT t.id, tn.name FROM pokemon_v2_type as t\n");
+            sql = String.Format("{0} LEFT JOIN\n(SELECT def.type_id AS id, IFNULL(curr.name, def.name) AS name FROM pokemon_v2_typename def\n", sql);
+            sql = String.Format("{0} LEFT JOIN pokemon_v2_typename curr ON def.type_id = curr.type_id AND def.language_id = 9 AND curr.language_id = {1}\n", sql, language);
+            sql = String.Format("{0} GROUP BY def.type_id)\nAS tn ON t.id = tn.id\n", sql);
+            sql = String.Format("{0} WHERE t.id = {1}", sql, id);
+            DbDataReader reader = await ExecuteReaderAsync(sql, token);
 
             var mapper = new DatabaseMapper<ElementType>();
-            return mapper.MapFromQuery(reader, mapping);
+            return await mapper.MapSingleObject(reader, token);
         }
 
         public async Task<List<Pokemon>> LoadAllPokemonAsync(int version, int language, CancellationToken token)
@@ -211,14 +184,8 @@ namespace PokeGuide.Data
             sql = String.Format("{0} order by ps.id", sql);
             DbDataReader reader = await ExecuteReaderAsync(sql, token);
 
-            var mapping = new List<Mapping>
-            {
-                new Mapping { Column = 0, PropertyName = "Id", TypeToCast = typeof(Int32) },
-                new Mapping { Column = 1, PropertyName = "Name", TypeToCast = typeof(String) }
-            };
-
             var mapper = new DatabaseMapper<Pokemon>();
-            return mapper.MapFromQuery(reader, mapping);
+            return mapper.MapFromQuery(reader);
         }
 
         public async Task<Pokemon> LoadPokemonAsync(int id, int version, int language, CancellationToken token)
@@ -284,6 +251,55 @@ namespace PokeGuide.Data
                 counter++;
             }
             return pokemon;
+        }
+
+        public async Task<DamageClass> LoadDamageClassAsync(int id, int language, CancellationToken token)
+        {
+            string sql = String.Format("SELECT mdc.id, mdcd.name FROM pokemon_v2_movedamageclass as mdc");
+            sql = String.Format("{0} LEFT JOIN\n(SELECT def.move_damage_class_id AS id, IFNULL(curr.name, def.name) AS name FROM pokemon_v2_movedamageclassdescription def\n", sql);
+            sql = String.Format("{0} LEFT JOIN pokemon_v2_movedamageclassdescription curr ON def.move_damage_class_id = curr.move_damage_class_id AND def.language_id = 9 AND curr.language_id = {1}\n", sql, language);
+            sql = String.Format("{0} GROUP BY def.move_damage_class_id)\nAS mdcd ON mdc.id = mdcd.id", sql);
+            DbDataReader reader = await ExecuteReaderAsync(sql, token);
+            var mapper = new DatabaseMapper<DamageClass>();
+            return await mapper.MapSingleObject(reader, token);
+        }
+
+        public async Task<Move> LoadMoveAsync(int id, int version, int language, CancellationToken token)
+        {
+            string sql = String.Format("SELECT m.id, m.power, m.pp, m.accuracy, m.priority, m.move_damage_class_id, m.type_id, mn.name FROM pokemon_v2_move as m\n");
+            sql = String.Format("{0} LEFT JOIN\n(SELECT def.move_id AS id, IFNULL(curr.name, def.name) AS name FROM pokemon_v2_movename def\n", sql);
+            sql = String.Format("{0} LEFT JOIN pokemon_v2_movename curr ON def.move_id = curr.move_id AND def.language_id = 9 AND curr.language_id = {1}\n", sql, language);
+            sql = String.Format("{0} GROUP BY def.move_id)\nAS mn ON m.id = mn.id\n", sql);
+            sql = String.Format("{0} WHERE m.id = {1}", sql, id);
+            DbDataReader reader = await ExecuteReaderAsync(sql, token);
+            Move result = null;
+
+            var mapper = new DatabaseMapper<Move>();
+            result = await mapper.MapSingleObject(reader, token);
+            int typeId = reader.GetInt32(reader.GetOrdinal("type_id"));
+            result.Type = await LoadTypeAsync(typeId, language, token);
+            int classId = reader.GetInt32(reader.GetOrdinal("move_damage_class_id"));
+            result.DamageClass = await LoadDamageClassAsync(classId, language, token);
+            sql = String.Format("SELECT id, power, pp, accuracy, type_id FROM pokemon_v2_movechange WHERE move_id = {0} and version_group_id =\n", id);
+            sql = String.Format("{0} (SELECT version_group_id FROM pokemon_v2_version WHERE id = {1})", sql, version);
+            DbDataReader reader2 = await ExecuteReaderAsync(sql, token);
+
+            if (await reader2.ReadAsync(token))
+            {
+                if (!String.IsNullOrWhiteSpace(reader2["power"].ToString()))
+                    result.Power = reader2.GetInt32(reader2.GetOrdinal("power"));
+                if (!String.IsNullOrWhiteSpace(reader2["pp"].ToString()))
+                    result.PowerPoints = reader2.GetInt32(reader2.GetOrdinal("pp"));
+                if (!String.IsNullOrWhiteSpace(reader2["accuracy"].ToString()))
+                    result.Accuracy = reader2.GetInt32(reader2.GetOrdinal("accuracy"));
+                if (!String.IsNullOrWhiteSpace(reader2["type_id"].ToString()))
+                {
+                    typeId = reader2.GetInt32(reader.GetOrdinal("type_id"));
+                    result.Type = await LoadTypeAsync(typeId, language, token);
+                }
+            }
+
+            return result;
         }
 
         /// <summary>

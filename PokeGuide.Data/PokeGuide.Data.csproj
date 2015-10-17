@@ -69,11 +69,13 @@
     <Compile Include="DatabaseMapper.cs" />
     <Compile Include="DataLoader.cs" />
     <Compile Include="Model\Ability.cs" />
+    <Compile Include="Model\DamageClass.cs" />
     <Compile Include="Model\ElementType.cs" />
     <Compile Include="Model\EggGroup.cs" />
     <Compile Include="Model\Mapping.cs" />
     <Compile Include="Model\GameVersion.cs" />
     <Compile Include="Model\ModelBase.cs" />
+    <Compile Include="Model\Move.cs" />
     <Compile Include="Model\Pokemon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

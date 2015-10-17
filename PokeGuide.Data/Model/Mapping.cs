@@ -10,7 +10,7 @@ namespace PokeGuide.Data.Model
         /// <summary>
         /// The sql column of the query result
         /// </summary>
-        public int Column { get; set; }
+        public string Column { get; set; }
         /// <summary>
         /// The name of the property in which the value should be stored
         /// </summary>
