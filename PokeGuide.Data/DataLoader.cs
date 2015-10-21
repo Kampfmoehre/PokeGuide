@@ -175,12 +175,12 @@ namespace PokeGuide.Data
 
         public async Task<List<Pokemon>> LoadAllPokemonAsync(int version, int language, CancellationToken token)
         {
-            string sql = String.Format("SELECT ps.id, psn.name FROM pokemon_v2_pokemonspecies as ps\n");
+            string sql = String.Format("SELECT ps.id, rtrim(psn.name || ' ' || pf.form_name) AS name FROM pokemon_v2_pokemonspecies as ps\n");
             sql = String.Format("{0} LEFT JOIN\n(SELECT def.pokemon_species_id AS id, IFNULL(curr.name, def.name) AS name, IFNULL(curr.genus, def.genus) AS genus FROM pokemon_v2_pokemonspeciesname def\n", sql);
             sql = String.Format("{0} LEFT JOIN pokemon_v2_pokemonspeciesname curr ON def.pokemon_species_id = curr.pokemon_species_id AND def.language_id = 9 AND curr.language_id = {1}\n", sql, language);
             sql = String.Format("{0} GROUP BY def.pokemon_species_id)\nAS psn ON ps.id = psn.id\n", sql);
             sql = String.Format("{0} LEFT JOIN pokemon_v2_pokemonform pf ON ps.id = pf.pokemon_id\n", sql);
-            sql = String.Format("{0} WHERE pf.version_group_id = (SELECT version_group_id FROM pokemon_v2_version WHERE id = {1})\n", sql, version);
+            sql = String.Format("{0} WHERE pf.version_group_id <= (SELECT version_group_id FROM pokemon_v2_version WHERE id = {1})\n", sql, version);
             sql = String.Format("{0} order by ps.id", sql);
             DbDataReader reader = await ExecuteReaderAsync(sql, token);
 
@@ -256,7 +256,7 @@ namespace PokeGuide.Data
         public async Task<DamageClass> LoadDamageClassAsync(int id, int language, CancellationToken token)
         {
             string sql = String.Format("SELECT mdc.id, mdcd.name FROM pokemon_v2_movedamageclass as mdc");
-            sql = String.Format("{0} LEFT JOIN\n(SELECT def.move_damage_class_id AS id, IFNULL(curr.name, def.name) AS name FROM pokemon_v2_movedamageclassdescription def\n", sql);
+            sql = String.Format("{0} LEFT JOIN\n(SELECT def.move_damage_class_id AS id, IFNULL(curr.description, def.description) AS name FROM pokemon_v2_movedamageclassdescription def\n", sql);
             sql = String.Format("{0} LEFT JOIN pokemon_v2_movedamageclassdescription curr ON def.move_damage_class_id = curr.move_damage_class_id AND def.language_id = 9 AND curr.language_id = {1}\n", sql, language);
             sql = String.Format("{0} GROUP BY def.move_damage_class_id)\nAS mdcd ON mdc.id = mdcd.id", sql);
             DbDataReader reader = await ExecuteReaderAsync(sql, token);
@@ -299,6 +299,41 @@ namespace PokeGuide.Data
                 }
             }
 
+            return result;
+        }
+
+        public async Task<MoveLearnMethod> LoadMoveLearnMethodAsync(int id, int language, CancellationToken token)
+        {
+            string sql = String.Format("SELECT mlm.id, mlmd.name, mlmd.description FROM pokemon_v2_movelearnmethod AS mlm\n");
+            sql = String.Format("{0} LEFT JOIN\n(SELECT def.move_learn_method_id AS id, IFNULL(curr.name, def.name) AS name, IFNULL(curr.description, def.description) AS description FROM pokemon_v2_movelearnmethodname def\n", sql);
+            sql = String.Format("{0} LEFT JOIN pokemon_v2_movelearnmethodname curr ON def.move_learn_method_id = curr.move_learn_method_id AND def.language_id = 9 AND curr.language_id = {1}\n", sql, language);
+            sql = String.Format("{0} GROUP BY def.move_learn_method_id)\nAS mlmd ON mlm.id = mlmd.id\n", sql);
+            sql = String.Format("{0} WHERE mlm.id = {1}", sql, id);
+            DbDataReader reader = await ExecuteReaderAsync(sql, token);
+
+            var mapper = new DatabaseMapper<MoveLearnMethod>();
+            return await mapper.MapSingleObject(reader, token);
+        }
+
+        public async Task<List<PokemonMove>> LoadPokemonMoveSetAsync(int pokemon, int version, int language, CancellationToken token)
+        {
+            string sql = String.Format("SELECT level, move_id, move_learn_method_id FROM pokemon_v2_pokemonmove\n");
+            sql = String.Format("{0} WHERE pokemon_id = {1} AND version_group_id =\n", sql, pokemon);
+            sql = String.Format("{0} (SELECT version_group_id FROM pokemon_v2_version WHERE id = {1})\n", sql, version);
+            sql = String.Format("{0} ORDER BY move_learn_method_id, level, 'order', move_id", sql);
+            DbDataReader reader = await ExecuteReaderAsync(sql, token);
+
+            var result = new List<PokemonMove>();
+            while (await reader.ReadAsync(token))
+            {
+                var element = new PokemonMove();                
+                int moveId = reader.GetInt32(reader.GetOrdinal("move_id"));
+                element.Move = await LoadMoveAsync(moveId, version, language, token);
+                element.Level = reader.GetInt32(reader.GetOrdinal("level"));
+                int learnMethodId = reader.GetInt32(reader.GetOrdinal("move_learn_method_id"));
+                element.LearnMethod = await LoadMoveLearnMethodAsync(learnMethodId, language, token);
+                result.Add(element);
+            }
             return result;
         }
 

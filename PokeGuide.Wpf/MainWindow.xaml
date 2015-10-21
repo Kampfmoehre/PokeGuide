@@ -6,7 +6,7 @@
         xmlns:ignore="http://www.galasoft.ch/ignore"
         mc:Ignorable="d ignore"
         Height="300"
-        Width="300"
+        Width="600"
         Title="MVVM Light Application"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
     
@@ -26,11 +26,43 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="100"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Label Content="Spiel:"/>
         <ComboBox Grid.Column="1" ItemsSource="{Binding Versions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedVersion}"/>
         <Label Grid.Row="1" Content="Pokemon"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Pokemon}" DisplayMemberPath="Name"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Pokemon}" SelectedItem="{Binding SelectedPokemon}" DisplayMemberPath="Name"/>
+        <Label Grid.Row ="2" Content="Details"/>
+        <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label Content="Typ 1:"/>
+            <TextBlock Grid.Column="1" Text="{Binding SelectedPokemon.Type1.Name}"/>
+            <Label Grid.Row="1" Content="Typ 2:"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedPokemon.Type2.Name}"/>
+            <Label Grid.Row="2" Content="Attacken:"/>
+            <DataGrid Grid.Row="2" Grid.Column="1" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ItemsSource="{Binding MoveSet}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Level" Binding="{Binding Level}"/>
+                    <DataGridTextColumn Header="Attacke" Binding="{Binding Move.Name}"/>
+                    <DataGridTextColumn Header="Typ" Binding="{Binding Move.Type.Name}"/>
+                    <DataGridTextColumn Header="Klasse" Binding="{Binding Move.DamageClass.Name}"/>
+                    <DataGridTextColumn Header="Stärke" Binding="{Binding Move.Power}"/>
+                    <DataGridTextColumn Header="Genauigkeit" Binding="{Binding Move.Accuracy}"/>
+                    <DataGridTextColumn Header="Angriffspunkte" Binding="{Binding Move.PowerPoints}"/>
+                    <DataGridTextColumn Header="Prioriät" Binding="{Binding Move.Priority}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
     </Grid>
 </Window>

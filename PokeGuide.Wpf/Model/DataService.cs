@@ -63,5 +63,43 @@ namespace PokeGuide.Wpf.Model
                 callback(null, ex);
             }
         }
+
+        public async void LoadPokemonMoveSet(int pokemon, int version, Action<List<MoveLearnElement>, Exception> callback, CancellationToken token)
+        {
+            try
+            {
+                List<Data.Model.PokemonMove> result = null;
+                using (var loader = new DataLoader(_database))
+                {
+                    result = await loader.LoadPokemonMoveSetAsync(pokemon, version, _language, token);
+                }
+                callback(result.Select(s => new MoveLearnElement
+                {
+                    Id = s.Id,
+                    LearnMethod = new MoveLearnMethod
+                    {
+                        Description = s.LearnMethod.Description,
+                        Id = s.LearnMethod.Id,
+                        Name = s.LearnMethod.Name
+                    },
+                    Level = s.Level,
+                    Move = new Move
+                    {
+                        Accuracy = s.Move.Accuracy,
+                        DamageClass = new DamageClass { Id = s.Move.DamageClass.Id, Name = s.Move.DamageClass.Name },
+                        Id = s.Move.Id,
+                        Name = s.Move.Name,
+                        Power = s.Move.Power,
+                        PowerPoints = s.Move.PowerPoints,
+                        Priority = s.Move.Priority,
+                        Type = new ElementType { Id = s.Move.Type.Id, Name = s.Move.Type.Name }
+                    }
+                }).ToList(), null);
+            }
+            catch (Exception ex)
+            {
+                callback(null, ex);
+            }
+        }
     }
 }

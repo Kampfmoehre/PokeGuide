@@ -51,7 +51,7 @@ namespace PokeGuide.Data
                 PropertyInfo prop = objectToWrite.GetType().GetProperty(map.PropertyName);
                 Type t = map.TypeToCast;
                 Object value = reader[map.Column];
-                if (value != null)
+                if (value != null && value != DBNull.Value)
                 {
                     Type nullableType = Nullable.GetUnderlyingType(prop.PropertyType);
                     if (nullableType != null)
