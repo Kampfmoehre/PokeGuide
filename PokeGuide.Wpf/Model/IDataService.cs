@@ -14,6 +14,7 @@ namespace PokeGuide.Wpf.Model
         /// Loads a list of all game versions
         /// </summary>
         /// <param name="callback">The callback with the result</param>
+        /// <param name="token">The cancellation token</param>
         void LoadGameVersionsAsync(Action<List<GameVersion>, Exception> callback, CancellationToken token);
         /// <summary>
         /// Loads a list of all Pokémon
@@ -21,7 +22,15 @@ namespace PokeGuide.Wpf.Model
         /// <param name="version">The version for which all Pokémon should be loaded</param>
         /// <param name="callback">The callback with the result</param>
         /// <param name="token">The cancellation token</param>
-        void LoadAllPokemonAsync(int version, Action<List<Pokemon>, Exception> callback, CancellationToken token);
+        void LoadAllSpeciesAsync(int generation, Action<List<Species>, Exception> callback, CancellationToken token);
+        /// <summary>
+        /// Loads all forms for a species
+        /// </summary>
+        /// <param name="species">The species</param>
+        /// <param name="versionGroup">The ID of the version group</param>
+        /// <param name="callback">The callback with the result</param>
+        /// <param name="token">The cancellation token</param>
+        void LoadPokemonFormsAsync(Species species, int versionGroup, Action<List<PokemonForm>, Exception> callback, CancellationToken token);        
         /// <summary>
         /// Loads a complete moveset for a Pokémon
         /// </summary>

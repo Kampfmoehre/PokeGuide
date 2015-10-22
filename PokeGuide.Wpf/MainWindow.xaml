@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ignore="http://www.galasoft.ch/ignore"
         mc:Ignorable="d ignore"
-        Height="300"
-        Width="600"
+        Height="400"
+        Width="700"
         Title="MVVM Light Application"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
     
@@ -27,16 +27,23 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="100"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Label Content="Spiel:"/>
         <ComboBox Grid.Column="1" ItemsSource="{Binding Versions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedVersion}"/>
         <Label Grid.Row="1" Content="Pokemon"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Pokemon}" SelectedItem="{Binding SelectedPokemon}" DisplayMemberPath="Name"/>
-        <Label Grid.Row ="2" Content="Details"/>
-        <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2">
+        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Species}" SelectedItem="{Binding SelectedSpecies}" DisplayMemberPath="Name"/>
+        <Label Grid.Row="1" Grid.Column="2" Content="Form"/>
+        <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding Forms}" SelectedItem="{Binding SelectedForm}" DisplayMemberPath="Name"/>
+        <Label Grid.Row ="2" Content="Details"/>        
+        <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="50"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -44,14 +51,32 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Label Content="Typ 1:"/>
-            <TextBlock Grid.Column="1" Text="{Binding SelectedPokemon.Type1.Name}"/>
+            <TextBlock Grid.Column="1" Text="{Binding SelectedForm.Type1.Name}"/>
             <Label Grid.Row="1" Content="Typ 2:"/>
-            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedPokemon.Type2.Name}"/>
-            <Label Grid.Row="2" Content="Attacken:"/>
-            <DataGrid Grid.Row="2" Grid.Column="1" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ItemsSource="{Binding MoveSet}">
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedForm.Type2.Name}"/>
+            <Label Grid.Row="2" Content="Fähigkeit 1:"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedForm.Ability1.Name}"/>
+            <Label Grid.Row="3" Content="Fähigkeit 2:"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedForm.Ability2.Name}"/>
+            <Label Grid.Row="4" Content="Versteckte Fähigkeit:"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedForm.HiddenAbility.Name}"/>
+            <Label Grid.Row="0" Grid.Column="2"  Content="Basis Erfahrung:"/>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding SelectedForm.BaseExperience}"/>
+            <Label Grid.Row="1" Grid.Column="2" Content="Basis Zuneigung:"/>
+            <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding SelectedForm.Species.BaseHappiness}"/>
+            <DataGrid Grid.RowSpan="2" Grid.Column="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ItemsSource="{Binding SelectedPokemon.BaseStats}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Name}"/>
+                    <DataGridTextColumn Header="Basis" Binding="{Binding StatValue}"/>
+                    <DataGridTextColumn Header="Ev" Binding="{Binding EffortValue}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Label Grid.Row="5" Content="Attacken:"/>
+            <DataGrid Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" ItemsSource="{Binding MoveSet}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Level" Binding="{Binding Level}"/>
                     <DataGridTextColumn Header="Attacke" Binding="{Binding Move.Name}"/>

@@ -15,13 +15,13 @@ namespace PokeGuide.Wpf.Design
             callback(item, null);
         }
 
-        public void LoadAllPokemonAsync(int version, Action<List<Pokemon>, Exception> callback, CancellationToken token)
+        public void LoadAllSpeciesAsync(int generation, Action<List<Species>, Exception> callback, CancellationToken token)
         {
-            var list = new List<Pokemon>
+            var list = new List<Species>
             {
-                new Pokemon { Id = 1, Name = "Bisasam" },
-                new Pokemon { Id = 2, Name = "Glumanda" },
-                new Pokemon { Id = 3, Name = "Schiggy" }
+                new Species { Id = 1, Name = "Bisasam" },
+                new Species { Id = 2, Name = "Glumanda" },
+                new Species { Id = 3, Name = "Schiggy" }
             };
             callback(list, null);
         }
@@ -35,6 +35,30 @@ namespace PokeGuide.Wpf.Design
                 new GameVersion { Id = 3, Name = "Gelb" }
             };
             callback(list, null);
+        }
+
+        public void LoadPokemonFormsAsync(Species species, int versionGroup, Action<List<PokemonForm>, Exception> callback, CancellationToken token)
+        {
+            var pokemonForm = new PokemonForm
+            {
+                BaseExperience = 40,
+                Height = 20,
+                Id = 1,
+                Name = "Mega Glurak X",
+                Species = new Species
+                {
+                    BaseHappiness = 40,
+                    CaptureRate = 50,
+                    Genus = "Drache",
+                    HatchCounter = 12,
+                    Id = 2,
+                    Name = "Glurak"                    
+                },
+                Type1 = new ElementType { Id = 4, Name = "Feuer" },
+                Type2 = new ElementType { Id = 6, Name = "Wasser" },
+                Weight = 80
+            };
+            callback(new List<PokemonForm> { pokemonForm }, null);
         }
 
         public void LoadPokemonMoveSet(int pokemon, int version, Action<List<MoveLearnElement>, Exception> callback, CancellationToken token)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using PokeGuide.Data;
@@ -25,16 +26,24 @@ namespace PokeGuide.Wpf.Model
             callback(item, null);
         }
 
-        public async void LoadAllPokemonAsync(int version, Action<List<Pokemon>, Exception> callback, CancellationToken token)
+        public async void LoadAllSpeciesAsync(int generation, Action<List<Species>, Exception> callback, CancellationToken token)
         {
             try
             {
-                List<Data.Model.Pokemon> list = null;
+                List<Data.Model.Species> list = null;
                 using (var loader = new DataLoader(_database))
                 {
-                    list = await loader.LoadAllPokemonAsync(version, _language, token);
+                    list = await loader.LoadAllSpeciesAsync(generation, _language, token);
                 }
-                callback(list.Select(s => new Pokemon { Id = s.Id, Name = s.Name }).ToList(), null);
+                callback(list.Select(s => new Species
+                {
+                    BaseHappiness = s.BaseHappiness,
+                    CaptureRate = s.CaptureRate,
+                    Genus = s.Genus,
+                    HatchCounter = s.HatchCounter,
+                    Id = s.Id,                    
+                    Name = s.Name                    
+                }).ToList(), null);
             }
             catch (Exception ex)
             {
@@ -51,11 +60,14 @@ namespace PokeGuide.Wpf.Model
                 {
                     result = await loader.LoadGamesAsync(_language, token);
                 }
-                var resultList = new List<GameVersion>();
-                foreach (Data.Model.GameVersion version in result)
+
+                List<GameVersion> resultList = result.Select(s => new GameVersion
                 {
-                    resultList.Add(new GameVersion { Id = version.Id, Name = version.Name });
-                }
+                    Generation = s.Generation,
+                    Id = s.Id,
+                    Name = s.Name,
+                    VersionGroup = s.VersionGroupId
+                }).ToList();
                 callback(resultList, null);
             }
             catch (Exception ex)
@@ -71,7 +83,7 @@ namespace PokeGuide.Wpf.Model
                 List<Data.Model.PokemonMove> result = null;
                 using (var loader = new DataLoader(_database))
                 {
-                    result = await loader.LoadPokemonMoveSetAsync(pokemon, version, _language, token);
+                    //result = await loader.LoadPokemonMoveSetAsync(pokemon, version, _language, token);
                 }
                 callback(result.Select(s => new MoveLearnElement
                 {
@@ -95,6 +107,58 @@ namespace PokeGuide.Wpf.Model
                         Type = new ElementType { Id = s.Move.Type.Id, Name = s.Move.Type.Name }
                     }
                 }).ToList(), null);
+            }
+            catch (Exception ex)
+            {
+                callback(null, ex);
+            }
+        }
+
+        public async void LoadPokemonFormsAsync(Species species, int versionGroup, Action<List<PokemonForm>, Exception> callback, CancellationToken token)
+        {
+            try
+            {
+                List<Data.Model.PokemonForm> result = null;
+                using (var loader = new DataLoader(_database))
+                {
+                    result = await loader.LoadFormsAsync(species.Id, versionGroup, _language, token);
+                }
+                List<PokemonForm> list = result.Select(s => new PokemonForm
+                {
+                    Ability1 = s.Ability1 == null ? null : new Ability
+                    {
+                        Description = s.Ability1.Description,
+                        Effect = s.Ability1.Effect,
+                        FlavorText = s.Ability1.FlavorText,
+                        Id = s.Ability1.Id,
+                        Name = s.Ability1.Name
+                    },
+                    Ability2 = s.Ability2 == null ? null : new Ability
+                    {
+                        Description = s.Ability2.Description,
+                        Effect = s.Ability2.Effect,
+                        FlavorText = s.Ability2.FlavorText,
+                        Id = s.Ability2.Id,
+                        Name = s.Ability2.Name
+                    },
+                    BaseExperience = s.BaseExperience,
+                    Height = s.Height,
+                    HiddenAbility = s.HiddenAbility == null ? null : new Ability
+                    {
+                        Description = s.HiddenAbility.Description,
+                        Effect = s.HiddenAbility.Effect,
+                        FlavorText = s.HiddenAbility.FlavorText,
+                        Id = s.HiddenAbility.Id,
+                        Name = s.HiddenAbility.Name
+                    },
+                    Id = s.Id,
+                    Name = s.Name,
+                    Species = species,
+                    Type1 = new ElementType { Id = s.Type1.Id, Name = s.Type1.Name },
+                    Type2 = s.Type2 == null ? null : new ElementType { Id = s.Type2.Id, Name = s.Type2.Name },
+                    Weight = s.Weight
+                }).ToList();
+                callback(list, null);
             }
             catch (Exception ex)
             {

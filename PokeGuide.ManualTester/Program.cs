@@ -27,14 +27,24 @@ namespace PokeGuide.ManualTester
             try
             {
                 using (var dl = new DataLoader("database.sqlite3"))
-                {
-                    List<Pokemon> pokemon = await dl.LoadAllPokemonAsync(23, 6, source.Token);
-                    //List<GameVersion> list = await dl.LoadGamesAsync(6, source.Token);
-                    //List<EggGroup> eggGroups = await dl.LoadEggGroupsAsync(6, source.Token);
-                    //List<ElementType> types = await dl.LoadTypesAsync(6, source.Token);
-                    //Ability ability = await dl.LoadAbilityAsync(53, 7, 6, source.Token);
+                {                    
+                    List<GameVersion> list = await dl.LoadGamesAsync(6, source.Token);
+                    List<Ability> abilities = await dl.LoadAbilitiesAsync(7, 6, source.Token);
+                    Ability ability = await dl.LoadAbilityAsync(153, 11, 6, source.Token);
+                    List<EggGroup> eggGroups = await dl.LoadEggGroupsAsync(6, source.Token);
+                    EggGroup groupy = await dl.LoadEggGroupAsync(3, 6, source.Token);
+                    List<ElementType> types = await dl.LoadTypesAsync(6, 6, source.Token);
+                    ElementType type = await dl.LoadTypeAsync(17, 3, 6, source.Token);
+                    List<Species> species = await dl.LoadAllSpeciesAsync(3, 6, source.Token);
+                    List<PokemonForm> forms = await dl.LoadFormsAsync(13, 3, 6, source.Token);
+                    //List<Pokemon> pokemon = await dl.LoadAllPokemonAsync(23, 6, source.Token);
+                    //
+                    //
+                    //
+                    //
                     //Pokemon pokemon = await dl.LoadPokemonAsync(1, 25, 6, source.Token);
-                    //List<Ability> abilities = await dl.LoadAbilitiesAsync(7, 6, source.Token);
+                    //
+                    //
                     //Move move = await dl.LoadMoveAsync(17, 4, 6, source.Token);
                     //List<PokemonMove> moveset = await dl.LoadPokemonMoveSetAsync(45, 23, 6, source.Token);
                     //foreach (GameVersion game in list)

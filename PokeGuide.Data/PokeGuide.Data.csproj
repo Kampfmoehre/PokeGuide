@@ -51,6 +51,24 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -72,13 +90,17 @@
     <Compile Include="Model\DamageClass.cs" />
     <Compile Include="Model\ElementType.cs" />
     <Compile Include="Model\EggGroup.cs" />
+    <Compile Include="Model\IModel.cs" />
     <Compile Include="Model\Mapping.cs" />
     <Compile Include="Model\GameVersion.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Model\Move.cs" />
     <Compile Include="Model\MoveLearnMethod.cs" />
     <Compile Include="Model\Pokemon.cs" />
+    <Compile Include="Model\PokemonForm.cs" />
     <Compile Include="Model\PokemonMove.cs" />
+    <Compile Include="Model\Species.cs" />
+    <Compile Include="Model\Stat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
