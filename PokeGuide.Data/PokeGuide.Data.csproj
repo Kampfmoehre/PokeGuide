@@ -91,6 +91,7 @@
     <Compile Include="Model\ElementType.cs" />
     <Compile Include="Model\EggGroup.cs" />
     <Compile Include="Model\IModel.cs" />
+    <Compile Include="Model\Language.cs" />
     <Compile Include="Model\Mapping.cs" />
     <Compile Include="Model\GameVersion.cs" />
     <Compile Include="Model\ModelBase.cs" />

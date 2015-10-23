@@ -24,5 +24,9 @@ namespace PokeGuide.Data.Model
                "LEFT JOIN pokemon_v2_versionname curr ON def.version_id = curr.version_id AND def.language_id = 9 AND curr.language_id = {0}\n" +
                "GROUP BY def.version_id)\nAS vn ON v.id = vn.id";
         }
+        internal override string GetCountQuery()
+        {
+            return "SELECT count(id) FROM pokemon_v2_version";
+        }
     }
 }

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeGuide.Data", "PokeGuide
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeGuide.Wpf", "PokeGuide.Wpf\PokeGuide.Wpf.csproj", "{A5A52F66-714A-4855-BFDF-D62E96343969}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeGuide.Common", "PokeGuide.Common\PokeGuide.Common.csproj", "{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{A5A52F66-714A-4855-BFDF-D62E96343969}.Release|x64.Build.0 = Release|x64
 		{A5A52F66-714A-4855-BFDF-D62E96343969}.Release|x86.ActiveCfg = Release|x86
 		{A5A52F66-714A-4855-BFDF-D62E96343969}.Release|x86.Build.0 = Release|x86
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Debug|x64.Build.0 = Debug|Any CPU
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Debug|x86.Build.0 = Debug|Any CPU
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Release|x64.ActiveCfg = Release|Any CPU
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Release|x64.Build.0 = Release|Any CPU
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Release|x86.ActiveCfg = Release|Any CPU
+		{001F4FF8-A69A-4CA2-AEB4-38C4B787131B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

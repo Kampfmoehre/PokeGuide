@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Threading;
 using PokeGuide.Wpf.Model;
 
 namespace PokeGuide.Wpf.ViewModel
@@ -15,16 +19,73 @@ namespace PokeGuide.Wpf.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
-        readonly IDataService _dataService;
+        Progress<double> _progress;
+        double __currentProgress;
+        string _currentAction;
+        readonly IStaticDataService _staticDataService;
+        readonly IPokemonService _pokemonService;
         CancellationTokenSource _tokenSource;
+        ObservableCollection<Language> _languages;
         ObservableCollection<GameVersion> _versions;
         GameVersion _selectedVersion;
         ObservableCollection<Species> _species;
         Species _selectedSpecies;
         ObservableCollection<PokemonForm> _forms;
         PokemonForm _selectedForm;
-        //ObservableCollection<MoveLearnElement> _moveSet;
+        RelayCommand _cancelLoadingCommand;
 
+        /// <summary>
+        /// Gets the MyCommand.
+        /// </summary>
+        public RelayCommand CancelLoadingCommand
+        {
+            get
+            {
+                return _cancelLoadingCommand ?? (_cancelLoadingCommand = new RelayCommand(() =>
+                    {
+                        _tokenSource.Cancel();
+                    },
+                    () => true));
+            }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public double CurrentProgress
+        {
+            get { return __currentProgress; }
+            set { Set(() => CurrentProgress, ref __currentProgress, value); }
+        }                
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public string CurrentAction
+        {
+            get { return _currentAction; }
+            set { Set(() => CurrentAction, ref _currentAction, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public ObservableCollection<Language> Languages
+        {
+            get { return _languages; }
+            set { Set(() => Languages, ref _languages, value); }
+        }
+        Language _selectedLanguage;
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public Language SelectedLanguage
+        {
+            get { return _selectedLanguage; }
+            set
+            {
+                Set(() => SelectedLanguage, ref _selectedLanguage, value);
+                if (value != null)
+                    LoadVersions(value.Id);
+            }
+        }
         /// <summary>
         /// Sets and gets versions
         /// </summary>
@@ -68,7 +129,7 @@ namespace PokeGuide.Wpf.ViewModel
                 if (value == null)
                     Forms = null;
                 else
-                    LoadForms(value, SelectedVersion.Id);
+                    LoadForms(value, SelectedVersion.VersionGroup);
             }
         }        
         /// <summary>
@@ -88,81 +149,71 @@ namespace PokeGuide.Wpf.ViewModel
             set { Set(() => SelectedForm, ref _selectedForm, value); }
         }
 
-        //Species _selectedPokemonIndex;
-        ///// <summary>
-        ///// Sets and gets the 
-        ///// </summary>
-        //public Species SelectedPokemonIndex
-        //{
-        //    get { return _selectedPokemonIndex; }
-        //    set
-        //    {
-        //        Set(() => SelectedPokemonIndex, ref _selectedPokemonIndex, value);
-        //        if (value != null)
-        //            LoadPokemon(value.Id, SelectedVersion.Id);
-        //    }
-        //}
-
-
-
-        ///// <summary>
-        ///// Sets and gets the moveset
-        ///// </summary>
-        //public ObservableCollection<MoveLearnElement> MoveSet
-        //{
-        //    get { return _moveSet; }
-        //    set { Set(() => MoveSet, ref _moveSet, value); }
-        //}
-
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel(IDataService dataService)
+        public MainViewModel(IStaticDataService staticDataService, IPokemonService pokemonService)
         {
             _tokenSource = new CancellationTokenSource();
-            _dataService = dataService;
-            _dataService.LoadGameVersionsAsync((list, error) =>
+            _staticDataService = staticDataService;
+            _pokemonService = pokemonService;
+            _progress = new Progress<double>();
+            _progress.ProgressChanged += (s, e) => CurrentProgress = e;
+            
+            Task.Factory.StartNew(async () =>
             {
-                if (error != null)
+                List<Language> languages = await _staticDataService.LoadLanguages(6, _tokenSource.Token);
+                
+                DispatcherHelper.CheckBeginInvokeOnUI(() =>
                 {
-                    return;
-                }
+                    if (_tokenSource.IsCancellationRequested)
+                        return;
+                    Languages = new ObservableCollection<Language>(languages);
+                    SelectedLanguage = Languages.First(f => f.Id == 6);                    
+                });
+            });
+        }
 
-                Versions = new ObservableCollection<GameVersion>(list);
+        async void LoadVersions(int language)
+        {
+            CurrentAction = "Loading games ...";
+            List<GameVersion> versions = await _staticDataService.LoadGameVersionAsync(language, _progress, _tokenSource.Token);
+            DispatcherHelper.CheckBeginInvokeOnUI(() =>
+            {
+                if (_tokenSource.IsCancellationRequested)
+                    return;
+                Versions = new ObservableCollection<GameVersion>(versions);
                 SelectedVersion = Versions.First();
-            }, _tokenSource.Token);
+                CurrentAction = "";
+            });
         }
 
-        void LoadAllSpecies(int generation)
+        async void LoadAllSpecies(int generation)
         {
-            _dataService.LoadAllSpeciesAsync(generation, (list, error) =>
+            CurrentAction = "Loading species ...";
+            List<Species> species = await _pokemonService.LoadAllSpeciesAsync(generation, SelectedLanguage.Id, _progress, _tokenSource.Token);
+            DispatcherHelper.CheckBeginInvokeOnUI(() =>
             {
-                if (error != null)
+                if (_tokenSource.IsCancellationRequested)
                     return;
-                Species = new ObservableCollection<Species>(list);
+                Species = new ObservableCollection<Species>(species);
                 SelectedSpecies = Species.First();
-            }, _tokenSource.Token);
+                CurrentAction = "";
+            });
         }
-        void LoadForms(Species species, int versionGroup)
+        async void LoadForms(Species species, int versionGroup)
         {
-            _dataService.LoadPokemonFormsAsync(species, versionGroup, (list, error) =>
+            CurrentAction = "Loading forms ...";
+            List<PokemonForm> forms = await _pokemonService.LoadPokemonFormsAsync(species, versionGroup, SelectedLanguage.Id, _progress, _tokenSource.Token);
+            DispatcherHelper.CheckBeginInvokeOnUI(() =>
             {
-                if (error != null)
+                if (_tokenSource.IsCancellationRequested)
                     return;
-                Forms = new ObservableCollection<PokemonForm>(list);
+                Forms = new ObservableCollection<PokemonForm>(forms);
                 SelectedForm = Forms.First();
-            }, _tokenSource.Token);
-        }
-
-        //void LoadPokemon(int id, int version)
-        //{
-        //    _dataService.LoadPokemonAsync(id, version, (pokemon, error) =>
-        //    {
-        //        if (error != null)
-        //            return;
-        //        //SelectedPokemon = pokemon;
-        //    }, _tokenSource.Token);
-        //}
+                CurrentAction = "";
+            });
+        }        
 
         //void LoadMoveSet(int pokemon, int version)
         //{

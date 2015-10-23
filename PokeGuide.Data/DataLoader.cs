@@ -71,15 +71,28 @@ namespace PokeGuide.Data
         }
 
         /// <summary>
-        /// Loads all games that exists in the database.
+        /// Loads a list of all languages with localized names
         /// </summary>
         /// <param name="language">The ID of the language</param>
         /// <param name="token">A token to cancel the query</param>
+        /// <returns>A list of languages</returns>
+        public async Task<List<Language>> LoadLanguagesAsync(int language, CancellationToken token)
+        {
+            var mapper = new DatabaseMapper<Language>(Connection);
+            return await mapper.MapFromQueryAsync(new object[] { language }, null, token);
+        }
+
+        /// <summary>
+        /// Loads all games that exists in the database.
+        /// </summary>
+        /// <param name="language">The ID of the language</param>
+        /// <param name="progress">An interface to track progress of the query</param>
+        /// <param name="token">A token to cancel the query</param>
         /// <returns>A list of <see cref="GameVersion"/>s.</returns>
-        public async Task<List<GameVersion>> LoadGamesAsync(int language, CancellationToken token)
+        public async Task<List<GameVersion>> LoadGamesAsync(int language, IProgress<double> progress, CancellationToken token)
         {
             var mapper = new DatabaseMapper<GameVersion>(Connection);
-            return await mapper.MapFromQueryAsync(new object[] { language }, token);
+            return await mapper.MapFromQueryAsync(new object[] { language }, progress, token);
         }
 
         /// <summary>
@@ -87,12 +100,13 @@ namespace PokeGuide.Data
         /// </summary>
         /// <param name="versionGroup">The ID of the version group</param>
         /// <param name="language">The ID of the language</param>
+        /// <param name="progress">An interface to track the query progress</param>
         /// <param name="token">A token to cancel the query</param>
         /// <returns>A list of <see cref="Ability"/>s.</returns>
-        public async Task<List<Ability>> LoadAbilitiesAsync(int versionGroup, int language, CancellationToken token)
+        public async Task<List<Ability>> LoadAbilitiesAsync(int versionGroup, int language, IProgress<double> progress, CancellationToken token)
         {
             var mapper = new DatabaseMapper<Ability>(Connection);
-            return await mapper.MapFromQueryAsync(new object[] { language, versionGroup }, token);
+            return await mapper.MapFromQueryAsync(new object[] { language, versionGroup }, progress, token);
         }
 
         /// <summary>
@@ -119,7 +133,7 @@ namespace PokeGuide.Data
         public async Task<List<EggGroup>> LoadEggGroupsAsync(int language, CancellationToken token)
         {
             var mapper = new DatabaseMapper<EggGroup>(Connection);
-            return await mapper.MapFromQueryAsync(new object[] { language }, token);
+            return await mapper.MapFromQueryAsync(new object[] { language }, null, token);
         }
 
         /// <summary>
@@ -145,7 +159,7 @@ namespace PokeGuide.Data
         public async Task<List<ElementType>> LoadTypesAsync(int generation, int language, CancellationToken token)
         {
             var mapper = new DatabaseMapper<ElementType>(Connection);
-            return await mapper.MapFromQueryAsync(new object[] { language, generation }, token);
+            return await mapper.MapFromQueryAsync(new object[] { language, generation }, null, token);
         }
 
         /// <summary>
@@ -160,6 +174,9 @@ namespace PokeGuide.Data
         public async Task<ElementType> LoadTypeAsync(int id, int generation, int language, CancellationToken token)
         {
             var mapper = new DatabaseMapper<ElementType>(Connection);
+            // Convert Fairy to normal before 6th gen
+            if (generation < 6 && id == 18)
+                id = 1;
             return await mapper.MapSingleObjectAsync(new object[] { language, generation, id }, token);
         }
 
@@ -168,12 +185,13 @@ namespace PokeGuide.Data
         /// </summary>
         /// <param name="generation">The ID of the generation</param>
         /// <param name="language">The ID of the language</param>
+        /// <param name="progress">An interface to track the progress of the query</param>
         /// <param name="token">A token to cancel the query</param>
         /// <returns>A list of species</returns>
-        public async Task<List<Species>> LoadAllSpeciesAsync(int generation, int language, CancellationToken token)
+        public async Task<List<Species>> LoadAllSpeciesAsync(int generation, int language, IProgress<double> progress, CancellationToken token)
         {
             var mapper = new DatabaseMapper<Species>(Connection);
-            return await mapper.MapFromQueryAsync(new object[] { language, generation }, token);
+            return await mapper.MapFromQueryAsync(new object[] { language, generation }, progress, token);
         }
 
         /// <summary>
@@ -184,10 +202,12 @@ namespace PokeGuide.Data
         /// <param name="language">The ID of the language</param>
         /// <param name="token">A token to cancel the query</param>
         /// <returns>A list of forms</returns>
-        public async Task<List<PokemonForm>> LoadFormsAsync(int species, int versionGroup, int language, CancellationToken token)
+        public async Task<List<PokemonForm>> LoadFormsAsync(int species, int versionGroup, int language, IProgress<double> progress, CancellationToken token)
         {
+            var subProgress = new Progress<double>();
+            subProgress.ProgressChanged += (s, e) => { progress.Report(Math.Round(e / 2, 1)); };
             var mapper = new DatabaseMapper<PokemonForm>(Connection);
-            List<PokemonForm> result = await mapper.MapFromQueryAsync(new object[] { language, species, versionGroup }, token);
+            List<PokemonForm> result = await mapper.MapFromQueryAsync(new object[] { language, species, versionGroup }, subProgress, token);
             int gen = await GetGenerationFromVersionGroup(versionGroup, token);
             //foreach (PokemonForm form in result)
             //{
@@ -211,6 +231,7 @@ namespace PokeGuide.Data
             //    if (x.HiddenAbility != null)
             //        x.HiddenAbility = await LoadAbilityAsync(x.HiddenAbility.Id, versionGroup, language, token);
             //});
+            int processed = result.Count;
             result.ForEach(async x =>
             {
                 x.Type1 = await LoadTypeAsync(x.Type1.Id, gen, language, token);
@@ -221,6 +242,8 @@ namespace PokeGuide.Data
                     x.Ability2 = await LoadAbilityAsync(x.Ability2.Id, versionGroup, language, token);
                 if (gen >= 5 && x.HiddenAbility != null)
                     x.HiddenAbility = await LoadAbilityAsync(x.HiddenAbility.Id, versionGroup, language, token);
+                processed++;
+                progress.Report(Math.Round(processed / (double)(result.Count * 2) * 100, 1));
             });
             return result;
         }        

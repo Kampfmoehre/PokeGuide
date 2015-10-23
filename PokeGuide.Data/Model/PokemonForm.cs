@@ -46,5 +46,13 @@ namespace PokeGuide.Data.Model
                 "LEFT JOIN pokemon_v2_pokemonability AS pa3 ON p.id = pa3.pokemon_id AND pa3.slot = 3\n" +
                 "WHERE ps.id = {1} AND pf.version_group_id <= {2}\nORDER BY pf.'order'";
         }
+
+        internal override string GetCountQuery()
+        {
+            return "SELECT count(pf.id) FROM pokemon_v2_pokemonform AS pf\n" +
+                "LEFT JOIN pokemon_v2_pokemon AS p ON p.id = pf.pokemon_id\n" +
+                "LEFT JOIN pokemon_v2_pokemonspecies AS ps ON ps.id = p.pokemon_species_id\n" +
+                "WHERE ps.id = {1} AND pf.version_group_id <= {2}";
+        }
     }
 }

@@ -32,5 +32,10 @@ namespace PokeGuide.Data.Model
         {
             return GetListQuery() + " AND ps.id = {2}";
         }
+        internal override string GetCountQuery()
+        {
+            return "SELECT count(ps.id) FROM pokemon_v2_pokemonspecies AS ps\n" +
+                "WHERE ps.generation_id <= {1}";
+        }
     }
 }

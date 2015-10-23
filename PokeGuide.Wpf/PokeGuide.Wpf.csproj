@@ -121,22 +121,27 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Design\DesignDataService.cs" />
+    <Compile Include="Converter\GenerationToVisibilityConverter.cs" />
+    <Compile Include="Design\DesignPokemonService.cs" />
+    <Compile Include="Design\DesignStaticDataService.cs" />
     <Compile Include="Model\Ability.cs" />
     <Compile Include="Model\DamageClass.cs" />
     <Compile Include="Model\DataItem.cs" />
-    <Compile Include="Model\DataService.cs" />
     <Compile Include="Model\ElementType.cs" />
     <Compile Include="Model\GameVersion.cs" />
-    <Compile Include="Model\IDataService.cs" />
+    <Compile Include="Model\IPokemonService.cs" />
+    <Compile Include="Model\IStaticDataService.cs" />
+    <Compile Include="Model\Language.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Model\Move.cs" />
     <Compile Include="Model\MoveLearnElement.cs" />
     <Compile Include="Model\MoveLearnMethod.cs" />
     <Compile Include="Model\Pokemon.cs" />
     <Compile Include="Model\PokemonForm.cs" />
+    <Compile Include="Model\PokemonService.cs" />
     <Compile Include="Model\Species.cs" />
     <Compile Include="Model\Stat.cs" />
+    <Compile Include="Model\StaticDataService.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="MainWindow.xaml">

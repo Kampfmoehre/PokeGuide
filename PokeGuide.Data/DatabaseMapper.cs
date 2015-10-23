@@ -30,13 +30,30 @@ namespace PokeGuide.Data
         /// <param name="queryArgs">Arguments for the query</param>
         /// <param name="token">The cancellation token</param>        
         /// <returns>A list of model instances</returns>
-        internal async Task<List<T>> MapFromQueryAsync(object[] queryArgs, CancellationToken token)
+        internal async Task<List<T>> MapFromQueryAsync(object[] queryArgs, IProgress<double> progress, CancellationToken token)
         {
+            double listCount = 0;
+            if (progress != null)
+                listCount = await GetListCount(queryArgs, token);
             string query = new T().GetListQuery();
             query = String.Format(query, queryArgs);
             var command = new SQLiteCommand(query, _connection);
-            DbDataReader reader = await command.ExecuteReaderAsync(token);
-            return await MapFromQueryAsync(reader, token);
+            DbDataReader reader = await command.ExecuteReaderAsync(token);            
+            return await MapFromQueryAsync(reader, listCount, progress, token);
+        }
+
+        /// <summary>
+        /// Retrieves the count of results of a query
+        /// </summary>
+        /// <param name="queryArgs"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        internal async Task<double> GetListCount(object[] queryArgs, CancellationToken token)
+        {
+            string query = new T().GetCountQuery();
+            var command = new SQLiteCommand(String.Format(query, queryArgs), _connection);
+            object result = await command.ExecuteScalarAsync(token);
+            return Convert.ToDouble(result);
         }
 
         /// <summary>
@@ -45,13 +62,21 @@ namespace PokeGuide.Data
         /// <param name="reader">The database reader from the query</param>
         /// <param name="token">The cancellation token</param>
         /// <returns>A list with a model for each row of the reader</returns>
-        internal async Task<List<T>> MapFromQueryAsync(DbDataReader reader, CancellationToken token)
+        internal async Task<List<T>> MapFromQueryAsync(DbDataReader reader, double totalCount, IProgress<double> progress, CancellationToken token)
         {
             var result = new List<T>();
+            int processed = 0;
             while (await reader.ReadAsync(token))
             {
                 T objectToWrite = FillObject(reader);
                 result.Add(objectToWrite);
+                processed++;
+                if (progress != null)
+                {
+                    progress.Report(Math.Round(processed / totalCount * 100, 1));
+                    // Slowdown for Progress indication
+                    //Thread.Sleep(250);
+                }
             }
 
             return result;

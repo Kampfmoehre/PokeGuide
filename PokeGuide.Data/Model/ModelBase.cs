@@ -45,5 +45,9 @@ namespace PokeGuide.Data.Model
         {
             return String.Empty;
         }
+        internal virtual string GetCountQuery()
+        {
+            return String.Empty;
+        }
     }
 }

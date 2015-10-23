@@ -31,11 +31,13 @@ namespace PokeGuide.Wpf.ViewModel
 
             if (ViewModelBase.IsInDesignModeStatic)
             {
-                SimpleIoc.Default.Register<IDataService, Design.DesignDataService>();
+                SimpleIoc.Default.Register<IStaticDataService, Design.DesignStaticDataService>();
+                SimpleIoc.Default.Register<IPokemonService, Design.DesignPokemonService>();
             }
             else
             {
-                SimpleIoc.Default.Register<IDataService, DataService>();
+                SimpleIoc.Default.Register<IStaticDataService>(() => new StaticDataService("database.sqlite3"));
+                SimpleIoc.Default.Register<IPokemonService>(() => new PokemonService("database.sqlite3"));
             }
 
             SimpleIoc.Default.Register<MainViewModel>();

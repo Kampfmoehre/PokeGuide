@@ -4,22 +4,25 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ignore="http://www.galasoft.ch/ignore"
+        xmlns:con="clr-namespace:PokeGuide.Wpf.Converter"
         mc:Ignorable="d ignore"
         Height="400"
         Width="700"
         Title="MVVM Light Application"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
     
-    <Window.Resources>
+    <Window.Resources>        
         <ResourceDictionary>
+            <con:GenerationToVisibilityConverter x:Key="genConverter"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Skins/MainSkin.xaml" />
             </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+        </ResourceDictionary>        
     </Window.Resources>
 
     <Grid x:Name="LayoutRoot">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
@@ -31,14 +34,26 @@
             <ColumnDefinition Width="100"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Label Content="Spiel:"/>
-        <ComboBox Grid.Column="1" ItemsSource="{Binding Versions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedVersion}"/>
-        <Label Grid.Row="1" Content="Pokemon"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Species}" SelectedItem="{Binding SelectedSpecies}" DisplayMemberPath="Name"/>
-        <Label Grid.Row="1" Grid.Column="2" Content="Form"/>
-        <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding Forms}" SelectedItem="{Binding SelectedForm}" DisplayMemberPath="Name"/>
-        <Label Grid.Row ="2" Content="Details"/>        
-        <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3">
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Content="{Binding CurrentAction}"/>
+            <ProgressBar Grid.Column="1" Maximum="100" Value="{Binding CurrentProgress}" Width="200"/>
+            <Button Grid.Column="2" Content="Abbrechen" Command="{Binding CancelLoadingCommand}"/>
+        </Grid>
+        <Label Grid.Row="1" Grid.Column="0" Content="Sprache:"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Languages}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedLanguage}"/>
+        <Label Grid.Row="1" Grid.Column="2" Content="Spiel:"/>
+        <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding Versions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedVersion}"/>
+        <Label Grid.Row="2" Content="Pokemon"/>
+        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding Species}" SelectedItem="{Binding SelectedSpecies}" DisplayMemberPath="Name"/>
+        <Label Grid.Row="2" Grid.Column="2" Content="Form"/>
+        <ComboBox Grid.Row="2" Grid.Column="3" ItemsSource="{Binding Forms}" SelectedItem="{Binding SelectedForm}" DisplayMemberPath="Name"/>
+        <Label Grid.Row ="3" Content="Details"/>        
+        <Grid Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="50"/>
@@ -58,12 +73,12 @@
             <TextBlock Grid.Column="1" Text="{Binding SelectedForm.Type1.Name}"/>
             <Label Grid.Row="1" Content="Typ 2:"/>
             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedForm.Type2.Name}"/>
-            <Label Grid.Row="2" Content="Fähigkeit 1:"/>
-            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedForm.Ability1.Name}"/>
-            <Label Grid.Row="3" Content="Fähigkeit 2:"/>
-            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedForm.Ability2.Name}"/>
-            <Label Grid.Row="4" Content="Versteckte Fähigkeit:"/>
-            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedForm.HiddenAbility.Name}"/>
+            <Label Grid.Row="2" Content="Fähigkeit 1:" Visibility="{Binding SelectedVersion.Generation, Converter={StaticResource genConverter}, ConverterParameter=3}"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedForm.Ability1.Name}" Visibility="{Binding SelectedVersion.Generation, Converter={StaticResource genConverter}, ConverterParameter=3}"/>
+            <Label Grid.Row="3" Content="Fähigkeit 2:" Visibility="{Binding SelectedVersion.Generation, Converter={StaticResource genConverter}, ConverterParameter=3}"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedForm.Ability2.Name}" Visibility="{Binding SelectedVersion.Generation, Converter={StaticResource genConverter}, ConverterParameter=3}"/>
+            <Label Grid.Row="4" Content="Versteckte Fähigkeit:" Visibility="{Binding SelectedVersion.Generation, Converter={StaticResource genConverter}, ConverterParameter=5}"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedForm.HiddenAbility.Name}" Visibility="{Binding SelectedVersion.Generation, Converter={StaticResource genConverter}, ConverterParameter=5}"/>
             <Label Grid.Row="0" Grid.Column="2"  Content="Basis Erfahrung:"/>
             <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding SelectedForm.BaseExperience}"/>
             <Label Grid.Row="1" Grid.Column="2" Content="Basis Zuneigung:"/>
