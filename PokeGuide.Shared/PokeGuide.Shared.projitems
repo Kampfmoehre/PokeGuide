@@ -18,4 +18,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Service\LocatorService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Service\StorageService.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)database.sqlite3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

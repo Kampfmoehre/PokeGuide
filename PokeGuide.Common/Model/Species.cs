@@ -7,6 +7,8 @@
         int _catchRate;
         PokedexEntry _dexEntry;
         GrowthRate _growthRate;
+        EggGroup _eggGroup1;
+        EggGroup _eggGroup2;
 
         /// <summary>
         /// Sets and gets the 
@@ -48,6 +50,22 @@
         {
             get { return _dexEntry; }
             set { Set(() => DexEntry, ref _dexEntry, value); }
+        } 
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public EggGroup EggGroup1
+        {
+            get { return _eggGroup1; }
+            set { Set(() => EggGroup1, ref _eggGroup1, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public EggGroup EggGroup2
+        {
+            get { return _eggGroup2; }
+            set { Set(() => EggGroup2, ref _eggGroup2, value); }
         }
     }
 }

@@ -18,7 +18,7 @@ namespace PokeGuide.ViewModel
         ObservableCollection<PokemonForm> Forms { get; set; }
         //NotifyTaskCompletion<ObservableCollection<PokemonForm>> Forms { get; set; }
         PokemonForm SelectedForm { get; set; }
-        RelayCommand LoadLanguagesCommand { get; set; }
+        RelayCommand<int> LoadLanguagesCommand { get; set; }
         bool IsLoading { get; set; }
     }
 }

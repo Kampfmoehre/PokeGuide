@@ -4,12 +4,13 @@
              xmlns:local="using:PokeGuide" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"               
              xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:PokeGuide.ViewModel"
              xmlns:deviceService="using:PokeGuide.Service"
              d1p1:Ignorable="d">
   <Application.Resources>
     <ResourceDictionary>
       <deviceService:DeviceLocatorService x:Key="Locator.W8" d:IsDataSource="True"/>
-      <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" xmlns:vm="using:PokeGuide.ViewModel" />        
+      <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />        
     </ResourceDictionary>
   </Application.Resources>
 </Application>

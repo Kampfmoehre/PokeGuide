@@ -14,5 +14,7 @@ namespace PokeGuide.Service
         Task<ObservableCollection<PokemonForm>> LoadFormsAsync(int speciesId, GameVersion version, int displayLanguage, CancellationToken token);
         Task<ElementType> LoadTypeAsync(int id, GameVersion version, int displayLanguage, CancellationToken token);
         Task<Ability> LoadAbilityAsync(int id, GameVersion version, int displayLanguage, CancellationToken token);
+        Task<EggGroup> LoadEggGroupAsync(int id, int displayLanguage, CancellationToken token);
+        Task<ObservableCollection<Stat>> LoadPokemonStats(int formId, GameVersion version, int displayLanguage, CancellationToken token);
     }
 }

@@ -1,16 +1,19 @@
-﻿namespace PokeGuide.Model
+﻿using System.Collections.ObjectModel;
+
+namespace PokeGuide.Model
 {
     public class PokemonForm : ModelBase
     {
         Species _species;
-        int _weight;
-        int _height;
+        double _weight;
+        double _height;
         int _baseExperience;
         ElementType _type1;
         ElementType _type2;
         Ability _ability1;
         Ability _ability2;
         Ability _hiddenAbility;
+        ObservableCollection<Stat> _stats;
         /// <summary>
         /// Sets and gets the 
         /// </summary>
@@ -22,7 +25,7 @@
         /// <summary>
         /// Sets and gets the 
         /// </summary>
-        public int Weight
+        public double Weight
         {
             get { return _weight; }
             set { Set(() => Weight, ref _weight, value); }
@@ -30,7 +33,7 @@
         /// <summary>
         /// Sets and gets the 
         /// </summary>
-        public int Height
+        public double Height
         {
             get { return _height; }
             set { Set(() => Height, ref _height, value); }
@@ -82,6 +85,14 @@
         {
             get { return _hiddenAbility; }
             set { Set(() => HiddenAbility, ref _hiddenAbility, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public ObservableCollection<Stat> Stats
+        {
+            get { return _stats; }
+            set { Set(() => Stats, ref _stats, value); }
         }
     }
 }

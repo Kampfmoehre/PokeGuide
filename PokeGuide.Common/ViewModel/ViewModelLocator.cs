@@ -33,6 +33,7 @@ namespace PokeGuide.ViewModel
             }
 
             SimpleIoc.Default.Register<IMainViewModel, MainViewModel>();
+            SimpleIoc.Default.Register<IPokemonViewModel, PokemonViewModel>();
         }
 
         public IMainViewModel MainViewModel
@@ -41,6 +42,10 @@ namespace PokeGuide.ViewModel
             {
                 return ServiceLocator.Current.GetInstance<IMainViewModel>();
             }
+        }
+        public IPokemonViewModel PokemonViewModel
+        {
+            get { return ServiceLocator.Current.GetInstance<IPokemonViewModel>(); }
         }
         
         public static void Cleanup()

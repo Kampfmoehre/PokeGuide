@@ -26,14 +26,8 @@ namespace PokeGuide.Service
                 await file.DeleteAsync(StorageDeleteOption.PermanentDelete);
             try
             {
-                //StorageFolder folder = Package.Current.InstalledLocation;
-                //StorageFile tempFile = await folder.GetFileAsync(fileName);
-                //string rtfString = await Windows.Storage.FileIO.ReadTextAsync(file);
-
                 StorageFile databaseFile = await Package.Current.InstalledLocation.GetFileAsync(fileName);
                 await databaseFile.CopyAsync(ApplicationData.Current.LocalFolder);
-                //file = await Package.Current.InstalledLocation.GetFileAsync(fileName);
-                //await tempFile.CopyAsync(ApplicationData.Current.LocalFolder);
             }
             catch (Exception ex)
             {

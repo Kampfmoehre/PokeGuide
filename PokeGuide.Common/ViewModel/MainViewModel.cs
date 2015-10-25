@@ -1,4 +1,3 @@
-using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
@@ -37,7 +36,7 @@ namespace PokeGuide.ViewModel
             {
                 Set(() => SelectedLanguage, ref _selectedLanguage, value);
                 if (value != null)
-                    LoadAndAssignVersions(value.Id);
+                    LoadAndAssignVersions(value.Id).ConfigureAwait(false);
             }
         }
         public ObservableCollection<GameVersion> Versions
@@ -51,8 +50,10 @@ namespace PokeGuide.ViewModel
             set
             {
                 Set(() => SelectedVersion, ref _selectedVersion, value);
+                SpeciesList = null;
+                SelectedSpecies = null;
                 if (value != null)
-                    LoadAndAssignSpecies(value, SelectedLanguage.Id);
+                    LoadAndAssignSpecies(value, SelectedLanguage.Id).ConfigureAwait(false);
             }
         }
         public ObservableCollection<SpeciesName> SpeciesList
@@ -66,8 +67,10 @@ namespace PokeGuide.ViewModel
             set
             {
                 Set(() => SelectedSpecies, ref _selectedSpecies, value);
+                Forms = null;
+                SelectedForm = null;
                 if (value != null)
-                    LoadAndAssignForms(value.Id, SelectedVersion, SelectedLanguage.Id);
+                    LoadAndAssignForms(value.Id, SelectedVersion, SelectedLanguage.Id).ConfigureAwait(false);
             }
         }
         public ObservableCollection<PokemonForm> Forms
@@ -81,7 +84,7 @@ namespace PokeGuide.ViewModel
             set { Set(() => SelectedForm, ref _selectedForm, value); }
         }
 
-        public RelayCommand LoadLanguagesCommand { get; set; }
+        public RelayCommand<int> LoadLanguagesCommand { get; set; }
 
         readonly CoreDispatcher _dispatcher;
 
@@ -94,32 +97,14 @@ namespace PokeGuide.ViewModel
             _tokenSource = new CancellationTokenSource();
             _staticDataService = staticDataService;
             _pokemonService = pokemonService;
+            IsLoading = true;
+
+            LoadLanguagesCommand = new RelayCommand<int>((value) =>
+            {
+                SelectedSpecies = SpeciesList.First(f => f.Id == value);
+            });
             
-            LoadAndAssignLanguages(6);
-
-            //Languages = new NotifyTaskCompletion<ObservableCollection<Language>>(_staticDataService.LoadLanguagesAsync(6, _tokenSource.Token));
-            //Languages.PropertyChanged += (s, e) =>
-            //{
-            //    if (e.PropertyName == "IsSuccessfullyCompleted")
-            //    {
-            //        SelectedLanguage = Languages.Result.First(f => f.Id == 6);
-
-            //        Versions = new NotifyTaskCompletion<ObservableCollection<GameVersion>>(_staticDataService.LoadVersionsAsync(SelectedLanguage.Id, _tokenSource.Token));
-            //        SpeciesList = new NotifyTaskCompletion<ObservableCollection<SpeciesName>>(_pokemonService.LoadAllSpeciesAsync(SelectedLanguage.Id, _tokenSource.Token));
-            //        SpeciesList.PropertyChanged += (s2, e2) =>
-            //        {
-            //            if (e2.PropertyName == "IsSuccessfullyCompleted")
-            //                SelectedSpecies = SpeciesList.Result.First();
-            //        };
-            //        //Versions.PropertyChanged += (s1, e1) =>
-            //        //{
-            //        //    if (e.PropertyName == "IsSuccessfullyCompleted")
-            //        //    {
-            //        //        SelectedVersion = Versions.Result.First();
-            //        //    }
-            //        //};
-            //    }
-            //};
+            LoadAndAssignLanguages(6).ConfigureAwait(false);
             if (IsInDesignMode)
             {
                 //Languages = new NotifyTaskCompletion<ObservableCollection<Language>>(
@@ -135,34 +120,20 @@ namespace PokeGuide.ViewModel
             }
         }
 
-        //void LoadAndAssignLanguages(int defaultLanguage)
-        //{
-        //    Task.Factory.StartNew<ObservableCollection<Language>>(async () =>
-        //    {
-        //        return await _staticDataService.LoadVersionsAsync(defaultLanguage, _tokenSource.Token);
-        //    }).ContinueWith(t =>
-        //    {
-        //        Languages = t.Result;
-        //    });
-        //}
         async Task LoadAndAssignLanguages(int defaultLanguage)
         {
             Languages = await _staticDataService.LoadLanguagesAsync(defaultLanguage, _tokenSource.Token);
-            SelectedLanguage = Languages.First(f => f.Id == 6);            
-            //await OnUiThread(async () =>
-            //{
-                
-            //});
+            SelectedLanguage = Languages.First(f => f.Id == 6);
         }
         async Task LoadAndAssignVersions(int displayLanguage)
         {
             Versions = await _staticDataService.LoadVersionsAsync(displayLanguage, _tokenSource.Token);
-            SelectedVersion = Versions.First();            
+            //SelectedVersion = Versions.First();            
         }
         async Task LoadAndAssignSpecies(GameVersion version, int displayLanguage)
         {
             SpeciesList = await _pokemonService.LoadAllSpeciesAsync(version, displayLanguage, _tokenSource.Token);
-            SelectedSpecies = SpeciesList.First();            
+            SelectedSpecies = SpeciesList.First();
         }
         async Task LoadAndAssignForms(int speciesId, GameVersion version, int displayLanguage)
         {
@@ -170,16 +141,6 @@ namespace PokeGuide.ViewModel
             Forms = await _pokemonService.LoadFormsAsync(speciesId, version, displayLanguage, _tokenSource.Token);
             SelectedForm = Forms.First();
             IsLoading = false;
-        }
-
-        async Task OnUiThread(Action action)
-        {
-            await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => action());
-        }
-
-        async Task OnUiThread(Func<Task> action)
-        {
-            await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, async() => await action());
         }
 
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,13 +51,14 @@ namespace PokeGuide.Design
             var tcs = new TaskCompletionSource<Species>();
             tcs.SetResult(new Species
             {
-                    BaseHappiness = 70,
-                    CatchRate = 45,
-                    DexEntry = LoadPokedexEntryAsync(39, 6, 6, token).Result,
-                    GrowthRate = LoadGrowthRateAsync(1, displayLanguage, token).Result,
-                    HatchCounter = 20,
-                    Id = 6,
-                    Name = "Glurak"
+                BaseHappiness = 70,
+                CatchRate = 45,
+                DexEntry = LoadPokedexEntryAsync(39, 6, 6, token).Result,
+                EggGroup1 = LoadEggGroupAsync(1, 6, token).Result,
+                GrowthRate = LoadGrowthRateAsync(1, displayLanguage, token).Result,
+                HatchCounter = 20,
+                Id = 6,
+                Name = "Glurak"
             });
             return tcs.Task;
         }
@@ -91,6 +91,23 @@ namespace PokeGuide.Design
         {
             var tcs = new TaskCompletionSource<Ability>();
             tcs.SetResult(new Ability { Description = "Awesome Description", Effect = "Strange effect", FlavorText = "Fancy ingame text", Id = 12, Name = "Feuer" });
+            return tcs.Task;
+        }
+
+        public Task<EggGroup> LoadEggGroupAsync(int id, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<EggGroup>();
+            tcs.SetResult(new EggGroup { Id = 1, Name = "Wasser" });
+            return tcs.Task;
+        }
+
+        public Task<ObservableCollection<Stat>> LoadPokemonStats(int formId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<ObservableCollection<Stat>>();
+            tcs.SetResult(new ObservableCollection<Stat>
+            {
+                new Stat { EffortValue = 1, Id = 1, Name = "KP" }
+            });
             return tcs.Task;
         }
     }

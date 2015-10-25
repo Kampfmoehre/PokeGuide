@@ -153,9 +153,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="database.sqlite3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="..\PokeGuide.Shared\PokeGuide.Shared.projitems" Label="Shared" />
