@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using PokeGuide.Model;
@@ -35,10 +36,10 @@ namespace PokeGuide.Design
             return tcs.Task;
         }
 
-        public Task<IEnumerable<SpeciesName>> LoadAllSpeciesAsync(int displayLanguage, CancellationToken token)
+        public Task<ObservableCollection<SpeciesName>> LoadAllSpeciesAsync(GameVersion version, int displayLanguage, CancellationToken token)
         {
-            var tcs = new TaskCompletionSource<IEnumerable<SpeciesName>>();
-            tcs.SetResult(new List<SpeciesName>
+            var tcs = new TaskCompletionSource<ObservableCollection<SpeciesName>>();
+            tcs.SetResult(new ObservableCollection<SpeciesName>
             {
                 new SpeciesName { Id = 6, Name = "Glurak", Generation = 1 },
                 new SpeciesName { Id = 7, Name = "Schiggy", Generation = 1 }
@@ -62,10 +63,10 @@ namespace PokeGuide.Design
             return tcs.Task;
         }
 
-        public Task<IEnumerable<PokemonForm>> LoadFormsAsync(int speciesId, GameVersion version, int displayLanguage, CancellationToken token)
+        public Task<ObservableCollection<PokemonForm>> LoadFormsAsync(int speciesId, GameVersion version, int displayLanguage, CancellationToken token)
         {
-            var tcs = new TaskCompletionSource<IEnumerable<PokemonForm>>();
-            tcs.SetResult(new List<PokemonForm> {
+            var tcs = new TaskCompletionSource<ObservableCollection<PokemonForm>>();
+            tcs.SetResult(new ObservableCollection<PokemonForm> {
                 new PokemonForm
                 {
                     BaseExperience = 255,

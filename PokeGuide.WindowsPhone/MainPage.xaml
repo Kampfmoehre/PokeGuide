@@ -6,12 +6,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding MainViewModel, Source={StaticResource Locator}}">
 
+    <!--<i:Interaction.Behaviors>
+        <core:EventTriggerBehavior EventName="Loaded">
+            <core:InvokeCommandAction Command="{Binding LoadLanguagesCommand}"/>
+        </core:EventTriggerBehavior>
+    </i:Interaction.Behaviors>-->
+    
     <Page.Resources>
-        <CollectionViewSource x:Key="VersionList" Source="{Binding Versions}">
-        </CollectionViewSource>
+        <CollectionViewSource x:Key="VersionList" Source="{Binding Versions}"/>
     </Page.Resources>
     
     <Grid>
@@ -43,9 +50,9 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <ComboBox Grid.Row="0" Grid.Column="1" Header="Sprache" ItemsSource="{Binding Languages}" 
-                      SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}" DisplayMemberPath="Name"/>
+                       DisplayMemberPath="Name" SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"/>
             <ComboBox Grid.Row="1" Grid.Column="0" Margin="10,0" Header="Pokémon" ItemsSource="{Binding SpeciesList}" 
-                      SelectedItem="{Binding SelectedSpeciesName, Mode=TwoWay}">
+                      SelectedItem="{Binding SelectedSpecies, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -57,7 +64,7 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <ComboBox Grid.Row="1" Grid.Column="1" Header="Form" ItemsSource="{Binding Forms}" 
-                      SelectedItem="{Binding SelectedForm, Mode=TwoWay}" DisplayMemberPath="Name"/>
+                       DisplayMemberPath="Name" SelectedItem="{Binding SelectedForm, Mode=TwoWay}"/>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
