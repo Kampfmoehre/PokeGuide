@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using PokeGuide.Service.Interface;
 using SQLite.Net;
 using SQLite.Net.Async;
 using SQLite.Net.Interop;

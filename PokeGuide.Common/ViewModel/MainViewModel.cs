@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using PokeGuide.Model;
-using PokeGuide.Service;
+using PokeGuide.Service.Interface;
 using Windows.UI.Core;
 
 namespace PokeGuide.ViewModel

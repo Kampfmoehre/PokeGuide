@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using PokeGuide.Model;
 
-namespace PokeGuide.Service
+namespace PokeGuide.Service.Interface
 {
     public interface IStaticDataService : IDataService
     {

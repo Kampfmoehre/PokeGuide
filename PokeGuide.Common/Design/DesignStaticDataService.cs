@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using PokeGuide.Model;
-using PokeGuide.Service;
+using PokeGuide.Service.Interface;
 
 namespace PokeGuide.Design
 {

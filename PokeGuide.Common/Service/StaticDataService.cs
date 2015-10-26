@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using PokeGuide.Model;
 using PokeGuide.Model.Database;
-
+using PokeGuide.Service.Interface;
 using SQLite.Net.Interop;
 
 namespace PokeGuide.Service

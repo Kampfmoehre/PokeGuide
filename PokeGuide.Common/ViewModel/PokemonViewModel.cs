@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using PokeGuide.Model;
-using PokeGuide.Service;
-using PokeGuide.ViewModel;
+using PokeGuide.Service.Interface;
 
 namespace PokeGuide.ViewModel
-{    
+{
     public class PokemonViewModel : ViewModelBase, IPokemonViewModel
     {
         CancellationTokenSource _tokenSource;
@@ -63,12 +56,6 @@ namespace PokeGuide.ViewModel
                     if (e1.PropertyName == "SelectedItem" && Versions.Result.SelectedItem != null)
                         SpeciesList = new NotifyTaskCompletion<SelectableCollection<SpeciesName>>(LoadSpecies(Versions.Result.SelectedItem, 6));
                 };
-                if (e.PropertyName == "IsSuccessfullyCompleted")
-                {
-                    
-                }
-                    
-                    
             };            
         }
 

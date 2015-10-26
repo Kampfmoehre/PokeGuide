@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace PokeGuide.Service
+namespace PokeGuide.Service.Interface
 {
     public interface IStorageService
     {

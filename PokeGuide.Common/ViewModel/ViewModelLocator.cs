@@ -3,6 +3,7 @@ using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 using PokeGuide.Design;
 using PokeGuide.Service;
+using PokeGuide.Service.Interface;
 
 namespace PokeGuide.ViewModel
 {

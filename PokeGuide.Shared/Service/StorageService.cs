@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using PokeGuide.Service.Interface;
 using Windows.ApplicationModel;
 using Windows.Storage;
 

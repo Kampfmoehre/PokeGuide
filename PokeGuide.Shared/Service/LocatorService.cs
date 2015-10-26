@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
+using PokeGuide.Service.Interface;
 using SQLite.Net.Interop;
 using SQLite.Net.Platform.WinRT;
 

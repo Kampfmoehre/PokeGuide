@@ -25,5 +25,7 @@ namespace PokeGuide.Model.Database
         public int? Ability2 { get; set; }
         [Column("hidden_ability")]
         public int? HiddenAbility { get; set; }
+        [Column("pokemon_id")]
+        public int PokemonId { get; set; }
     }
 }

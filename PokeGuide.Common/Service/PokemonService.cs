@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -7,11 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using PokeGuide.Model;
 using PokeGuide.Model.Database;
+using PokeGuide.Service.Interface;
 using SQLite.Net.Interop;
 
 namespace PokeGuide.Service
 {
-    public class PokemonService : DataService, IPokemonService
+    public class PokemonService : BaseDataService, IPokemonService
     {
         public PokemonService(IStorageService storageService, ISQLitePlatform sqlitePlatform) 
             : base(storageService, sqlitePlatform)
@@ -80,8 +81,8 @@ namespace PokeGuide.Service
                     "LEFT JOIN\n(SELECT def.pokemon_species_id AS id, IFNULL(curr.name, def.name) AS name, IFNULL(curr.genus, def.genus) AS genus FROM pokemon_v2_pokemonspeciesname def\n" +
                     "LEFT JOIN pokemon_v2_pokemonspeciesname curr ON def.pokemon_species_id = curr.pokemon_species_id AND def.language_id = 9 AND curr.language_id = ?\n" +
                     "GROUP BY def.pokemon_species_id)\nAS psn ON ps.id = psn.id\n" +                    
-                    "WHERE ps.id <= ?";
-                IEnumerable<DbPokemonSpecies> list = await _connection.QueryAsync<DbPokemonSpecies>(token, query, new object[] { displayLanguage, version.Generation });                
+                    "WHERE ps.id = ?";
+                IEnumerable<DbPokemonSpecies> list = await _connection.QueryAsync<DbPokemonSpecies>(token, query, new object[] { displayLanguage, id });
                 query = "SELECT p.id, pn.name FROM pokemon_v2_pokedex p\n" +
                     "LEFT JOIN\n(SELECT e.pokedex_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_pokedexdescription e\n" +
                     "LEFT OUTER JOIN pokemon_v2_pokedexdescription o ON e.pokedex_id = o.pokedex_id and o.language_id = ?\n" +
@@ -122,7 +123,7 @@ namespace PokeGuide.Service
         {
             try
             {
-                string query = "SELECT pf.id, pfn.name, p.height, p.weight, p.base_experience, pt1.type_id AS type1, pt2.type_id AS type2, " +
+                string query = "SELECT pf.id, pf.pokemon_id, pfn.name, p.height, p.weight, p.base_experience, pt1.type_id AS type1, pt2.type_id AS type2, " +
                  "pa1.ability_id AS ability1, pa2.ability_id AS ability2, pa3.ability_id AS hidden_ability FROM pokemon_v2_pokemonform pf\n" +
                  "LEFT JOIN\n(SELECT e.pokemon_form_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_pokemonformname e\n" +
                  "LEFT OUTER JOIN pokemon_v2_pokemonformname o ON e.pokemon_form_id = o.pokemon_form_id and o.language_id = ?\n" +
@@ -137,18 +138,25 @@ namespace PokeGuide.Service
 
                 IEnumerable<DbPokemonForm> forms = await _connection.QueryAsync<DbPokemonForm>(token, query, new object[] { displayLanguage, speciesId });
                 Species species = await LoadSpeciesAsync(speciesId, version, displayLanguage, token);
-                var result = new ObservableCollection<PokemonForm>();
-                foreach (DbPokemonForm f in forms)
+
+                var bag = new ConcurrentBag<PokemonForm>();
+
+                var tasks = forms.Select(async (f) =>
                 {
                     var form = new PokemonForm
                     {
                         BaseExperience = f.BaseExperience,
                         Height = Math.Round((double)f.Height / 10, 2),
                         Id = f.Id,
-                        Name = f.Name,
+                        //Name = f.Name,
                         Species = species,
                         Weight = Math.Round((double)f.Weight / 10, 2)
                     };
+                    if (String.IsNullOrWhiteSpace(f.Name))
+                        form.Name = species.Name;
+                    else
+                        form.Name = f.Name;
+
                     // Handle Fairy before Gen 6
                     if (version.Generation < 6 && f.Type1 == 18)
                         f.Type1 = 1;
@@ -165,37 +173,21 @@ namespace PokeGuide.Service
                             form.HiddenAbility = await LoadAbilityAsync((int)f.HiddenAbility, version, displayLanguage, token);
                     }
 
-                    form.Stats = await LoadPokemonStats(f.Id, version, displayLanguage, token);
+                    form.Stats = await LoadPokemonStats(f.PokemonId, version, displayLanguage, token);
 
-                    result.Add(form);
-                }
+                    bag.Add(form);
+                });
+                await Task.WhenAll(tasks);
+                //foreach (DbPokemonForm f in forms)
+                //{
+                    
+                //}
 
-                return result;
+                return new ObservableCollection<PokemonForm>(bag.OrderBy(o => o.Id));
             }
             catch (Exception)
             {
                 return new ObservableCollection<PokemonForm>();
-            }
-        }
-
-        public async Task<ElementType> LoadTypeAsync(int id, GameVersion version, int displayLanguage, CancellationToken token)
-        {
-            try
-            {
-                string query = "SELECT t.id, tn.name, t.move_damage_class_id FROM pokemon_v2_type t\n" +
-                    "LEFT JOIN\n(SELECT e.type_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_typename e\n" +
-                    "LEFT OUTER JOIN pokemon_v2_typename o ON e.type_id = o.type_id and o.language_id = ?\n" +
-                    "WHERE e.language_id = 9\nGROUP BY e.type_id)\nAS tn ON t.id = tn.id\n" +
-                    "WHERE t.id = ? AND t.generation_id <= ?";
-                IEnumerable<DbType> types = await _connection.QueryAsync<DbType>(token, query, new object[] { displayLanguage, id, version.Generation });
-                DbType type = types.First(); // await _connection.ExecuteScalarAsync<DbType>(token, query, new object[] { displayLanguage, id, version.Generation });
-                if (type == null)
-                    return null;
-                return new ElementType { Id = type.Id, Name = type.Name };
-            }
-            catch (Exception)
-            {
-                return null;
             }
         }
 
