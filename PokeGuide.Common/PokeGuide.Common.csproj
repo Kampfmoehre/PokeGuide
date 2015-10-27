@@ -68,10 +68,12 @@
     <Compile Include="Model\Database\DbGrowthRate.cs" />
     <Compile Include="Model\Database\DbLanguage.cs" />
     <Compile Include="Model\Database\DbMove.cs" />
+    <Compile Include="Model\Database\DbMoveLearnMethod.cs" />
     <Compile Include="Model\Database\DbPokedex.cs" />
     <Compile Include="Model\Database\DbPokemonDexNumber.cs" />
     <Compile Include="Model\Database\DbPokemonEggGroup.cs" />
     <Compile Include="Model\Database\DbPokemonForm.cs" />
+    <Compile Include="Model\Database\DbPokemonMove.cs" />
     <Compile Include="Model\Database\DbPokemonSpecies.cs" />
     <Compile Include="Model\Database\DbPokemonStat.cs" />
     <Compile Include="Model\Database\DbType.cs" />

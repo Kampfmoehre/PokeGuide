@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using PokeGuide.Model;
@@ -100,12 +101,35 @@ namespace PokeGuide.Design
             return tcs.Task;
         }
 
-        public Task<ObservableCollection<Stat>> LoadPokemonStats(int formId, GameVersion version, int displayLanguage, CancellationToken token)
+        public Task<ObservableCollection<Stat>> LoadPokemonStatsAsync(int formId, GameVersion version, int displayLanguage, CancellationToken token)
         {
             var tcs = new TaskCompletionSource<ObservableCollection<Stat>>();
             tcs.SetResult(new ObservableCollection<Stat>
             {
-                new Stat { EffortValue = 1, Id = 1, Name = "KP" }
+                new Stat { EffortValue = 1, Id = 1, Name = "KP", StatValue = 110 },
+                new Stat { EffortValue = 0, Id = 2, Name = "Angriff", StatValue = 60 },
+                new Stat { EffortValue = 1, Id = 3, Name = "Verteidigung", StatValue = 75 },
+                new Stat { EffortValue = 0, Id = 4, Name = "Spezialangriff", StatValue = 55 },
+                new Stat { EffortValue = 1, Id = 5, Name = "Spezialverteidigung", StatValue = 70 },
+                new Stat { EffortValue = 0, Id = 6, Name = "Initative", StatValue = 70 }
+            });
+            return tcs.Task;
+        }
+
+        public Task<PokemonForm> LoadFormAsync(int formId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<PokemonForm>();
+            tcs.SetResult(new PokemonForm
+            {
+                Ability1 = new Ability { Description = "blub", Effect = "blob", FlavorText = "blubber", Id = 12, Name = "furz" },
+                BaseExperience = 255,
+                Height = 12,
+                Id = 12,
+                Name = "Mega Glurak X",
+                Stats = LoadPokemonStatsAsync(1, version, displayLanguage, token).Result,
+                Species = LoadSpeciesAsync(12, version, displayLanguage, token).Result,
+                Type1 = new ElementType { DamageClassId = 1, Id = 9, Name = "Unlicht" },
+                Weight = 100
             });
             return tcs.Task;
         }

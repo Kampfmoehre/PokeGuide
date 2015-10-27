@@ -14,6 +14,7 @@ namespace PokeGuide.Model
         Ability _ability2;
         Ability _hiddenAbility;
         ObservableCollection<Stat> _stats;
+        ObservableCollection<PokemonMove> _moveSet;
         /// <summary>
         /// Sets and gets the 
         /// </summary>
@@ -93,6 +94,14 @@ namespace PokeGuide.Model
         {
             get { return _stats; }
             set { Set(() => Stats, ref _stats, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public ObservableCollection<PokemonMove> MoveSet
+        {
+            get { return _moveSet; }
+            set { Set(() => MoveSet, ref _moveSet, value); }
         }
     }
 }

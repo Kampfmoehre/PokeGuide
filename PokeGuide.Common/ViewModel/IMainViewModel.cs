@@ -17,7 +17,8 @@ namespace PokeGuide.ViewModel
         SpeciesName SelectedSpecies { get; set; }
         ObservableCollection<PokemonForm> Forms { get; set; }
         //NotifyTaskCompletion<ObservableCollection<PokemonForm>> Forms { get; set; }
-        PokemonForm SelectedForm { get; set; }
+        PokemonForm SelectedFormName { get; set; }
+        PokemonForm CurrentForm { get; set; }
         RelayCommand<int> LoadLanguagesCommand { get; set; }
         bool IsLoading { get; set; }
     }

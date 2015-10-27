@@ -91,60 +91,60 @@
             <Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" BorderBrush="#FF22E45F" BorderThickness="0,2"/>-->
             <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource BaseTextBlockStyle}" Text="ID:"/>
             <TextBlock Grid.Row="0" Grid.Column="1" Style="{StaticResource BaseTextBlockStyle}" 
-                    Text="{Binding SelectedForm.Species.Id}" HorizontalAlignment="Center"/>
+                    Text="{Binding CurrentForm.Species.Id}" HorizontalAlignment="Center"/>
             <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource BaseTextBlockStyle}" Text="Dex:"/>
             <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource BaseTextBlockStyle}" 
-                    Text="{Binding SelectedForm.Species.DexEntry.DexNumber}" HorizontalAlignment="Center"/>
+                    Text="{Binding CurrentForm.Species.DexEntry.DexNumber}" HorizontalAlignment="Center"/>
             <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource BaseTextBlockStyle}" Text="Höhe:"/>
             <TextBlock Grid.Row="0" Grid.Column="3" Style="{StaticResource BaseTextBlockStyle}" 
-                    Text="{Binding SelectedForm.Height}" HorizontalAlignment="Center"/>
+                    Text="{Binding CurrentForm.Height}" HorizontalAlignment="Center"/>
             <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource BaseTextBlockStyle}" Text="Gewicht:"/>
             <TextBlock Grid.Row="1" Grid.Column="3" Style="{StaticResource BaseTextBlockStyle}" 
-                    Text="{Binding SelectedForm.Weight}" HorizontalAlignment="Center"/>
+                    Text="{Binding CurrentForm.Weight}" HorizontalAlignment="Center"/>
             <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource BaseTextBlockStyle}" Text="Typ:"/>
             <StackPanel Grid.Row="2" Grid.Column="1">
                 <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.Type1.Name}" HorizontalAlignment="Left"/>
+                       Text="{Binding CurrentForm.Type1.Name}" HorizontalAlignment="Left"/>
                 <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.Type2.Name}" HorizontalAlignment="Left"/>
+                       Text="{Binding CurrentForm.Type2.Name}" HorizontalAlignment="Left"/>
             </StackPanel>
             <TextBlock Grid.Row="2" Grid.Column="2" Style="{StaticResource BaseTextBlockStyle}" Text="Ei-Gruppe:"/>
             <StackPanel Grid.Row="2" Grid.Column="3">                
                 <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.Species.EggGroup1.Name}" HorizontalAlignment="Left"/>
+                       Text="{Binding CurrentForm.Species.EggGroup1.Name}" HorizontalAlignment="Left"/>
                 <TextBlock Grid.Row="2" Grid.Column="2" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.Species.EggGroup2.Name}" HorizontalAlignment="Left"/>
+                       Text="{Binding CurrentForm.Species.EggGroup2.Name}" HorizontalAlignment="Left"/>
             </StackPanel>
 
             <TextBlock Grid.Row="3" Grid.Column="0" Style="{StaticResource BaseTextBlockStyle}" Text="Zuneigung:"/>
             <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.Species.BaseHappiness}" HorizontalAlignment="Center"/>
+                       Text="{Binding SelectedFormCurrentForm.Species.BaseHappiness}" HorizontalAlignment="Center"/>
             <TextBlock Grid.Row="3" Grid.Column="2" Style="{StaticResource BaseTextBlockStyle}" Text="Ei-Zyklen:"/>
             <TextBlock Grid.Row="3" Grid.Column="3" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.Species.HatchCounter}" HorizontalAlignment="Center"/>
+                       Text="{Binding CurrentForm.Species.HatchCounter}" HorizontalAlignment="Center"/>
 
             <TextBlock Grid.Row="4" Grid.Column="0" Style="{StaticResource BaseTextBlockStyle}" Text="Fangrate:"/>
             <TextBlock Grid.Row="4" Grid.Column="1" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.Species.CatchRate}" HorizontalAlignment="Center"/>
+                       Text="{Binding CurrentForm.Species.CatchRate}" HorizontalAlignment="Center"/>
             <TextBlock Grid.Row="5" Grid.Column="0" Style="{StaticResource BaseTextBlockStyle}" Text="Basis Erfahrung:"/>
             <TextBlock Grid.Row="5" Grid.Column="1" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.BaseExperience}" HorizontalAlignment="Center"/>
+                       Text="{Binding CurrentForm.BaseExperience}" HorizontalAlignment="Center"/>
             <TextBlock Grid.Row="6" Grid.Column="0" Style="{StaticResource BaseTextBlockStyle}" Text="Exp-Gruppe:"/>
             <TextBlock Grid.Row="6" Grid.Column="1" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.Species.GrowthRate.Name}" HorizontalAlignment="Left"/>
+                       Text="{Binding CurrentForm.Species.GrowthRate.Name}" HorizontalAlignment="Left"/>
 
             <TextBlock Grid.Row="4" Grid.Column="2" Style="{StaticResource BaseTextBlockStyle}" Text="Fähigkeit:"/>
             <StackPanel Grid.Row="4" Grid.Column="3" Grid.RowSpan="3">                
                 <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.Ability1.Name}" HorizontalAlignment="Left"/>
+                       Text="{Binding CurrentForm.Ability1.Name}" HorizontalAlignment="Left"/>
                 <TextBlock Grid.Row="3" Grid.Column="2" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.Ability2.Name}" HorizontalAlignment="Left"/>
+                       Text="{Binding CurrentForm.Ability2.Name}" HorizontalAlignment="Left"/>
                 <TextBlock Grid.Row="3" Grid.Column="3" Style="{StaticResource BaseTextBlockStyle}" 
-                       Text="{Binding SelectedForm.HiddenAbility.Name}" HorizontalAlignment="Left"/>
+                       Text="{Binding CurrentForm.HiddenAbility.Name}" HorizontalAlignment="Left"/>
             </StackPanel>
-            
-            
-            <GridView Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4" ItemsSource="{Binding SelectedForm.Stats}" 
+
+
+            <GridView Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding CurrentForm.Stats}" 
                       SelectionMode="None" IsActiveView="false" HorizontalAlignment="Left">
                 <GridView.ItemTemplate>
                     <DataTemplate>
@@ -174,6 +174,31 @@
                         <TextBlock Text="Basiswerte:" Style="{StaticResource BaseTextBlockStyle}"/>
                     </DataTemplate>
                 </GridView.HeaderTemplate>
+            </GridView>
+            <GridView Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="2" ItemsSource="{Binding CurrentForm.MoveSet}"
+                      SelectionMode="None" IsActiveView="True" HorizontalAlignment="Left">
+                <GridView.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="Attacken:" Style="{StaticResource BaseTextBlockStyle}"/>
+                    </DataTemplate>
+                </GridView.HeaderTemplate>
+                <GridView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Move.Name}" Style="{ThemeResource BaseTextBlockStyle}" 
+                                       HorizontalAlignment="Left"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Move.Type.Name}" Style="{ThemeResource BaseTextBlockStyle}" 
+                                       HorizontalAlignment="Left"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Move.DamageClass.Name}" Style="{ThemeResource BaseTextBlockStyle}" 
+                                       HorizontalAlignment="Left"/>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
             </GridView>
             
             <ProgressRing Grid.Row="0" Grid.RowSpan="20" Grid.ColumnSpan="4" Margin="0" IsActive="{Binding IsLoading}"/>

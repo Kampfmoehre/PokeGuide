@@ -25,12 +25,14 @@ namespace PokeGuide.ViewModel
                 // Create design time view services and models
                 SimpleIoc.Default.Register<IStaticDataService, DesignStaticDataService>();
                 SimpleIoc.Default.Register<IPokemonService, DesignPokemonService>();
+                SimpleIoc.Default.Register<IMoveService, DesignMoveService>();
             }
             else
             {
                 // Create run time view services and models
                 SimpleIoc.Default.Register<IStaticDataService, StaticDataService>();
                 SimpleIoc.Default.Register<IPokemonService, PokemonService>();
+                SimpleIoc.Default.Register<IMoveService, MoveService>();
             }
 
             SimpleIoc.Default.Register<IMainViewModel, MainViewModel>();

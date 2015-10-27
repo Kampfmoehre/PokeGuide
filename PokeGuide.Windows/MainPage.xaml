@@ -8,22 +8,68 @@
     mc:Ignorable="d"
     DataContext="{Binding PokemonViewModel, Source={StaticResource Locator}}">
 
+    <Page.Resources>
+        <DataTemplate x:Key="myTemplate">
+            <Grid Width="190" Height="20" Margin="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="130"/>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="30"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding Name}"/>
+                <TextBlock Grid.Column="1" Text="{Binding StatValue}" HorizontalAlignment="Right"/>
+                <TextBlock Grid.Column="2" Text="{Binding EffortValue}" HorizontalAlignment="Right"/>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="250"/>
             <ColumnDefinition Width="50"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ComboBox Grid.Row="0" Grid.Column="0" Header="Version:" ItemsSource="{Binding Versions.Result.Collection}" 
+        <ComboBox Grid.Row="0" Grid.Column="1" Header="Sprache" ItemsSource="{Binding Languages.Result.Collection}"
+                  SelectedItem="{Binding Languages.Result.SelectedItem}" DisplayMemberPath="Name"/>
+        <ProgressRing Grid.Row="0" Grid.Column="2" IsActive="{Binding Languages.IsNotCompleted}"/>
+        <Button Grid.Row="1" Grid.Column="0" Content="Spiele laden" Command="{Binding LoadVersionCommand}"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" Header="Version" ItemsSource="{Binding Versions.Result.Collection}" 
                   SelectedItem="{Binding Versions.Result.SelectedItem}" DisplayMemberPath="Name"/>
-        <ProgressRing Grid.Row="0" Grid.Column="1" IsActive="{Binding Versions.IsNotCompleted}"/>
-        <ComboBox Grid.Row="1" Grid.Column="0" Header="Pokémon" ItemsSource="{Binding SpeciesList.Result.Collection}"
+        <ProgressRing Grid.Row="1" Grid.Column="2" IsActive="{Binding Versions.IsNotCompleted}"/>
+        <Button Grid.Row="2" Grid.Column="0" Content="Pokémon laden" Command="{Binding LoadSpeciesCommand}"/>        
+        <ComboBox Grid.Row="2" Grid.Column="1" Header="Pokémon" ItemsSource="{Binding SpeciesList.Result.Collection}"
                   SelectedItem="{Binding SpeciesList.Result.SelectedItem}" DisplayMemberPath="Name"/>
-        <ProgressRing Grid.Row="0" Grid.Column="1" IsActive="{Binding SpeciesList.IsNotCompleted}"/>
+        <ProgressRing Grid.Row="2" Grid.Column="2" IsActive="{Binding SpeciesList.IsNotCompleted}"/>
+        <Button Grid.Row="3" Grid.Column="0" Content="Formen laden" Command="{Binding LoadFormsCommand}"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" Header="Form" ItemsSource="{Binding Forms.Result.Collection}"
+                  SelectedItem="{Binding Forms.Result.SelectedItem}" DisplayMemberPath="Name"/>
+        <ProgressRing Grid.Row="3" Grid.Column="2" IsActive="{Binding Forms.IsNotCompleted}"/>
+        <Button Grid.Row="4" Grid.Column="0" Content="Form laden" Command="{Binding LoadFormCommand}"/>
+        <Grid Grid.Row="0" Grid.Column="3" Grid.RowSpan="6">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <ListView Grid.Row="1" Grid.Column="0" Header="Basiswerte" ItemsSource="{Binding CurrentForm.Result.Stats}" ItemTemplate="{StaticResource myTemplate}">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="FrameworkElement">
+                        <Setter Property="Margin" Value="0"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </Grid>
     </Grid>
 </Page>

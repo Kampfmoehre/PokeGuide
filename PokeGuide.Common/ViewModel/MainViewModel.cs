@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
@@ -14,6 +15,7 @@ namespace PokeGuide.ViewModel
     {
         IStaticDataService _staticDataService;
         IPokemonService _pokemonService;
+        IMoveService _moveService;
         CancellationTokenSource _tokenSource;
         ObservableCollection<Language> _languages;
         Language _selectedLanguage;
@@ -68,7 +70,7 @@ namespace PokeGuide.ViewModel
             {
                 Set(() => SelectedSpecies, ref _selectedSpecies, value);
                 Forms = null;
-                SelectedForm = null;
+                SelectedFormName = null;
                 if (value != null)
                     LoadAndAssignForms(value.Id, SelectedVersion, SelectedLanguage.Id).ConfigureAwait(false);
             }
@@ -78,11 +80,26 @@ namespace PokeGuide.ViewModel
             get { return _forms; }
             set { Set(() => Forms, ref _forms, value); }
         }
-        public PokemonForm SelectedForm
+        public PokemonForm SelectedFormName
         {
             get { return _selectedForm; }
-            set { Set(() => SelectedForm, ref _selectedForm, value); }
+            set
+            {
+                Set(() => SelectedFormName, ref _selectedForm, value);
+                if (value != null)
+                    LoadAndAssignForm(value.Id, SelectedVersion, SelectedLanguage.Id).ConfigureAwait(false);
+            }
         }
+
+        PokemonForm _currentForm;
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public PokemonForm CurrentForm
+        {
+            get { return _currentForm; }
+            set { Set(() => CurrentForm, ref _currentForm, value); }
+        }        
 
         public RelayCommand<int> LoadLanguagesCommand { get; set; }
 
@@ -91,12 +108,13 @@ namespace PokeGuide.ViewModel
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel(IStaticDataService staticDataService, IPokemonService pokemonService)
+        public MainViewModel(IStaticDataService staticDataService, IPokemonService pokemonService, IMoveService moveService)
         {
             _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             _tokenSource = new CancellationTokenSource();
             _staticDataService = staticDataService;
             _pokemonService = pokemonService;
+            _moveService = moveService;
             IsLoading = true;
 
             LoadLanguagesCommand = new RelayCommand<int>((value) =>
@@ -139,7 +157,15 @@ namespace PokeGuide.ViewModel
         {
             IsLoading = true;
             Forms = await _pokemonService.LoadFormsAsync(speciesId, version, displayLanguage, _tokenSource.Token);
-            SelectedForm = Forms.First();
+            SelectedFormName = Forms.First();
+            IsLoading = false;
+        }
+        async Task LoadAndAssignForm(int id, GameVersion version, int displayLanguage)
+        {
+            IsLoading = true;
+            CurrentForm = await _pokemonService.LoadFormAsync(id, version, displayLanguage, _tokenSource.Token);
+            
+            CurrentForm.MoveSet = await _moveService.LoadMoveSetAsync(CurrentForm.Id, version, displayLanguage, _tokenSource.Token);
             IsLoading = false;
         }
 

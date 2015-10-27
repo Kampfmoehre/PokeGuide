@@ -29,5 +29,14 @@
             get { return _learnMethod; }
             set { Set(() => LearnMethod, ref _learnMethod, value); }
         }
+        int? _order;
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public int? Order
+        {
+            get { return _order; }
+            set { Set(() => Order, ref _order, value); }
+        }
     }
 }

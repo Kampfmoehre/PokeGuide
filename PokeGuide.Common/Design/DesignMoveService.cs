@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using PokeGuide.Model;
@@ -29,6 +30,13 @@ namespace PokeGuide.Design
                 Priority = 0,
                 Type = new ElementType { Id = 1, Name = "Flug" }
             });
+            return tcs.Task;
+        }
+
+        public Task<MoveLearnMethod> LoadMoveLearnMethodAsync(int id, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<MoveLearnMethod>();
+            tcs.SetResult(new MoveLearnMethod { Id = 1, Name = "Level" });
             return tcs.Task;
         }
 
