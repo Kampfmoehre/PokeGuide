@@ -12,9 +12,14 @@ namespace PokeGuide.Service
 {
     public class BaseDataService : DataService, IBaseDataService
     {
-        public BaseDataService(IStorageService storageService, ISQLitePlatform sqlitePlatform) 
+        public BaseDataService(IStorageService storageService, ISQLitePlatform sqlitePlatform)
             : base(storageService, sqlitePlatform)
-        { }
+        {
+            TypeList = new AsyncLazy<IEnumerable<ElementType>>(async () =>
+            {
+                return await LoadTypesAsync(6, null);
+            });
+        }
 
         public async Task<ElementType> LoadTypeAsync(int id, GameVersion version, int displayLanguage, CancellationToken token)
         {
@@ -36,5 +41,36 @@ namespace PokeGuide.Service
                 return null;
             }
         }
+
+        public async Task<ElementType> GetTypeAsync(int id, GameVersion version)
+        {
+            return await TypeList.FirstOrDefault(f => f.Id == id && f.Generation <= version.Generation);
+        }
+
+        public async Task<IEnumerable<ElementType>>LoadTypesAsync(int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = "SELECT t.id, tn.name, t.move_damage_class_id, t.generation_id FROM pokemon_v2_type t\n" +
+                    "LEFT JOIN\n(SELECT e.type_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_typename e\n" +
+                    "LEFT OUTER JOIN pokemon_v2_typename o ON e.type_id = o.type_id and o.language_id = ?\n" +
+                    "WERE e.language_id = 9\nGROUP BY e.type_id)\nAS tn ON t.id = tn.id";
+                    //"WHERE t.generation_id <= ?";
+                    IEnumerable<DbType> types = await _connection.QueryAsync<DbType>(token, query, new object[] { displayLanguage, id, version.Generation });
+                    return types.Select(s => new ElementType
+                    {
+                        DamageClassId = s.MoveDamageClassId,
+                        Generation = s.GenerationId,
+                        Id = s.id,
+                        Name = s.Name
+                    });
+            }
+            catch (System.Exception)
+            {
+                return new List<ElementType>();
+            }
+        }
+        // see https://github.com/StephenCleary/AsyncEx/wiki/NotifyTaskCompletion
+        public AsyncLazy<IEnumerable<ElementType>> TypeList  {get; private set; }
     }
 }
