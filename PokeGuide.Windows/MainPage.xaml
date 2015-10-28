@@ -21,6 +21,10 @@
                 <TextBlock Grid.Column="2" Text="{Binding EffortValue}" HorizontalAlignment="Right"/>
             </Grid>
         </DataTemplate>
+        <Style TargetType="Button">
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
     </Page.Resources>
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -39,21 +43,22 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <ComboBox Grid.Row="0" Grid.Column="1" Header="Sprache" ItemsSource="{Binding Languages.Result.Collection}"
-                  SelectedItem="{Binding Languages.Result.SelectedItem}" DisplayMemberPath="Name"/>
+                  SelectedItem="{Binding Languages.Result.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
         <ProgressRing Grid.Row="0" Grid.Column="2" IsActive="{Binding Languages.IsNotCompleted}"/>
         <Button Grid.Row="1" Grid.Column="0" Content="Spiele laden" Command="{Binding LoadVersionCommand}"/>
         <ComboBox Grid.Row="1" Grid.Column="1" Header="Version" ItemsSource="{Binding Versions.Result.Collection}" 
-                  SelectedItem="{Binding Versions.Result.SelectedItem}" DisplayMemberPath="Name"/>
+                  SelectedItem="{Binding Versions.Result.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
         <ProgressRing Grid.Row="1" Grid.Column="2" IsActive="{Binding Versions.IsNotCompleted}"/>
         <Button Grid.Row="2" Grid.Column="0" Content="Pokémon laden" Command="{Binding LoadSpeciesCommand}"/>        
         <ComboBox Grid.Row="2" Grid.Column="1" Header="Pokémon" ItemsSource="{Binding SpeciesList.Result.Collection}"
-                  SelectedItem="{Binding SpeciesList.Result.SelectedItem}" DisplayMemberPath="Name"/>
+                  SelectedItem="{Binding SpeciesList.Result.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
         <ProgressRing Grid.Row="2" Grid.Column="2" IsActive="{Binding SpeciesList.IsNotCompleted}"/>
         <Button Grid.Row="3" Grid.Column="0" Content="Formen laden" Command="{Binding LoadFormsCommand}"/>
         <ComboBox Grid.Row="3" Grid.Column="1" Header="Form" ItemsSource="{Binding Forms.Result.Collection}"
-                  SelectedItem="{Binding Forms.Result.SelectedItem}" DisplayMemberPath="Name"/>
+                  SelectedItem="{Binding Forms.Result.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
         <ProgressRing Grid.Row="3" Grid.Column="2" IsActive="{Binding Forms.IsNotCompleted}"/>
-        <Button Grid.Row="4" Grid.Column="0" Content="Form laden" Command="{Binding LoadFormCommand}"/>
+        <Button Grid.Row="4" Grid.Column="1" Content="Form laden" Command="{Binding LoadFormCommand}"/>
+        <ProgressRing Grid.Row="4" Grid.Column="2" IsActive="{Binding CurrentForm.IsNotCompleted}"/>
         <Grid Grid.Row="0" Grid.Column="3" Grid.RowSpan="6">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -63,6 +68,31 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="ID"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.Id}"/>
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CurrentForm.Result.Species.DexEntry.DexNumber}"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Typ"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentForm.Result.Type1.Name}"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CurrentForm.Result.Type2.Name}"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Fähigkeit"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentForm.Result.Ability1.Name}"/>
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CurrentForm.Result.Ability2.Name}"/>
+                <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding CurrentForm.Result.HiddenAbility.Name}"/>
+            </Grid>
             <ListView Grid.Row="1" Grid.Column="0" Header="Basiswerte" ItemsSource="{Binding CurrentForm.Result.Stats}" ItemTemplate="{StaticResource myTemplate}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="FrameworkElement">
@@ -70,6 +100,36 @@
                     </Style>
                 </ListView.ItemContainerStyle>
             </ListView>
+            <ListView Grid.Row="1" Grid.Column="1" Header="Attacken" ItemsSource="{Binding CurrentMoveSet.Result}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition Width="25"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Level}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Move.Name}"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Move.Type.Name}"/>
+                            <TextBlock Grid.Column="3" Text="{Binding Move.DamageClass.Name}"/>
+                            <TextBlock Grid.Column="4" Text="{Binding Move.Power}" HorizontalAlignment="Right"/>
+                            <TextBlock Grid.Column="5" Text="{Binding Move.Accuracy}" HorizontalAlignment="Right"/>
+                            <TextBlock Grid.Column="6" Text="{Binding Move.PowerPoints}" HorizontalAlignment="Right"/>
+                            <TextBlock Grid.Column="7" Text="{Binding Move.Priority}" HorizontalAlignment="Right"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="Zeit:"/>
+                <TextBlock Text="{Binding TimeConsumed}"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </Page>

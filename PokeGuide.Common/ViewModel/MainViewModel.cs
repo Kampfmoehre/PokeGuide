@@ -72,7 +72,7 @@ namespace PokeGuide.ViewModel
                 Forms = null;
                 SelectedFormName = null;
                 if (value != null)
-                    LoadAndAssignForms(value.Id, SelectedVersion, SelectedLanguage.Id).ConfigureAwait(false);
+                    LoadAndAssignForms(value, SelectedVersion, SelectedLanguage.Id).ConfigureAwait(false);
             }
         }
         public ObservableCollection<PokemonForm> Forms
@@ -153,10 +153,10 @@ namespace PokeGuide.ViewModel
             SpeciesList = await _pokemonService.LoadAllSpeciesAsync(version, displayLanguage, _tokenSource.Token);
             SelectedSpecies = SpeciesList.First();
         }
-        async Task LoadAndAssignForms(int speciesId, GameVersion version, int displayLanguage)
+        async Task LoadAndAssignForms(SpeciesName species, GameVersion version, int displayLanguage)
         {
             IsLoading = true;
-            Forms = await _pokemonService.LoadFormsAsync(speciesId, version, displayLanguage, _tokenSource.Token);
+            Forms = await _pokemonService.LoadFormsAsync(species, version, displayLanguage, _tokenSource.Token);
             SelectedFormName = Forms.First();
             IsLoading = false;
         }

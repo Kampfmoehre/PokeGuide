@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Nito.AsyncEx;
 using PokeGuide.Model;
 using PokeGuide.Service.Interface;
 
@@ -11,83 +13,132 @@ namespace PokeGuide.ViewModel
 {
     public class PokemonViewModel : ViewModelBase, IPokemonViewModel
     {
+        DateTime _debugStart;
+        DateTime _debugEnd;
+
         CancellationTokenSource _tokenSource;
         IStaticDataService _staticDataService;
         IPokemonService _pokemonService;
         IMoveService _moveService;
-        NotifyTaskCompletion<SelectableCollection<GameVersion>> _versions;
-        NotifyTaskCompletion<SelectableCollection<SpeciesName>> _speciesList;
-        NotifyTaskCompletion<SelectableCollection<PokemonForm>> _forms;
+        INotifyTaskCompletion<SelectableCollection<Language>> _languages;
+        INotifyTaskCompletion<SelectableCollection<GameVersion>> _versions;
+        INotifyTaskCompletion<SelectableCollection<SpeciesName>> _speciesList;
+        INotifyTaskCompletion<SelectableCollection<PokemonForm>> _forms;
+        INotifyTaskCompletion<PokemonForm> _currentForm;
+        INotifyTaskCompletion<ObservableCollection<PokemonMove>> _currentMoveSet;
+        RelayCommand _loadVersionCommand;
+        RelayCommand _loadSpeciesCommand;
+        RelayCommand _loadFormsCommand;
+        RelayCommand _loadFormCommand;
         /// <summary>
         /// Sets and gets the 
         /// </summary>
-        public NotifyTaskCompletion<SelectableCollection<GameVersion>> Versions
-        {
-            get { return _versions ; }
-            set { Set(() => Versions, ref _versions , value); }
-        }
-        /// <summary>
-        /// Sets and gets the 
-        /// </summary>
-        public NotifyTaskCompletion<SelectableCollection<SpeciesName>> SpeciesList
-        {
-            get { return _speciesList; }
-            set { Set(() => SpeciesList, ref _speciesList, value); }
-        }
-        /// <summary>
-        /// Sets and gets the 
-        /// </summary>
-        public NotifyTaskCompletion<SelectableCollection<PokemonForm>> Forms
-        {
-            get { return _forms; }
-            set { Set(() => Forms, ref _forms, value); }
-        }
-        NotifyTaskCompletion<SelectableCollection<Language>> _languages;
-        /// <summary>
-        /// Sets and gets the 
-        /// </summary>
-        public NotifyTaskCompletion<SelectableCollection<Language>> Languages
+        public INotifyTaskCompletion<SelectableCollection<Language>> Languages
         {
             get { return _languages; }
             set
             {
                 Set(() => Languages, ref _languages, value);
-                LoadVersionCommand.RaiseCanExecuteChanged();
+                if (Languages != null)
+                {
+                    Languages.PropertyChanged += (s, e) =>
+                    {
+                        if (e.PropertyName == "IsSuccessfullyCompleted")
+                        {                            
+                            Languages.Result.SelectedItem = Languages.Result.Collection.First(f => f.Id == 6);
+                            ResetOperations();
+                            LoadVersionCommand.RaiseCanExecuteChanged();
+                        }
+                    };
+                }                
             }
         }
-        NotifyTaskCompletion<PokemonForm> _currentForm;
         /// <summary>
         /// Sets and gets the 
         /// </summary>
-        public NotifyTaskCompletion<PokemonForm> CurrentForm
+        public INotifyTaskCompletion<SelectableCollection<GameVersion>> Versions
+        {
+            get { return _versions ; }
+            set
+            {
+                Set(() => Versions, ref _versions , value);
+                if (Versions != null)
+                {
+                    Versions.PropertyChanged += (s, e) =>
+                    {
+                        if (e.PropertyName == "IsSuccessfullyCompleted")
+                            LoadSpeciesCommand.RaiseCanExecuteChanged();
+                    };
+                }
+            }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public INotifyTaskCompletion<SelectableCollection<SpeciesName>> SpeciesList
+        {
+            get { return _speciesList; }
+            set
+            {
+                Set(() => SpeciesList, ref _speciesList, value);
+                if (SpeciesList != null)
+                {
+                    SpeciesList.PropertyChanged += (s, e) =>
+                    {
+                        if (e.PropertyName == "IsSuccessfullyCompleted")
+                            LoadFormsCommand.RaiseCanExecuteChanged();
+                    };
+                }
+            }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public INotifyTaskCompletion<SelectableCollection<PokemonForm>> Forms
+        {
+            get { return _forms; }
+            set
+            {
+                Set(() => Forms, ref _forms, value);
+                if (Forms != null)
+                {
+                    Forms.PropertyChanged += (s, e) =>
+                    {
+                        if (e.PropertyName == "IsSuccessfullyCompleted")
+                            LoadFormCommand.RaiseCanExecuteChanged();
+                    };
+                }
+            }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public INotifyTaskCompletion<PokemonForm> CurrentForm
         {
             get { return _currentForm; }
             set { Set(() => CurrentForm, ref _currentForm, value); }
         }
-        NotifyTaskCompletion<ObservableCollection<PokemonMove>> _currentMoveSet;
         /// <summary>
         /// Sets and gets the 
         /// </summary>
-        public NotifyTaskCompletion<ObservableCollection<PokemonMove>> CurrentMoveSet
+        public INotifyTaskCompletion<ObservableCollection<PokemonMove>> CurrentMoveSet
         {
             get { return _currentMoveSet; }
             set { Set(() => CurrentMoveSet, ref _currentMoveSet, value); }
         }
-        RelayCommand _loadVersionCommand;
         public RelayCommand LoadVersionCommand {
             get
             {
                 if (_loadVersionCommand == null)
                 {
                     _loadVersionCommand = new RelayCommand(() =>
-                        Versions = new NotifyTaskCompletion<SelectableCollection<GameVersion>>(LoadVersionsAsync(Languages.Result.SelectedItem.Id)),
+                        Versions = NotifyTaskCompletion.Create(LoadVersionsAsync(Languages.Result.SelectedItem.Id)),
                         IsLanguageSet
                     );
                 }
                 return _loadVersionCommand;
             }
         }
-        RelayCommand _loadSpeciesCommand;
         public RelayCommand LoadSpeciesCommand
         {
             get
@@ -95,14 +146,13 @@ namespace PokeGuide.ViewModel
                 if (_loadSpeciesCommand == null)
                 {
                     _loadSpeciesCommand = new RelayCommand(() =>
-                        SpeciesList = new NotifyTaskCompletion<SelectableCollection<SpeciesName>>(LoadSpeciesAsync(Versions.Result.SelectedItem, Languages.Result.SelectedItem.Id)),
+                        SpeciesList = NotifyTaskCompletion.Create(LoadSpeciesAsync(Versions.Result.SelectedItem, Languages.Result.SelectedItem.Id)),
                         () => { return IsLanguageSet() && IsVersionSet(); }
                     );
                 }
                 return _loadSpeciesCommand;
             }
         }
-        RelayCommand _loadFormsCommand;
         public RelayCommand LoadFormsCommand
         {
             get
@@ -110,24 +160,25 @@ namespace PokeGuide.ViewModel
                 if (_loadFormsCommand == null)
                 {
                     _loadFormsCommand = new RelayCommand(() =>
-                        Forms = new NotifyTaskCompletion<SelectableCollection<PokemonForm>>(LoadFormsAsync(SpeciesList.Result.SelectedItem.Id, Versions.Result.SelectedItem, Languages.Result.SelectedItem.Id)),
+                        Forms = NotifyTaskCompletion.Create(LoadFormsAsync(SpeciesList.Result.SelectedItem, Versions.Result.SelectedItem, Languages.Result.SelectedItem.Id)),
                         () => { return IsLanguageSet() && IsVersionSet() && SpeciesList.Result != null && SpeciesList.Result.SelectedItem != null; }
                     );
                 }
                 return _loadFormsCommand;
             }
         }
-        RelayCommand _loadFormCommand;
         public RelayCommand LoadFormCommand
         {
             get
             {
-                if (_loadFormsCommand == null)
+                if (_loadFormCommand == null)
                 {
                     _loadFormCommand = new RelayCommand(() =>
                         {
-                            CurrentForm = new NotifyTaskCompletion<PokemonForm>(LoadFormAsync(Forms.Result.SelectedItem.Id, Versions.Result.SelectedItem, Languages.Result.SelectedItem.Id));
-                            CurrentMoveSet = new NotifyTaskCompletion<ObservableCollection<PokemonMove>>(LoadMoveSetAsync(Forms.Result.SelectedItem.Id, Versions.Result.SelectedItem, Languages.Result.SelectedItem.Id));
+                            _debugStart = DateTime.Now;
+                            CurrentForm = NotifyTaskCompletion.Create(LoadFormAsync(Forms.Result.SelectedItem.Id, Versions.Result.SelectedItem, Languages.Result.SelectedItem.Id));
+                            CurrentMoveSet = NotifyTaskCompletion.Create(LoadMoveSetAsync(Forms.Result.SelectedItem.Id, Versions.Result.SelectedItem, Languages.Result.SelectedItem.Id));
+
                         },
                         () => { return IsLanguageSet() && IsVersionSet() && Forms.Result != null && Forms.Result.SelectedItem != null; }
                     );
@@ -142,7 +193,7 @@ namespace PokeGuide.ViewModel
             _staticDataService = staticDataService;
             _pokemonService = pokemonService;
             _moveService = moveService;
-            Languages = new NotifyTaskCompletion<SelectableCollection<Language>>(LoadLanguagesAsync(6));            
+            Languages = NotifyTaskCompletion.Create(LoadLanguagesAsync(6));
                  
             //Versions = new NotifyTaskCompletion<SelectableCollection<GameVersion>>(LoadVersions(6));
             
@@ -156,11 +207,11 @@ namespace PokeGuide.ViewModel
             //};
             if (IsInDesignMode)
             {
-                Versions = new NotifyTaskCompletion<SelectableCollection<GameVersion>>(LoadVersionsAsync(6));
-                SpeciesList = new NotifyTaskCompletion<SelectableCollection<SpeciesName>>(LoadSpeciesAsync(null, 6));
-                Forms = new NotifyTaskCompletion<SelectableCollection<PokemonForm>>(LoadFormsAsync(1, null, 6));
-                CurrentForm = new NotifyTaskCompletion<PokemonForm>(LoadFormAsync(1, null, 6));
-                CurrentMoveSet = new NotifyTaskCompletion<ObservableCollection<PokemonMove>>(LoadMoveSetAsync(6, null, 6));
+                Versions = NotifyTaskCompletion.Create(LoadVersionsAsync(6));
+                SpeciesList = NotifyTaskCompletion.Create(LoadSpeciesAsync(null, 6));
+                Forms = NotifyTaskCompletion.Create(LoadFormsAsync(new SpeciesName { Id = 1 }, null, 6));
+                CurrentForm = NotifyTaskCompletion.Create(LoadFormAsync(1, null, 6));
+                CurrentMoveSet = NotifyTaskCompletion.Create(LoadMoveSetAsync(6, null, 6));
             }
         }
 
@@ -185,9 +236,9 @@ namespace PokeGuide.ViewModel
         {
             return new SelectableCollection<SpeciesName>(await _pokemonService.LoadAllSpeciesAsync(version, language, _tokenSource.Token));
         }
-        async Task<SelectableCollection<PokemonForm>> LoadFormsAsync(int speciesId, GameVersion version, int language)
+        async Task<SelectableCollection<PokemonForm>> LoadFormsAsync(SpeciesName species, GameVersion version, int language)
         {
-            return new SelectableCollection<PokemonForm>(await _pokemonService.LoadFormsAsync(speciesId, version, language, _tokenSource.Token));
+            return new SelectableCollection<PokemonForm>(await _pokemonService.LoadFormsAsync(species, version, language, _tokenSource.Token));
         }
         async Task<PokemonForm> LoadFormAsync(int formid, GameVersion version, int language)
         {
@@ -195,7 +246,28 @@ namespace PokeGuide.ViewModel
         }
         async Task<ObservableCollection<PokemonMove>> LoadMoveSetAsync(int formid, GameVersion version, int language)
         {
-            return await _moveService.LoadMoveSetAsync(formid, version, language, _tokenSource.Token);
+            var unused = await _pokemonService.LoadMoveSetAsync(formid, version, language, _tokenSource.Token);
+            _debugEnd = DateTime.Now;
+            TimeSpan span = _debugEnd - _debugStart;
+            TimeConsumed = String.Format("{0} sek und {1} ms", span.Seconds, span.Milliseconds);
+            return unused;
+        }
+
+
+        string _timeConsumed;
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public string TimeConsumed
+        {
+            get { return _timeConsumed; }
+            set { Set(() => TimeConsumed, ref _timeConsumed, value); }
+        }
+
+        void ResetOperations()
+        {
+            //_tokenSource.Cancel();
+            _pokemonService.InitializeResources(Languages.Result.SelectedItem.Id, _tokenSource.Token);            
         }
     }
 }

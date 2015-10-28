@@ -17,26 +17,7 @@ namespace PokeGuide.Service
         public PokemonService(IStorageService storageService, ISQLitePlatform sqlitePlatform) 
             : base(storageService, sqlitePlatform)
         { }
-
-        public async Task<GrowthRate> LoadGrowthRateAsync(int id, int displayLanguage, CancellationToken token)
-        {
-            try
-            {
-                string query = "SELECT gr.id, grd.name FROM pokemon_v2_growthrate gr\n" +
-                    "LEFT JOIN\n(SELECT e.growth_rate_id AS id, COALESCE(o.description, e.description) AS name FROM pokemon_v2_growthratedescription e\n" +
-                    "LEFT OUTER JOIN pokemon_v2_growthratedescription o ON e.growth_rate_id = o.growth_rate_id and o.language_id = ?\n" +
-                    "WHERE e.language_id = 9\nGROUP BY e.growth_rate_id)\nAS grd ON gr.id = grd.id\n" + 
-                    "WHERE gr.id = ?";
-                IEnumerable<DbGrowthRate> growthRates = await _connection.QueryAsync<DbGrowthRate>(token, query, new object[] { displayLanguage, id });
-                DbGrowthRate growthRate = growthRates.First(); // await _connection.ExecuteScalarAsync<DbGrowthRate>(token, query, new object[] { displayLanguage, id });
-                return new GrowthRate { Id = growthRate.Id, Name = growthRate.Name };
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
+        
         public async Task<PokedexEntry> LoadPokedexEntryAsync(int dexId, int speciesId, int displayLanguage, CancellationToken token)
         {
             try
@@ -104,7 +85,7 @@ namespace PokeGuide.Service
                     Id = dbSpecies.Id,
                     Name = dbSpecies.Name
                 };
-                species.GrowthRate = await LoadGrowthRateAsync(dbSpecies.GrowthRateId, displayLanguage, token);
+                species.GrowthRate = await GetGrowthRateAsync(dbSpecies.GrowthRateId);
                 species.DexEntry = await LoadPokedexEntryAsync(dex.Id,  dbSpecies.Id, displayLanguage, token);
                 species.DexEntry.Name = dex.Name;
                 species.EggGroup1 = await LoadEggGroupAsync(eggGroups[0].EggGroupId, displayLanguage, token);
@@ -119,7 +100,7 @@ namespace PokeGuide.Service
             }
         }
 
-        public async Task<ObservableCollection<PokemonForm>> LoadFormsAsync(int speciesId, GameVersion version, int displayLanguage, CancellationToken token)
+        public async Task<ObservableCollection<PokemonForm>> LoadFormsAsync(SpeciesName species, GameVersion version, int displayLanguage, CancellationToken token)
         {
             try
             {
@@ -128,7 +109,7 @@ namespace PokeGuide.Service
                     "LEFT JOIN\n(SELECT e.pokemon_form_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_pokemonformname e\n" +
                     "LEFT OUTER JOIN pokemon_v2_pokemonformname o ON e.pokemon_form_id = o.pokemon_form_id and o.language_id = ?\n" +
                     "WHERE e.language_id = 9\nGROUP BY e.pokemon_form_id)\nAS pfn ON pf.id = pfn.id\n" +
-                    "WHERE p.pokemon_species_id = ?";
+                    "WHERE p.pokemon_species_id = ? AND pf.version_group_id <= ?";
                 //string query = "SELECT pf.id, pf.pokemon_id, pfn.name, p.height, p.weight, p.base_experience, pt1.type_id AS type1, pt2.type_id AS type2, " +
                 // "pa1.ability_id AS ability1, pa2.ability_id AS ability2, pa3.ability_id AS hidden_ability FROM pokemon_v2_pokemonform pf\n" +
                 // "LEFT JOIN\n(SELECT e.pokemon_form_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_pokemonformname e\n" +
@@ -142,7 +123,7 @@ namespace PokeGuide.Service
                 // "LEFT JOIN pokemon_v2_pokemonability AS pa3 ON p.id = pa3.pokemon_id AND pa3.slot = 3\n" +                  
                 // "WHERE p.pokemon_species_id = ?";// AND pf.version_group_id = ?
 
-                IEnumerable<DbPokemonForm> forms = await _connection.QueryAsync<DbPokemonForm>(token, query, new object[] { displayLanguage, speciesId });
+                IEnumerable<DbPokemonForm> forms = await _connection.QueryAsync<DbPokemonForm>(token, query, new object[] { displayLanguage, species.Id, version.VersionGroup });
                 //Species species = await LoadSpeciesAsync(speciesId, version, displayLanguage, token);
 
                 //var bag = new ConcurrentBag<PokemonForm>();
@@ -186,7 +167,15 @@ namespace PokeGuide.Service
                 //await Task.WhenAll(tasks);
 
                 //return new ObservableCollection<PokemonForm>(bag.OrderBy(o => o.Id));
-                return new ObservableCollection<PokemonForm>(forms.Select(s => new PokemonForm { Id = s.Id, Name = s.Name }));
+                return new ObservableCollection<PokemonForm>(forms.Select((s) =>
+                {
+                    var f = new PokemonForm { Id = s.Id };
+                    if (String.IsNullOrWhiteSpace(s.Name))
+                        f.Name = species.Name;
+                        else
+                        f.Name = s.Name;
+                    return f;
+                }));
             }
             catch (Exception)
             {
@@ -319,7 +308,7 @@ namespace PokeGuide.Service
                 "LEFT JOIN pokemon_v2_pokemonability AS pa1 ON p.id = pa1.pokemon_id AND pa1.slot = 1\n" +
                 "LEFT JOIN pokemon_v2_pokemonability AS pa2 ON p.id = pa2.pokemon_id AND pa2.slot = 2\n" +
                 "LEFT JOIN pokemon_v2_pokemonability AS pa3 ON p.id = pa3.pokemon_id AND pa3.slot = 3\n" +
-                "WHERE pf.id = ? AND pf.version_group_id = ?";
+                "WHERE pf.id = ?";
                 IEnumerable<DbPokemonForm> forms = await _connection.QueryAsync<DbPokemonForm>(token, query, new object[] { displayLanguage, formId, version.VersionGroup });
                 DbPokemonForm f = forms.First();
 
@@ -341,9 +330,9 @@ namespace PokeGuide.Service
                 // Handle Fairy before Gen 6
                 if (version.Generation < 6 && f.Type1 == 18)
                     f.Type1 = 1;
-                form.Type1 = await LoadTypeAsync(f.Type1, version, displayLanguage, token);
+                form.Type1 = await GetTypeAsync(f.Type1, version);
                 if (f.Type2 != null)
-                    form.Type2 = await LoadTypeAsync((int)f.Type2, version, displayLanguage, token);
+                    form.Type2 = await GetTypeAsync((int)f.Type2, version);
 
                 if (version.Generation >= 3)
                 {
@@ -361,6 +350,92 @@ namespace PokeGuide.Service
             catch (Exception)
             {
                 return null;
+            }
+        }
+
+        public async Task<Move> LoadMoveAsync(int id, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = "SELECT m.id, mn.name, m.power, m.pp, m.accuracy, m.priority, m.move_damage_class_id, m.type_id FROM pokemon_v2_move m\n" +
+                    "LEFT JOIN\n(SELECT e.move_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_movename e\n" +
+                    "LEFT OUTER JOIN pokemon_v2_movename o ON e.move_id = o.move_id and o.language_id = ?\n" +
+                    "WHERE e.language_id = 9\nGROUP BY e.move_id)\nAS mn ON m.id = mn.id\n" +
+                    "WHERE m.id = ? AND m.generation_id <= ?";
+                IEnumerable<DbMove> moves = await _connection.QueryAsync<DbMove>(token, query, new object[] { displayLanguage, id, version.Generation });
+                DbMove move = moves.First();
+                var result = new Move
+                {
+                    Accuracy = move.Accuracy,
+                    Id = move.Id,
+                    Name = move.Name,
+                    Power = move.Power,
+                    PowerPoints = move.PowerPoints,
+                    Priority = move.Priority
+                };
+                result.Type = await GetTypeAsync(move.Type, version);
+                if (version.Generation > 3)
+                    result.DamageClass = await GetDamageClassAsync(move.MoveDamageClass);
+                else
+                    result.DamageClass = await GetDamageClassAsync(result.Type.DamageClassId);
+
+                return result;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<MoveLearnMethod> LoadMoveLearnMethodAsync(int id, int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = "SELECT mlm.id, mlmd.name FROM pokemon_v2_movelearnmethod mlm\n" +
+                    "LEFT JOIN\n(SELECT e.move_learn_method_id AS id, COALESCE(o.name, e.name) AS name, COALESCE(o.description, e.description) AS description FROM pokemon_v2_movelearnmethodname e\n" +
+                    "LEFT OUTER JOIN pokemon_v2_movelearnmethodname o ON e.move_learn_method_id = o.move_learn_method_id and o.language_id = ?\n" +
+                    "WHERE e.language_id = 9\nGROUP BY e.move_learn_method_id)\nAS mlmd ON mlm.id = mlmd.id\n" +
+                    "WHERE mlm.id = ?";
+                IEnumerable<DbMoveLearnMethod> methods = await _connection.QueryAsync<DbMoveLearnMethod>(token, query, new object[] { displayLanguage, id });
+                DbMoveLearnMethod method = methods.First();
+                return new MoveLearnMethod
+                {
+                    Description = method.Description,
+                    Id = method.Id,
+                    Name = method.Name
+                };
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<ObservableCollection<PokemonMove>> LoadMoveSetAsync(int pokemonId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                List<DbPokemonMove> moveList = await _connection.Table<DbPokemonMove>().Where(w => w.PokemonId == pokemonId && w.VersionGroupId == version.VersionGroup).ToListAsync(token);
+
+                var bag = new ConcurrentBag<PokemonMove>();
+                var tasks = moveList.Select(async (m) =>
+                {
+                    var move = new PokemonMove
+                    {
+                        Id = m.Id,
+                        Level = m.Level,
+                        Order = m.Order
+                    };
+                    move.LearnMethod = await LoadMoveLearnMethodAsync(m.MoveLearnMethodId, displayLanguage, token);
+                    move.Move = await LoadMoveAsync(m.MoveId, version, displayLanguage, token);
+                    bag.Add(move);
+                });
+                await Task.WhenAll(tasks);
+                return new ObservableCollection<PokemonMove>(bag.OrderBy(o => o.LearnMethod.Id).ThenBy(t => t.Level).ThenBy(t => t.Order));
+            }
+            catch (Exception)
+            {
+                return new ObservableCollection<PokemonMove>();
             }
         }
     }

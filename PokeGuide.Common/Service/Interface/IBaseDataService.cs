@@ -6,6 +6,9 @@ namespace PokeGuide.Service.Interface
 {
     public interface IBaseDataService
     {
-        Task<ElementType> LoadTypeAsync(int id, GameVersion version, int displayLanguage, CancellationToken token);
+        Task<ElementType> GetTypeAsync(int id, GameVersion version);
+        Task<GrowthRate> GetGrowthRateAsync(int id);
+        Task<DamageClass> GetDamageClassAsync(int id);
+        void InitializeResources(int displayLanguage, CancellationToken token);
     }
 }

@@ -107,7 +107,6 @@
     <Compile Include="ViewModel\IMainViewModel.cs" />
     <Compile Include="ViewModel\IPokemonViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="ViewModel\NotifyTaskCompletion.cs" />
     <Compile Include="ViewModel\PokemonViewModel.cs" />
     <Compile Include="ViewModel\SelectableCollection.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
@@ -126,6 +125,14 @@
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.3.0.1\lib\portable-net45+netcore45+wpa81\Nito.AsyncEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Concurrent, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.AsyncEx.3.0.1\lib\portable-net45+netcore45+wpa81\Nito.AsyncEx.Concurrent.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SQLite.Net, Version=3.0.5.0, Culture=neutral, processorArchitecture=MSIL">
