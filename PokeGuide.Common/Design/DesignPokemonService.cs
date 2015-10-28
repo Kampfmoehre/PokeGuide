@@ -1,0 +1,223 @@
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
+using PokeGuide.Model;
+using PokeGuide.Service.Interface;
+
+namespace PokeGuide.Design
+{
+    public class DesignPokemonService : IPokemonService
+    {
+        public void Cleanup()
+        { }
+
+        public Task<GrowthRate> GetGrowthRateAsync(int id)
+        {
+            var tcs = new TaskCompletionSource<GrowthRate>();
+            tcs.SetResult(new GrowthRate
+            {
+                    Id = 1,
+                    Name = "Langsam"
+            });
+            return tcs.Task;
+        }
+
+        public Task<PokedexEntry> LoadPokedexEntryAsync(int dexId, int speciesId, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<PokedexEntry>();
+            tcs.SetResult(new PokedexEntry
+            {
+                DexNumber = 6,
+                Id = dexId,
+                Name = "Neue Hoenn"
+            });
+            return tcs.Task;
+        }
+
+        public Task<ObservableCollection<SpeciesName>> LoadAllSpeciesAsync(GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<ObservableCollection<SpeciesName>>();
+            tcs.SetResult(new ObservableCollection<SpeciesName>
+            {
+                new SpeciesName { Id = 6, Name = "Glurak", Generation = 1 },
+                new SpeciesName { Id = 7, Name = "Schiggy", Generation = 1 }
+            });
+            return tcs.Task;
+        }
+
+        public Task<Species> LoadSpeciesAsync(int id, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<Species>();
+            tcs.SetResult(new Species
+            {
+                BaseHappiness = 70,
+                CatchRate = 45,
+                DexEntry = LoadPokedexEntryAsync(39, 6, 6, token).Result,
+                EggGroup1 = LoadEggGroupAsync(1, 6, token).Result,
+                GrowthRate = GetGrowthRateAsync(1).Result,
+                HatchCounter = 20,
+                Id = 6,
+                Name = "Glurak"
+            });
+            return tcs.Task;
+        }
+
+        public Task<ObservableCollection<PokemonForm>> LoadFormsAsync(SpeciesName species, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<ObservableCollection<PokemonForm>>();
+            tcs.SetResult(new ObservableCollection<PokemonForm> {
+                new PokemonForm
+                {
+                    BaseExperience = 255,
+                    Height = 12,
+                    Id = 12,
+                    Name = "Mega Glurak X",
+                    Species = LoadSpeciesAsync(species.Id, version, displayLanguage, token).Result,
+                    Weight = 100
+                }
+            });
+            return tcs.Task;
+        }
+
+        public Task<ElementType> GetTypeAsync(int id, GameVersion version)
+        {
+            var tcs = new TaskCompletionSource<ElementType>();
+            tcs.SetResult(new ElementType { Id = 12, Name = "Feuer" });
+            return tcs.Task;
+        }
+
+        public Task<Ability> LoadAbilityAsync(int id, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<Ability>();
+            tcs.SetResult(new Ability { Description = "Awesome Description", Effect = "Strange effect", FlavorText = "Fancy ingame text", Id = 12, Name = "Temposchub" });
+            return tcs.Task;
+        }
+
+        public Task<EggGroup> LoadEggGroupAsync(int id, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<EggGroup>();
+            tcs.SetResult(new EggGroup { Id = 1, Name = "Wasser" });
+            return tcs.Task;
+        }
+
+        public Task<ObservableCollection<Stat>> LoadPokemonStatsAsync(int formId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<ObservableCollection<Stat>>();
+            tcs.SetResult(new ObservableCollection<Stat>
+            {
+                new Stat { EffortValue = 1, Id = 1, Name = "KP", StatValue = 110 },
+                new Stat { EffortValue = 0, Id = 2, Name = "Angriff", StatValue = 60 },
+                new Stat { EffortValue = 1, Id = 3, Name = "Verteidigung", StatValue = 75 },
+                new Stat { EffortValue = 0, Id = 4, Name = "Spezialangriff", StatValue = 55 },
+                new Stat { EffortValue = 1, Id = 5, Name = "Spezialverteidigung", StatValue = 70 },
+                new Stat { EffortValue = 0, Id = 6, Name = "Initative", StatValue = 70 }
+            });
+            return tcs.Task;
+        }
+
+        public Task<PokemonForm> LoadFormAsync(int formId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<PokemonForm>();
+            tcs.SetResult(new PokemonForm
+            {
+                Ability1 = new Ability { Description = "blub", Effect = "blob", FlavorText = "blubber", Id = 12, Name = "Adlerauge" },
+                Ability2 = LoadAbilityAsync(1, version, displayLanguage, token).Result,
+                BaseExperience = 255,
+                Height = 12,
+                Id = 12,
+                HiddenAbility = new Ability { Description = "Secret Ability", Effect = "Awesome effect", FlavorText = "You know nothing", Id = 24, Name = "versteckt"},
+                Name = "Mega Glurak X",
+                Stats = LoadPokemonStatsAsync(1, version, displayLanguage, token).Result,
+                Species = LoadSpeciesAsync(12, version, displayLanguage, token).Result,
+                Type1 = new ElementType { DamageClassId = 1, Id = 9, Name = "Unlicht" },
+                Type2 = GetTypeAsync(1, version).Result,
+                Weight = 100
+            });
+            return tcs.Task;
+        }
+
+        public void InitializeResources(int displayLanguage, CancellationToken token)
+        {
+            
+        }
+              
+        public Task<DamageClass> GetDamageClassAsync(int id)
+        {
+            var tcs = new TaskCompletionSource<DamageClass>();
+            tcs.SetResult(new DamageClass { Id = id, Name = "Physisch" });
+            return tcs.Task;
+        }
+
+        public Task<Move> LoadMoveAsync(int id, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<Move>();
+            tcs.SetResult(new Move
+            {
+                Accuracy = 90,
+                DamageClass = GetDamageClassAsync(1).Result,
+                Id = 2,
+                Name = "Flügelschlag",
+                Power = 60,
+                PowerPoints = 15,
+                Priority = 0,
+                Type = new ElementType { Id = 1, Name = "Flug" }
+            });
+            return tcs.Task;
+        }
+
+        public Task<MoveLearnMethod> LoadMoveLearnMethodAsync(int id, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<MoveLearnMethod>();
+            tcs.SetResult(new MoveLearnMethod { Id = 1, Name = "Level" });
+            return tcs.Task;
+        }
+
+        public Task<ObservableCollection<PokemonMove>> LoadMoveSetAsync(int pokemonId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<ObservableCollection<PokemonMove>>();
+            tcs.SetResult(new ObservableCollection<PokemonMove>
+            {
+                new PokemonMove
+                {
+                    LearnMethod = new MoveLearnMethod { Id = 1, Name = "Level" },
+                    Level = 12,
+                    Move = LoadMoveAsync(1, version, displayLanguage, token).Result
+                },
+                new PokemonMove
+                {
+                    LearnMethod = new MoveLearnMethod { Id = 1, Name = "Level" },
+                    Level = 24,
+                    Move = new Move
+                    {
+                        Accuracy = 100,
+                        DamageClass = new DamageClass { Id = 2, Name = "Speziell" },
+                        Id = 156,
+                        Name = "Flammenwurf",
+                        Power = 120,
+                        PowerPoints = 5,
+                        Priority = -2,
+                        Type = new ElementType { DamageClassId = 1, Generation = 1, Id = 7, Name = "Coleottero" }
+                    }
+                },
+                new PokemonMove
+                {
+                    LearnMethod = new MoveLearnMethod { Id = 1, Name = "Level" },
+                    Level = 24,
+                    Move = new Move
+                    {
+                        Accuracy = null,
+                        DamageClass = new DamageClass { Id = 2, Name = "Status" },
+                        Id = 156,
+                        Name = "Giftpuder",
+                        Power = null,
+                        PowerPoints = 25,
+                        Priority = 2,
+                        Type = new ElementType { DamageClassId = 1, Generation = 1, Id = 7, Name = "Gift" }
+                    }
+                }
+            });
+            return tcs.Task;
+        }
+    }
+}
