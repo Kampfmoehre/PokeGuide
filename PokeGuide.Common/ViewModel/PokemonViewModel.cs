@@ -20,10 +20,10 @@ namespace PokeGuide.ViewModel
         IStaticDataService _staticDataService;
         IPokemonService _pokemonService;
         IMoveService _moveService;
-        INotifyTaskCompletion<SelectableCollection<Language>> _languages;
-        INotifyTaskCompletion<SelectableCollection<GameVersion>> _versions;
-        INotifyTaskCompletion<SelectableCollection<SpeciesName>> _speciesList;
-        INotifyTaskCompletion<SelectableCollection<PokemonForm>> _forms;
+        INotifyTaskCompletionCollection<Language> _languages;
+        INotifyTaskCompletionCollection<GameVersion> _versions;
+        INotifyTaskCompletionCollection<SpeciesName> _speciesList;
+        INotifyTaskCompletionCollection<PokemonForm> _forms;
         INotifyTaskCompletion<PokemonForm> _currentForm;
         INotifyTaskCompletion<ObservableCollection<PokemonMove>> _currentMoveSet;
         RelayCommand _loadVersionCommand;
@@ -31,32 +31,48 @@ namespace PokeGuide.ViewModel
         RelayCommand _loadFormsCommand;
         RelayCommand _loadFormCommand;
         /// <summary>
-        /// Sets and gets the 
+        /// Sets and gets the
         /// </summary>
-        public INotifyTaskCompletion<SelectableCollection<Language>> Languages
+        public INotifyTaskCompletionCollection<Language> Languages
         {
             get { return _languages; }
             set
             {
-                Set(() => Languages, ref _languages, value);
                 if (Languages != null)
                 {
-                    Languages.PropertyChanged += (s, e) =>
-                    {
-                        if (e.PropertyName == "IsSuccessfullyCompleted")
-                        {                            
-                            Languages.Result.SelectedItem = Languages.Result.Collection.First(f => f.Id == 6);
-                            ResetOperations();
-                            LoadVersionCommand.RaiseCanExecuteChanged();
-                        }
-                    };
-                }                
+                    Languages.SelectedItemChanged -= SelectedLanguageChanged;
+                    Languages.PropertyChanged += Languages_propertyChanged;
+                }
+                Set(() => Languages, ref _languages, value);
+                if (Languages != null)
+                    Languages.PropertyChanged += Languages_propertyChanged;
             }
         }
+
+        void Languages_propertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "IsSuccessfullyCompleted")
+            {
+                Languages.SelectedItemChanged += SelectedLanguageChanged;
+                Languages.Result.SelectedItem = Languages.Result.Collection.First(f => f.Id == 6);
+                //  ResetOperations();
+                //  LoadVersionCommand.RaiseCanExecuteChanged();
+            }
+        }
+        void SelectedLanguageChanged(object sender, SelectedItemChangedEventArgs<Language> e)
+        {
+            Versions = null;
+            SpeciesList = null;
+            Forms = null;
+            CurrentForm = null;
+            CurrentMoveSet = null;
+            if (e.NewItem != null)
+                Versions = NotifyTaskCompletionCollection<Language>.Create(LoadVersionsAsync(e.NewItem.Id));
+        }
         /// <summary>
-        /// Sets and gets the 
+        /// Sets and gets the
         /// </summary>
-        public INotifyTaskCompletion<SelectableCollection<GameVersion>> Versions
+        public INotifyTaskCompletionCollection<GameVersion> Versions
         {
             get { return _versions ; }
             set
@@ -73,9 +89,9 @@ namespace PokeGuide.ViewModel
             }
         }
         /// <summary>
-        /// Sets and gets the 
+        /// Sets and gets the
         /// </summary>
-        public INotifyTaskCompletion<SelectableCollection<SpeciesName>> SpeciesList
+        public INotifyTaskCompletionCollection<SpeciesName> SpeciesList
         {
             get { return _speciesList; }
             set
@@ -92,9 +108,9 @@ namespace PokeGuide.ViewModel
             }
         }
         /// <summary>
-        /// Sets and gets the 
+        /// Sets and gets the
         /// </summary>
-        public INotifyTaskCompletion<SelectableCollection<PokemonForm>> Forms
+        public INotifyTaskCompletionCollection<PokemonForm> Forms
         {
             get { return _forms; }
             set
@@ -111,7 +127,7 @@ namespace PokeGuide.ViewModel
             }
         }
         /// <summary>
-        /// Sets and gets the 
+        /// Sets and gets the
         /// </summary>
         public INotifyTaskCompletion<PokemonForm> CurrentForm
         {
@@ -119,7 +135,7 @@ namespace PokeGuide.ViewModel
             set { Set(() => CurrentForm, ref _currentForm, value); }
         }
         /// <summary>
-        /// Sets and gets the 
+        /// Sets and gets the
         /// </summary>
         public INotifyTaskCompletion<ObservableCollection<PokemonMove>> CurrentMoveSet
         {
@@ -194,9 +210,9 @@ namespace PokeGuide.ViewModel
             _pokemonService = pokemonService;
             _moveService = moveService;
             Languages = NotifyTaskCompletion.Create(LoadLanguagesAsync(6));
-                 
+
             //Versions = new NotifyTaskCompletion<SelectableCollection<GameVersion>>(LoadVersions(6));
-            
+
             //Versions.PropertyChanged += (s, e) =>
             //{
             //    Versions.Result.PropertyChanged += (s1, e1) =>
@@ -256,7 +272,7 @@ namespace PokeGuide.ViewModel
 
         string _timeConsumed;
         /// <summary>
-        /// Sets and gets the 
+        /// Sets and gets the
         /// </summary>
         public string TimeConsumed
         {
@@ -267,7 +283,7 @@ namespace PokeGuide.ViewModel
         void ResetOperations()
         {
             //_tokenSource.Cancel();
-            _pokemonService.InitializeResources(Languages.Result.SelectedItem.Id, _tokenSource.Token);            
+            _pokemonService.InitializeResources(Languages.Result.SelectedItem.Id, _tokenSource.Token);
         }
     }
 }

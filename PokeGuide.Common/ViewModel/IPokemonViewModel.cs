@@ -6,11 +6,11 @@ using PokeGuide.Model;
 namespace PokeGuide.ViewModel
 {
     public interface IPokemonViewModel
-    {        
-        INotifyTaskCompletion<SelectableCollection<Language>> Languages { get; set; }
-        INotifyTaskCompletion<SelectableCollection<GameVersion>> Versions { get; set; }
-        INotifyTaskCompletion<SelectableCollection<SpeciesName>> SpeciesList { get; set; }
-        INotifyTaskCompletion<SelectableCollection<PokemonForm>> Forms { get; set; }
+    {
+        INotifyTaskCompletionCollection<Language> Languages { get; set; }
+        INotifyTaskCompletionCollection<GameVersion> Versions { get; set; }
+        INotifyTaskCompletionCollection<SpeciesName> SpeciesList { get; set; }
+        INotifyTaskCompletionCollection<PokemonForm> Forms { get; set; }
         INotifyTaskCompletion<PokemonForm> CurrentForm { get; set; }
         INotifyTaskCompletion<ObservableCollection<PokemonMove>> CurrentMoveSet { get; set; }
         RelayCommand LoadVersionCommand { get; }
