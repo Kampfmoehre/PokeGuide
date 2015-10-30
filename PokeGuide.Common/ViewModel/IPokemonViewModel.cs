@@ -13,10 +13,7 @@ namespace PokeGuide.ViewModel
         INotifyTaskCompletionCollection<PokemonForm> Forms { get; set; }
         INotifyTaskCompletion<PokemonForm> CurrentForm { get; set; }
         INotifyTaskCompletion<ObservableCollection<PokemonMove>> CurrentMoveSet { get; set; }
-        RelayCommand LoadVersionCommand { get; }
-        RelayCommand LoadSpeciesCommand { get; }
-        RelayCommand LoadFormsCommand { get; }
-        RelayCommand LoadFormCommand { get; }
         string TimeConsumed { get; set; }
+        RelayCommand<int> LoadFormCommand { get; }
     }
 }

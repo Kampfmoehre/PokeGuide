@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{Binding PokemonViewModel, Source={StaticResource Locator}}">
 
     <Page.Resources>
@@ -27,8 +28,9 @@
         </Style>
     </Page.Resources>
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Margin="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -37,70 +39,124 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="0"/>
             <ColumnDefinition Width="250"/>
             <ColumnDefinition Width="50"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ComboBox Grid.Row="0" Grid.Column="1" Header="Sprache" ItemsSource="{Binding Languages.Result.Collection}"
-                  SelectedItem="{Binding Languages.Result.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" Header="Sprache" ItemsSource="{Binding Languages.Collection}"
+                  SelectedItem="{Binding Languages.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
         <ProgressRing Grid.Row="0" Grid.Column="2" IsActive="{Binding Languages.IsNotCompleted}"/>
-        <Button Grid.Row="1" Grid.Column="0" Content="Spiele laden" Command="{Binding LoadVersionCommand}"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" Header="Version" ItemsSource="{Binding Versions.Result.Collection}" 
-                  SelectedItem="{Binding Versions.Result.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" Header="Version" ItemsSource="{Binding Versions.Collection}" 
+                  SelectedItem="{Binding Versions.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
         <ProgressRing Grid.Row="1" Grid.Column="2" IsActive="{Binding Versions.IsNotCompleted}"/>
-        <Button Grid.Row="2" Grid.Column="0" Content="Pokémon laden" Command="{Binding LoadSpeciesCommand}"/>        
-        <ComboBox Grid.Row="2" Grid.Column="1" Header="Pokémon" ItemsSource="{Binding SpeciesList.Result.Collection}"
-                  SelectedItem="{Binding SpeciesList.Result.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
+        <ComboBox Grid.Row="2" Grid.Column="1" Header="Pokémon" ItemsSource="{Binding SpeciesList.Collection}"
+                  SelectedItem="{Binding SpeciesList.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
         <ProgressRing Grid.Row="2" Grid.Column="2" IsActive="{Binding SpeciesList.IsNotCompleted}"/>
-        <Button Grid.Row="3" Grid.Column="0" Content="Formen laden" Command="{Binding LoadFormsCommand}"/>
-        <ComboBox Grid.Row="3" Grid.Column="1" Header="Form" ItemsSource="{Binding Forms.Result.Collection}"
-                  SelectedItem="{Binding Forms.Result.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" Header="Form" ItemsSource="{Binding Forms.Collection}"
+                  SelectedItem="{Binding Forms.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
         <ProgressRing Grid.Row="3" Grid.Column="2" IsActive="{Binding Forms.IsNotCompleted}"/>
-        <Button Grid.Row="4" Grid.Column="1" Content="Form laden" Command="{Binding LoadFormCommand}"/>
         <ProgressRing Grid.Row="4" Grid.Column="2" IsActive="{Binding CurrentForm.IsNotCompleted}"/>
-        <Grid Grid.Row="0" Grid.Column="3" Grid.RowSpan="6">
+        <ProgressRing Grid.Row="5" Grid.Column="2" IsActive="{Binding CurrentMoveSet.IsNotCompleted}"/>
+
+        <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Text="Zeit:"/>
+            <TextBlock Text="{Binding TimeConsumed}"/>
+        </StackPanel>
+        
+        <Grid Grid.Row="0" Grid.Column="3" Grid.RowSpan="7">
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.15*"/>
+                <ColumnDefinition Width="0.5*"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Grid Grid.Row="0" Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="ID"/>
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.Id}"/>
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding CurrentForm.Result.Species.DexEntry.DexNumber}"/>
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Typ"/>
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentForm.Result.Type1.Name}"/>
-                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CurrentForm.Result.Type2.Name}"/>
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Fähigkeit"/>
-                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentForm.Result.Ability1.Name}"/>
-                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding CurrentForm.Result.Ability2.Name}"/>
-                <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding CurrentForm.Result.HiddenAbility.Name}"/>
-            </Grid>
-            <ListView Grid.Row="1" Grid.Column="0" Header="Basiswerte" ItemsSource="{Binding CurrentForm.Result.Stats}" ItemTemplate="{StaticResource myTemplate}">
+            
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="ID"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.Id}"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Dex"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.DexEntry.DexNumber}"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Höhe"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentForm.Result.Height}"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Gewicht"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CurrentForm.Result.Weight}"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Typ"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding CurrentForm.Result.Type1.Name}"/>
+            <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding CurrentForm.Result.Type2.Name}"/>
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Fangrate"/>
+            <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.CatchRate}"/>
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Exp Gruppe"/>
+            <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.GrowthRate.Name}"/>
+            <TextBlock Grid.Row="8" Grid.Column="0" Text="Basis Exp"/>
+            <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding CurrentForm.Result.BaseExperience}"/>
+            <TextBlock Grid.Row="9" Grid.Column="0" Text="Basis Zuneigung"/>
+            <TextBlock Grid.Row="9" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.BaseHappiness}"/>
+            <TextBlock Grid.Row="10" Grid.Column="0" Text="Item"/>
+            <StackPanel Grid.Row="10" Grid.Column="1" Orientation="Horizontal">
+                <TextBlock Text="{Binding CurrentForm.Result.HeldItem.Name}" Margin="0,0,5,0"/>
+                <TextBlock Text="{Binding CurrentForm.Result.HeldItemRarity}"/>
+                <TextBlock Text="%"/>
+            </StackPanel>
+            <TextBlock Grid.Row="11" Grid.Column="0" Text="Ei Gruppe"/>
+            <TextBlock Grid.Row="11" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.EggGroup1.Name}"/>
+            <TextBlock Grid.Row="12" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.EggGroup2.Name}"/>
+            <TextBlock Grid.Row="13" Grid.Column="0" Text="Ei Zyklen"/>
+            <TextBlock Grid.Row="13" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.HatchCounter}"/>
+            <TextBlock Grid.Row="14" Grid.Column="0" Text="Fähigkeit"/>
+            <TextBlock Grid.Row="14" Grid.Column="1" Text="{Binding CurrentForm.Result.Ability1.Name}"/>
+            <TextBlock Grid.Row="15" Grid.Column="1" Text="{Binding CurrentForm.Result.Ability2.Name}"/>
+            <TextBlock Grid.Row="16" Grid.Column="0" Text="Versteckte Fähigkeit"/>
+            <TextBlock Grid.Row="16" Grid.Column="1" Text="{Binding CurrentForm.Result.HiddenAbility.Name}"/>
+            <ListView Grid.Row="0" Grid.Column="2" Grid.RowSpan="7" Header="Basiswerte" ItemsSource="{Binding CurrentForm.Result.Stats}" 
+                      ItemTemplate="{StaticResource myTemplate}" SelectionMode="None">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="FrameworkElement">
                         <Setter Property="Margin" Value="0"/>
                     </Style>
                 </ListView.ItemContainerStyle>
             </ListView>
-            <ListView Grid.Row="1" Grid.Column="1" Header="Attacken" ItemsSource="{Binding CurrentMoveSet.Result}">
+            <ListView x:Name="evolutionList" Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="5" Header="Entwicklung" 
+                      ItemsSource="{Binding CurrentForm.Result.Species.PossibleEvolutions}" SelectionMode="None">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding EvolvesTo.Id}" VerticalAlignment="Center"/>
+                            <HyperlinkButton Grid.Column="1" Content="{Binding EvolvesTo.Name}" Command="{Binding ElementName=evolutionList, Path=DataContext.LoadFormCommand}"
+                                             CommandParameter="{Binding EvolvesTo.Id}"/>                            
+                            <TextBlock Grid.Column="2" Text="{Binding MinLevel}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="3" Text="{Binding EvolutionTrigger}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="4" Text="{Binding EvolutionItem.Name}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <ListView Grid.Row="0" Grid.Column="3" Grid.RowSpan="20" Header="Attacken" ItemsSource="{Binding CurrentMoveSet.Result}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -126,10 +182,6 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="Zeit:"/>
-                <TextBlock Text="{Binding TimeConsumed}"/>
-            </StackPanel>
         </Grid>
     </Grid>
 </Page>

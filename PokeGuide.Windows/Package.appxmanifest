@@ -1,41 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest">
-
-  <Identity Name="9b6e6d7d-56b3-4c56-8ab2-cbf28393771a"
-            Publisher="CN=Satan"
-            Version="1.0.0.0" />
-
+  <Identity Name="9b6e6d7d-56b3-4c56-8ab2-cbf28393771a" Publisher="CN=Satan" Version="1.0.0.0" />
   <Properties>
     <DisplayName>PokeGuide.Windows</DisplayName>
     <PublisherDisplayName>Satan</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
-
   <Prerequisites>
     <OSMinVersion>6.3.0</OSMinVersion>
     <OSMaxVersionTested>6.3.0</OSMaxVersionTested>
   </Prerequisites>
-
   <Resources>
-    <Resource Language="x-generate"/>
+    <Resource Language="x-generate" />
   </Resources>
-
   <Applications>
-    <Application Id="App"
-        Executable="$targetnametoken$.exe"
-        EntryPoint="PokeGuide.Windows.App">
-        <m2:VisualElements
-            DisplayName="PokeGuide.Windows"
-            Square150x150Logo="Assets\Logo.png"
-            Square30x30Logo="Assets\SmallLogo.png"
-            Description="PokeGuide.Windows"
-            ForegroundText="light"
-            BackgroundColor="#464646">
-            <m2:SplashScreen Image="Assets\SplashScreen.png" />
-        </m2:VisualElements>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="PokeGuide.Windows.App">
+      <m2:VisualElements DisplayName="PokeGuide" Square150x150Logo="Assets\Logo.png" Square30x30Logo="Assets\SmallLogo.png" Description="PokeGuide zeigt Informationen über Pokémon an" ForegroundText="light" BackgroundColor="#464646" ToastCapable="false">
+        <m2:DefaultTile>
+          <m2:ShowNameOnTiles>
+            <m2:ShowOn Tile="square150x150Logo" />
+          </m2:ShowNameOnTiles>
+        </m2:DefaultTile>
+        <m2:SplashScreen Image="Assets\SplashScreen.png" />
+      </m2:VisualElements>
     </Application>
   </Applications>
-  <Capabilities>
-    <Capability Name="internetClient" />
-  </Capabilities>
 </Package>

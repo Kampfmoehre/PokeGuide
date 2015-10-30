@@ -15,6 +15,8 @@ namespace PokeGuide.Model
         Ability _hiddenAbility;
         ObservableCollection<Stat> _stats;
         ObservableCollection<PokemonMove> _moveSet;
+        Item _heldItem;
+        int? _heldItemRarity;
         /// <summary>
         /// Sets and gets the 
         /// </summary>
@@ -102,6 +104,22 @@ namespace PokeGuide.Model
         {
             get { return _moveSet; }
             set { Set(() => MoveSet, ref _moveSet, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public Item HeldItem
+        {
+            get { return _heldItem; }
+            set { Set(() => HeldItem, ref _heldItem, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public int? HeldItemRarity
+        {
+            get { return _heldItemRarity; }
+            set { Set(() => HeldItemRarity, ref _heldItemRarity, value); }
         }
     }
 }

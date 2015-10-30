@@ -7,27 +7,27 @@ using System.Threading.Tasks;
 
 using Nito.AsyncEx;
 
-namespace PokeGuide.Common.Model
+namespace PokeGuide.Model
 {
-    public static class NotifyTaskCompletionCollection<TResult>
+    public static class NotifyTaskCompletionCollection<T> where T : ModelBase
     {
-        public static INotifyTaskCompletionCollection<TResult> Create(Task<ObservableCollection<TResult>> task)
+        public static INotifyTaskCompletionCollection<T> Create(Task<ObservableCollection<T>> task, int? itemToSelect = null)
         {
-            return new NotifyTaskCompletionCollectionImplementation<TResult>(task);
+            return new NotifyTaskCompletionCollectionImplementation<T>(task, itemToSelect);
         }
 
-        public static INotifyTaskCompletionCollection<TResult> Create(Func<Task<ObservableCollection<TResult>>> asyncAction)
+        public static INotifyTaskCompletionCollection<T> Create(Func<Task<ObservableCollection<T>>> asyncAction, int? itemToSelect = null)
         {
-            return Create(asyncAction());
+            return Create(asyncAction(), itemToSelect);
         }
 
-        private sealed class NotifyTaskCompletionCollectionImplementation<TResult> : INotifyTaskCompletionCollection<TResult>
+        private sealed class NotifyTaskCompletionCollectionImplementation<TResult> : INotifyTaskCompletionCollection<TResult> where TResult : ModelBase
         {
             TResult _selectedItem;
             public event PropertyChangedEventHandler PropertyChanged;
             public event SelectedItemChangedEventHandler<TResult> SelectedItemChanged;
 
-            public NotifyTaskCompletionCollectionImplementation(Task<ObservableCollection<TResult>> task)
+            public NotifyTaskCompletionCollectionImplementation(Task<ObservableCollection<TResult>> task, int? itemToSelect = null)
             {
                 Task = task;
                 if (task.IsCompleted)
@@ -58,7 +58,10 @@ namespace PokeGuide.Common.Model
                     else
                     {
                         propertyChanged(this, new PropertyChangedEventArgs("Collection"));
-                        SelectedItem = Collection.FirstOrDefault();
+                        if (itemToSelect != null)
+                            SelectedItem = Collection.FirstOrDefault(f => f.Id == (int)itemToSelect);
+                        else if (Collection.Count == 1)
+                            SelectedItem = Collection.First();
                         propertyChanged(this, new PropertyChangedEventArgs("IsSuccessfullyCompleted"));
                     }
                 }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, scheduler);

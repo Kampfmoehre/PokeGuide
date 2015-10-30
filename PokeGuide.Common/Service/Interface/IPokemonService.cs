@@ -16,6 +16,8 @@ namespace PokeGuide.Service.Interface
         Task<Ability> LoadAbilityAsync(int id, GameVersion version, int displayLanguage, CancellationToken token);
         Task<EggGroup> LoadEggGroupAsync(int id, int displayLanguage, CancellationToken token);
         Task<ObservableCollection<Stat>> LoadPokemonStatsAsync(int formId, GameVersion version, int displayLanguage, CancellationToken token);
+        Task<ObservableCollection<PokemonEvolution>> LoadPossibleEvolutionsAsync(int speciesId, GameVersion version, int displayLanguage, CancellationToken token);
+        Task<Item> LoadItemAsync(int id, int displayLanguage, CancellationToken token);
 
         Task<Move> LoadMoveAsync(int id, GameVersion version, int displayLanguage, CancellationToken token);
         //Task<DamageClass> LoadDamageClassAsync(int id, int displayLanguage, CancellationToken token);

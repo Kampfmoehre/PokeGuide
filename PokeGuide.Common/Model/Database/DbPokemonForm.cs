@@ -29,5 +29,9 @@ namespace PokeGuide.Model.Database
         public int PokemonId { get; set; }
         [Column("pokemon_species_id")]
         public int PokemonSpeciesId { get; set; }
+        [Column("rarity")]
+        public int? ItemRarity { get; set; }
+        [Column("item_id")]
+        public int? ItemId { get; set; }
     }
 }

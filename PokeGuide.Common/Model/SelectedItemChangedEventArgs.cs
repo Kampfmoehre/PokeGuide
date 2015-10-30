@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PokeGuide.Common.Model
+namespace PokeGuide.Model
 {
     public class SelectedItemChangedEventArgs<T> : EventArgs
     {

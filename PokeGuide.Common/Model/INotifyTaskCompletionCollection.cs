@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 using Nito.AsyncEx;
 
-namespace PokeGuide.Common.Model
+namespace PokeGuide.Model
 {
     public interface INotifyTaskCompletionCollection<T> : INotifyTaskCompletion
     {

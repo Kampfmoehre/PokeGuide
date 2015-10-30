@@ -1,4 +1,6 @@
-﻿namespace PokeGuide.Model
+﻿using System.Collections.ObjectModel;
+
+namespace PokeGuide.Model
 {
     public class Species : SpeciesName
     {
@@ -9,7 +11,7 @@
         GrowthRate _growthRate;
         EggGroup _eggGroup1;
         EggGroup _eggGroup2;
-
+        ObservableCollection<PokemonEvolution> _possibleEvolutions;
         /// <summary>
         /// Sets and gets the 
         /// </summary>
@@ -66,6 +68,14 @@
         {
             get { return _eggGroup2; }
             set { Set(() => EggGroup2, ref _eggGroup2, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public ObservableCollection<PokemonEvolution> PossibleEvolutions
+        {
+            get { return _possibleEvolutions; }
+            set { Set(() => PossibleEvolutions, ref _possibleEvolutions, value); }
         }
     }
 }

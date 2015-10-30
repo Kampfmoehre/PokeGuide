@@ -55,10 +55,12 @@ namespace PokeGuide.Design
                 CatchRate = 45,
                 DexEntry = LoadPokedexEntryAsync(39, 6, 6, token).Result,
                 EggGroup1 = LoadEggGroupAsync(1, 6, token).Result,
+                EggGroup2 = new EggGroup { Id = 12, Name = "Humanotyp" },
                 GrowthRate = GetGrowthRateAsync(1).Result,
                 HatchCounter = 20,
                 Id = 6,
-                Name = "Glurak"
+                Name = "Glurak",
+                PossibleEvolutions = LoadPossibleEvolutionsAsync(id, version, displayLanguage, token).Result
             });
             return tcs.Task;
         }
@@ -125,6 +127,8 @@ namespace PokeGuide.Design
                 Ability2 = LoadAbilityAsync(1, version, displayLanguage, token).Result,
                 BaseExperience = 255,
                 Height = 12,
+                HeldItem = new Item { Id = 15, Name = "Beere" },
+                HeldItemRarity = 5,
                 Id = 12,
                 HiddenAbility = new Ability { Description = "Secret Ability", Effect = "Awesome effect", FlavorText = "You know nothing", Id = 24, Name = "versteckt"},
                 Name = "Mega Glurak X",
@@ -218,6 +222,27 @@ namespace PokeGuide.Design
                 }
             });
             return tcs.Task;
+        }
+
+        public Task<ObservableCollection<PokemonEvolution>> LoadPossibleEvolutionsAsync(int speciesId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<ObservableCollection<PokemonEvolution>>();
+            tcs.SetResult(new ObservableCollection<PokemonEvolution>
+            {
+                new PokemonEvolution
+                {
+                    EvolutionTrigger = "Levelaufstieg",
+                    EvolutionItem = new Item { Id = 12, Name = "Feuerstein" },
+                    EvolvesTo = new SpeciesName { Id = 12, Name = "Glutexo" },
+                    MinLevel = 16
+                }
+            });
+            return tcs.Task;
+        }
+
+        public Task<Item> LoadItemAsync(int id, int displayLanguage, CancellationToken token)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -63,6 +63,7 @@
     <Compile Include="Model\Ability.cs" />
     <Compile Include="Model\DamageClass.cs" />
     <Compile Include="Model\Database\DbAbility.cs" />
+    <Compile Include="Model\Database\DbItem.cs" />
     <Compile Include="Model\Database\DbMoveDamageClass.cs" />
     <Compile Include="Model\Database\DbEggGroup.cs" />
     <Compile Include="Model\Database\DbGrowthRate.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Model\Database\DbPokedex.cs" />
     <Compile Include="Model\Database\DbPokemonDexNumber.cs" />
     <Compile Include="Model\Database\DbPokemonEggGroup.cs" />
+    <Compile Include="Model\Database\DbPokemonEvolution.cs" />
     <Compile Include="Model\Database\DbPokemonForm.cs" />
     <Compile Include="Model\Database\DbPokemonMove.cs" />
     <Compile Include="Model\Database\DbPokemonSpecies.cs" />
@@ -83,12 +85,14 @@
     <Compile Include="Model\GameVersion.cs" />
     <Compile Include="Model\GrowthRate.cs" />
     <Compile Include="Model\INotifyTaskCompletionCollection.cs" />
+    <Compile Include="Model\Item.cs" />
     <Compile Include="Model\Language.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Model\Move.cs" />
     <Compile Include="Model\MoveLearnMethod.cs" />
     <Compile Include="Model\NotifyTaskCompletionCollection.cs" />
     <Compile Include="Model\PokedexEntry.cs" />
+    <Compile Include="Model\PokemonEvolution.cs" />
     <Compile Include="Model\PokemonForm.cs" />
     <Compile Include="Model\PokemonMove.cs" />
     <Compile Include="Model\SelectedItemChangedEventArgs.cs" />
