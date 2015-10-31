@@ -189,9 +189,9 @@ namespace PokeGuide.ViewModel
 
             if (IsInDesignMode)
             {
-                Versions = NotifyTaskCompletionCollection<GameVersion>.Create(LoadVersionsAsync(6), 1);
-                SpeciesList = NotifyTaskCompletionCollection<SpeciesName>.Create(LoadSpeciesAsync(null, 6), 1);
-                Forms = NotifyTaskCompletionCollection<PokemonForm>.Create(LoadFormsAsync(new SpeciesName { Id = 1 }, null, 6), 1);
+                Versions = NotifyTaskCompletionCollection<GameVersion>.Create(LoadVersionsAsync(6));
+                SpeciesList = NotifyTaskCompletionCollection<SpeciesName>.Create(LoadSpeciesAsync(null, 6));
+                Forms = NotifyTaskCompletionCollection<PokemonForm>.Create(LoadFormsAsync(new SpeciesName { Id = 1 }, null, 6));
                 CurrentForm = NotifyTaskCompletion.Create(LoadFormAsync(1, null, 6));
                 CurrentMoveSet = NotifyTaskCompletion.Create(LoadMoveSetAsync(6, null, 6));
             }

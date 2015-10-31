@@ -54,6 +54,15 @@ namespace PokeGuide
             }
 #endif
 
+#if WINDOWS_PHONE_APP
+            if (e.PreviousExecutionState != ApplicationExecutionState.Running)
+            {
+                bool loadState = (e.PreviousExecutionState == ApplicationExecutionState.Terminated);
+                var splash = new ExtendedSplashScreen();
+                Window.Current.Content = splash;
+                Window.Current.Activate();
+            }            
+#endif
             Frame rootFrame = Window.Current.Content as Frame;
 
             // App-Initialisierung nicht wiederholen, wenn das Fenster bereits Inhalte enthält.

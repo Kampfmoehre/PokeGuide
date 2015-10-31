@@ -1,0 +1,19 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PokeGuide.Themes">
+
+    <DataTemplate x:Key="pokemonStatListViewItemTemplate">
+        <Grid Width="190" Height="20" Margin="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="130"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{Binding Name}"/>
+            <TextBlock Grid.Column="1" Text="{Binding StatValue}" HorizontalAlignment="Right"/>
+            <TextBlock Grid.Column="2" Text="{Binding EffortValue}" HorizontalAlignment="Right"/>
+        </Grid>
+    </DataTemplate>
+
+</ResourceDictionary>

@@ -8,9 +8,13 @@
              xmlns:deviceService="using:PokeGuide.Service"
              d1p1:Ignorable="d">
   <Application.Resources>
-    <ResourceDictionary>
-      <deviceService:DeviceLocatorService x:Key="Locator.W8" d:IsDataSource="True"/>
-      <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />        
-    </ResourceDictionary>
+        <ResourceDictionary>
+              <deviceService:DeviceLocatorService x:Key="Locator.W8" d:IsDataSource="True"/>
+              <vm:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/MainStyles.xaml"/>
+                <ResourceDictionary Source="Themes/Templates.xaml"/>
+            </ResourceDictionary.MergedDictionaries>             
+        </ResourceDictionary>
   </Application.Resources>
 </Application>

@@ -27,6 +27,7 @@ namespace PokeGuide.Design
             var tcs = new TaskCompletionSource<ObservableCollection<GameVersion>>();
             tcs.SetResult(new ObservableCollection<GameVersion>
             {
+                new GameVersion { Generation = 1, Id = 1, Name = "Rot", VersionGroup = 1},
                 new GameVersion { Generation = 6, Id = 23, Name = "X", VersionGroup = 15},
                 new GameVersion { Generation = 6, Id = 24, Name = "Y", VersionGroup = 15}
             });
