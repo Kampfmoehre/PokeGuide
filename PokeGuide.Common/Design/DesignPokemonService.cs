@@ -56,6 +56,7 @@ namespace PokeGuide.Design
                 DexEntry = LoadPokedexEntryAsync(39, 6, 6, token).Result,
                 EggGroup1 = LoadEggGroupAsync(1, 6, token).Result,
                 EggGroup2 = new EggGroup { Id = 12, Name = "Humanotyp" },
+                GenderRate   = new GenderRate { Female = 50, Male = 50},
                 GrowthRate = GetGrowthRateAsync(1).Result,
                 HatchCounter = 20,
                 Id = 6,
@@ -231,9 +232,9 @@ namespace PokeGuide.Design
             {
                 new PokemonEvolution
                 {
-                    EvolutionTrigger = "Levelaufstieg",
+                    EvolutionTrigger = "Gegenstand benutzen",
                     EvolutionItem = new Item { Id = 12, Name = "Feuerstein" },
-                    EvolvesTo = new SpeciesName { Id = 12, Name = "Glutexo" },
+                    EvolvesTo = new SpeciesName { Id = 122, Name = "Pumpdjinn" },
                     MinLevel = 16
                 }
             });
@@ -243,6 +244,83 @@ namespace PokeGuide.Design
         public Task<Item> LoadItemAsync(int id, int displayLanguage, CancellationToken token)
         {
             throw new NotImplementedException();
+        }
+
+        public Task<ObservableCollection<PokemonEvolution>> LoadEvolutionGroupAsync(int speciesId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<ObservableCollection<PokemonEvolution>>();
+            tcs.SetResult(new ObservableCollection<PokemonEvolution>
+            {
+                new PokemonEvolution
+                {
+                    EvolutionItem = LoadItemAsync(1, displayLanguage, token).Result,
+                    EvolutionTrigger = "Gegenstand nutzen",
+                    EvolvesTo = new SpeciesName { Id = 45, Name = "Arkani" }                    
+                },
+                new PokemonEvolution
+                {
+                    EvolvesTo = new SpeciesName { Id = 482, Name = "Dragoran" },
+                    MinLevel = 58
+                },
+                new PokemonEvolution
+                {
+                    EvolutionLocation = LoadLocationFromIdAsync(1, version, displayLanguage, token).Result,
+                    EvolvesTo = new SpeciesName { Id = 245, Name = "Magneton" }
+                }
+            });
+            return tcs.Task;
+        }
+
+        public Task<Location> LoadLocationFromIdAsync(int id, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<Location>();
+            tcs.SetResult(new Location
+            {
+                Id = 12,
+                Name = "Kraterberg"
+            });
+            return tcs.Task;
+        }
+
+        public Task<Location> LoadLocationFromAreaAsync(int areaId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<Location>();
+            tcs.SetResult(new Location
+            {
+                Id = 12,
+                Name = "Kraterberg",
+                AreaId = 13,
+                AreaName = "1F"
+            });
+            return tcs.Task;
+        }
+
+        public Task<ObservableCollection<PokemonLocation>> LoadPokemonEncountersAsync(int pokemonId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<ObservableCollection<PokemonLocation>>();
+            tcs.SetResult(new ObservableCollection<PokemonLocation>
+            {
+                new PokemonLocation
+                {
+                    EncounterMethod = new EncounterMethod {Id = 1, Name = "Grass" },
+                    Location = LoadLocationFromAreaAsync(1, version, displayLanguage, token).Result,
+                    MaxLevel = 30,
+                    MinLevel = 20,
+                    Rarity = 12
+                }
+            });
+            return tcs.Task;
+        }
+
+        public Task<EncounterMethod> GetEncounterMethodAsync(int id)
+        {
+            var tcs = new TaskCompletionSource<EncounterMethod>();
+            tcs.SetResult(new EncounterMethod
+            {
+                Id = 12,
+                Name = "Surfer"
+            });
+            return tcs.Task;
         }
     }
 }

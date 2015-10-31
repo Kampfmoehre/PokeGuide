@@ -91,7 +91,8 @@ namespace PokeGuide.Service
                 species.EggGroup1 = await LoadEggGroupAsync(eggGroups[0].EggGroupId, displayLanguage, token);
                 if (eggGroups.Count > 1)
                     species.EggGroup2 = await LoadEggGroupAsync(eggGroups[1].EggGroupId, displayLanguage, token);
-                species.PossibleEvolutions = await LoadPossibleEvolutionsAsync(id, version, displayLanguage, token);
+                //species.PossibleEvolutions = await LoadPossibleEvolutionsAsync(id, version, displayLanguage, token);
+                species.GenderRate = CalculateGenderRate(dbSpecies.GenderRate);
 
                 return species;
             }
@@ -99,6 +100,26 @@ namespace PokeGuide.Service
             {
                 return null;
             }
+        }
+
+        GenderRate CalculateGenderRate(int femaleEights)
+        {
+            var rate = new GenderRate
+            {
+                Id = femaleEights
+            };
+
+            if (femaleEights == -1)
+            {
+                rate.Female = null;
+                rate.Male = null;
+            }
+            else
+            {
+                rate.Female = ((double)femaleEights / 8) * 100;
+                rate.Male = ((double)(8 - femaleEights) / 8) * 100;
+            }
+            return rate;
         }
 
         public async Task<ObservableCollection<PokemonForm>> LoadFormsAsync(SpeciesName species, GameVersion version, int displayLanguage, CancellationToken token)
@@ -284,7 +305,7 @@ namespace PokeGuide.Service
                 if (f.ItemId != null)
                     form.HeldItem = await LoadItemAsync((int)f.ItemId, displayLanguage, token);
 
-                form.Stats = await LoadPokemonStatsAsync(f.PokemonId, version, displayLanguage, token);
+                //form.Stats = await LoadPokemonStatsAsync(f.PokemonId, version, displayLanguage, token);
 
                return form;
             }
@@ -437,6 +458,136 @@ namespace PokeGuide.Service
             {
                 return null;
                 throw;
+            }
+        }
+
+        public async Task<ObservableCollection<PokemonEvolution>> LoadEvolutionGroupAsync(int speciesId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = "SELECT ps.id, psn.name, pe.min_level, etn.name AS evolution_trigger, pe.evolution_item_id, pe.location_id, ec.baby_trigger_item_id,\n" +
+                    "pe.min_happiness, pe.time_of_day FROM pokemon_v2_pokemonspecies ps\n" +
+                    "LEFT JOIN\n(SELECT def.pokemon_species_id AS id, IFNULL(curr.name, def.name) AS name FROM pokemon_v2_pokemonspeciesname def\n" +
+                    "LEFT JOIN pokemon_v2_pokemonspeciesname curr ON def.pokemon_species_id = curr.pokemon_species_id AND def.language_id = 9 AND curr.language_id = ?\n" +
+                    "GROUP BY def.pokemon_species_id)\nAS psn ON ps.id = psn.id\n" +
+                    "LEFT JOIN pokemon_v2_pokemonevolution pe ON pe.evolved_species_id = ps.id\n" +
+                    "LEFT JOIN pokemon_v2_evolutiontrigger et ON pe.evolution_trigger_id = et.id\n" +
+                    "LEFT JOIN\n(SELECT e.evolution_trigger_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_evolutiontriggername e\n" +
+                    "LEFT OUTER JOIN pokemon_v2_evolutiontriggername o ON e.evolution_trigger_id = o.evolution_trigger_id and o.language_id = ?\n" +
+                    "WHERE e.language_id = 9\n\nGROUP BY e.evolution_trigger_id)\nAS etn ON et.id = etn.id\n" +
+                    "LEFT JOIN pokemon_v2_evolutionchain ec ON ec.id = ps.evolution_chain_id\n" +
+                    "WHERE ps.evolution_chain_id = (SELECT evolution_chain_id FROM pokemon_v2_pokemonspecies WHERE id = ?) AND ps.generation_id <= ?";
+                IEnumerable<DbPokemonEvolution> evolutions = await _connection.QueryAsync<DbPokemonEvolution>(token, query, new object[] 
+                {
+                    displayLanguage,
+                    displayLanguage,
+                    speciesId,
+                    version.Generation
+                });
+                var result = new ObservableCollection<PokemonEvolution>();
+                foreach (DbPokemonEvolution evolution in evolutions)
+                {
+                    var evo = new PokemonEvolution
+                    {
+                        DayTime = evolution.TimeOfDay,
+                        EvolutionTrigger = evolution.EvolutionTrigger,
+                        EvolvesTo = new SpeciesName { Id = evolution.Id, Name = evolution.Name },
+                        MinLevel = evolution.MinLevel,
+                        MinHappiness = evolution.MinHappiness
+                    };
+
+                    if (evolution.LocationId != null)
+                    {
+                        Location loc = await LoadLocationFromIdAsync((int)evolution.LocationId, version, displayLanguage, token);
+                        if (loc == null)
+                            continue;
+                        evo.EvolutionLocation = loc;
+                    }
+                    if (evolution.EvolutionItemId != null)
+                        evo.EvolutionItem = await LoadItemAsync((int)evolution.EvolutionItemId, displayLanguage, token);
+                    result.Add(evo);
+                }
+                return result;
+            }
+            catch (Exception)
+            {
+                return new ObservableCollection<PokemonEvolution>();
+            }
+        }
+
+        public async Task<Location> LoadLocationFromIdAsync(int id, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = "SELECT loc.id, ln.name FROM pokemon_v2_location loc\n" +
+                    "LEFT JOIN\n(SELECT e.location_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_locationname e\n" +
+                    "LEFT OUTER JOIN pokemon_v2_locationname o ON e.location_id = o.location_id and o.language_id = ?\n" +
+                    "WHERE e.language_id = 9\nGROUP BY e.location_id)\nAS ln ON loc.id = ln.id\n" +
+                    "LEFT JOIN pokemon_v2_region r ON r.id = loc.region_id\n" +
+                    "LEFT JOIN pokemon_v2_versiongroupregion vgr ON r.id = vgr.region_id\n" +
+                    "WHERE loc.id = ? AND vgr.version_group_id = ?";
+                IEnumerable<DbLocation> locations = await _connection.QueryAsync<DbLocation>(token, query, new object[] { displayLanguage, id, version.VersionGroup });                
+                DbLocation location = locations.FirstOrDefault();
+                if (location == null)
+                    return null;
+                return new Location { Id = location.Id, Name = location.Name };
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Location> LoadLocationFromAreaAsync(int areaId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = "SELECT la.id, lan.name, la.location_id FROM pokemon_v2_locationarea la\n" +
+                        "LEFT JOIN\n(SELECT e.location_area_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_locationareaname e\n" +
+                        "LEFT OUTER JOIN pokemon_v2_locationareaname o ON e.location_area_id = o.location_area_id and o.language_id = ?\n" +
+                        "WHERE e.language_id = 9\nGROUP BY e.location_area_id)\nAS lan ON la.id = lan.id\n" +                        
+                        "WHERE la.id = ?";
+                IEnumerable<DbLocationArea> areas = await _connection.QueryAsync<DbLocationArea>(token, query, new object[] { displayLanguage, areaId });
+                DbLocationArea area = areas.First();
+                Location location = await LoadLocationFromIdAsync(area.LocationId, version, displayLanguage, token);
+                location.AreaId = area.Id;
+                location.AreaName = area.Name;
+                return location;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<ObservableCollection<PokemonLocation>> LoadPokemonEncountersAsync(int pokemonId, GameVersion version, int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = "SELECT enc.id, enc.min_level, enc.max_level, es.rarity, es.encounter_method_id, enc.location_area_id FROM pokemon_v2_encounter enc\n" +
+                    "LEFT JOIN pokemon_v2_encounterslot es ON es.id = enc.encounter_slot_id\n" +
+                    "LEFT JOIN pokemon_v2_encountermethod em ON em.id = es.encounter_method_id\n" +
+                    "WHERE pokemon_id = ? AND version_id = ?";
+                IEnumerable<DbPokemonEncounter> encounters = await _connection.QueryAsync<DbPokemonEncounter>(token, query, new object[] { pokemonId, version.Id });
+                var result = new ObservableCollection<PokemonLocation>();
+                foreach (DbPokemonEncounter encounter in encounters)
+                {
+                    var location = new PokemonLocation
+                    {
+                        Id = encounter.Id,
+                        MaxLevel = encounter.MaxLevel,
+                        MinLevel = encounter.MinLevel,
+                        Rarity = encounter.Rarity
+                    };
+                    location.EncounterMethod = await GetEncounterMethodAsync(encounter.EncounterMethodId);
+                    location.Location = await LoadLocationFromAreaAsync(encounter.LocationAreaId, version, displayLanguage, token);
+                    result.Add(location);
+                }
+                return result;
+            }
+            catch (Exception)
+            {
+                return new ObservableCollection<PokemonLocation>();
             }
         }
     }

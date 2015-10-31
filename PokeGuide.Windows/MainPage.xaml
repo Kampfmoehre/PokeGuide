@@ -11,6 +11,14 @@
 
     <Page.Resources>
         <con:GenerationToVisibilityConverter x:Key="genConverter"/>
+        <con:BooleanToVisibilityConverter x:Key="boolConverter"/>
+        <Style x:Key="progress" TargetType="ProgressRing">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="0,40,0,0"/>
+        </Style>        
     </Page.Resources>
 
     <Grid Background="{StaticResource DefaultPageBackgroundBrush}">
@@ -18,15 +26,15 @@
             <ColumnDefinition Width="20"/>
             <ColumnDefinition Width="150"/>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="220"/>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
@@ -54,143 +62,248 @@
                   SelectedItem="{Binding Forms.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
             <ProgressRing Grid.Row="3" Grid.Column="1" IsActive="{Binding Forms.IsNotCompleted}"/>
         </Grid>
-       
-        
-        
-        
-        <ProgressRing Grid.Row="4" Grid.Column="2" IsActive="{Binding CurrentForm.IsNotCompleted}"/>
-        <ProgressRing Grid.Row="5" Grid.Column="2" IsActive="{Binding CurrentMoveSet.IsNotCompleted}"/>
 
+        
+        
         <Grid Grid.Row="1" Grid.Column="3">
             <Grid.RowDefinitions>
-                
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="3" Text="Eigenschaften" Style="{StaticResource DefaultHeaderStyle}"/>
+            <ProgressRing Grid.Row="1" Grid.Column="3" IsActive="{Binding CurrentForm.IsNotCompleted}" Style="{StaticResource progress}"/>
+            <Grid Grid.Row="1" Visibility="{Binding CurrentForm.IsCompleted, Converter={StaticResource boolConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Row="0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="120"/>
-                        <ColumnDefinition Width="100"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="ID"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.Id}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Dex"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.DexEntry.DexNumber}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Höhe"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentForm.Result.Height}"/>
-                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Gewicht"/>
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CurrentForm.Result.Weight}"/>
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Typ"/>
-                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding CurrentForm.Result.Type1.Name}"/>
-                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding CurrentForm.Result.Type2.Name}"/>
-                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Fangrate"/>
-                    <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.CatchRate}"/>
-                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Exp Gruppe"/>
-                    <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.GrowthRate.Name}"/>
-                    <TextBlock Grid.Row="8" Grid.Column="0" Text="Basis Exp"/>
-                    <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding CurrentForm.Result.BaseExperience}"/>                   
-                </Grid>
-            </StackPanel>
-            <StackPanel Grid.Row="1" Visibility="{Binding Path=Versions.SelectedItem.Generation, Converter={StaticResource genConverter}, ConverterParameter=2}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="120"/>
-                        <ColumnDefinition Width="100"/>
-                    </Grid.ColumnDefinitions>               
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Basis Zuneigung"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.BaseHappiness}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Item"/>
-                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
-                        <TextBlock Text="{Binding CurrentForm.Result.HeldItem.Name}" Margin="0,0,5,0"/>
-                        <TextBlock Text="{Binding CurrentForm.Result.HeldItemRarity}"/>
-                        <TextBlock Text="%"/>
-                    </StackPanel>
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Ei Gruppe"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.EggGroup1.Name}"/>
-                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.EggGroup2.Name}"/>
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Ei Zyklen"/>
-                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.HatchCounter}"/>
-                </Grid>
-            </StackPanel>
-            <StackPanel Grid.Row="2" Visibility="{Binding Path=Versions.SelectedItem.Generation, Converter={StaticResource genConverter}, ConverterParameter=3}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="120"/>
-                        <ColumnDefinition Width="100"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Fähigkeit"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentForm.Result.Ability1.Name}"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentForm.Result.Ability2.Name}"/>
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Versteckte Fähigkeit"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentForm.Result.HiddenAbility.Name}"/>
-                </Grid>
-            </StackPanel>            
+                <StackPanel Grid.Row="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="100"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="ID" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.Id}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Dex" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.DexEntry.DexNumber}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Höhe" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentForm.Result.Height}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Gewicht" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CurrentForm.Result.Weight}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="Typ" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding CurrentForm.Result.Type1.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding CurrentForm.Result.Type2.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Fangrate" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.CatchRate}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="7" Grid.Column="0" Text="Exp Gruppe" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.GrowthRate.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="8" Grid.Column="0" Text="Basis Exp" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="8" Grid.Column="1" Text="{Binding CurrentForm.Result.BaseExperience}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                    </Grid>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Visibility="{Binding Path=Versions.SelectedItem.Generation, Converter={StaticResource genConverter}, ConverterParameter=2}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="100"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Basis Zuneigung" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.BaseHappiness}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Item" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                            <TextBlock Text="{Binding CurrentForm.Result.HeldItem.Name}" Margin="0,0,5,0" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Text="{Binding CurrentForm.Result.HeldItemRarity}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Text="%" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Geschlecht" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                            <TextBlock Text="{Binding CurrentForm.Result.Species.GenderRate.Female}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Text="/" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Text="{Binding CurrentForm.Result.Species.GenderRate.Male}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        </StackPanel>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Ei Gruppe" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.EggGroup1.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.EggGroup2.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Ei Zyklen" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding CurrentForm.Result.Species.HatchCounter}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                    </Grid>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Visibility="{Binding Path=Versions.SelectedItem.Generation, Converter={StaticResource genConverter}, ConverterParameter=3}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="100"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Fähigkeit" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentForm.Result.Ability1.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentForm.Result.Ability2.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Versteckte Fähigkeit" Style="{StaticResource DefaultTextBlockStyle}" 
+                                    Visibility="{Binding Versions.SelectedItem.Generation, Converter={StaticResource genConverter}, ConverterParameter=5}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentForm.Result.HiddenAbility.Name}" Style="{StaticResource DefaultTextBlockStyle}"
+                                    Visibility="{Binding Versions.SelectedItem.Generation, Converter={StaticResource genConverter}, ConverterParameter=5}"/>
+                    </Grid>
+                </StackPanel>                    
+            </Grid>
+            <TextBlock Grid.Row="2" Text="Basiswerte" Style="{StaticResource DefaultHeaderStyle}"/>
+            <ProgressRing Grid.Row="3" IsActive="{Binding CurrentStats.IsNotCompleted}" Style="{StaticResource progress}"/>
+            <ListView Grid.Row="3" Header="Basiswerte" ItemsSource="{Binding CurrentStats.Result}" SelectionMode="None" HeaderTemplate="{StaticResource pokemonStatListViewHeaderTemplate}"
+                      ItemTemplate="{StaticResource pokemonStatListViewItemTemplate}" Visibility="{Binding CurrentStats.IsCompleted, Converter={StaticResource boolConverter}}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="FrameworkElement">
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="MinHeight" Value="10"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
         </Grid>
-        <StackPanel Grid.Row="1" Grid.Column="5" Orientation="Vertical">
-            <ListView Grid.Row="1" Grid.Column="2" Grid.RowSpan="7" Header="Basiswerte" ItemsSource="{Binding CurrentForm.Result.Stats}" 
-                      ItemTemplate="{StaticResource pokemonStatListViewItemTemplate}" SelectionMode="None">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="FrameworkElement">
-                        <Setter Property="Margin" Value="0"/>
-                    </Style>
-                </ListView.ItemContainerStyle>
-            </ListView>
-            <ListView x:Name="evolutionList" Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="5" Header="Entwicklung" 
-                      ItemsSource="{Binding CurrentForm.Result.Species.PossibleEvolutions}" SelectionMode="None">
+        <Grid Grid.Row="1" Grid.Column="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+                
+            <TextBlock Grid.Row="0" Text="Evolution" Style="{StaticResource DefaultHeaderStyle}"/>
+            <ProgressRing Grid.Row="1" IsActive="{Binding CurrentEvolutions.IsNotCompleted}" Style="{StaticResource progress}"/>
+            <ListView Grid.Row="1" x:Name="evolutionList" Header="Entwicklung" SelectionMode="None"
+                      ItemsSource="{Binding CurrentEvolutions.Result}">
+                <ListView.HeaderTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="130"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="#" Style="{StaticResource DefaultTextBlockStyle}" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="Name" Margin="18,0,0,0" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="2" Text="Min Level" Margin="-30,0,0,0" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="3" Text="Art der Entwicklung" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="4" Text="Voraussetzung" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.HeaderTemplate>
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="20"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="20"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="130"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding EvolvesTo.Id}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="0" Text="{Binding EvolvesTo.Id}" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource DefaultTextBlockStyle}"/>
                             <HyperlinkButton Grid.Column="1" Content="{Binding EvolvesTo.Name}" Command="{Binding ElementName=evolutionList, Path=DataContext.LoadFormCommand}"
-                                             CommandParameter="{Binding EvolvesTo.Id}"/>
-                            <TextBlock Grid.Column="2" Text="{Binding MinLevel}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="{Binding EvolutionTrigger}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" Text="{Binding EvolutionItem.Name}" VerticalAlignment="Center"/>
+                                        CommandParameter="{Binding EvolvesTo.Id}"/>
+                            <TextBlock Grid.Column="2" Text="{Binding MinLevel}" VerticalAlignment="Center" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="3" Text="{Binding EvolutionTrigger}" VerticalAlignment="Center" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="4" Text="{Binding EvolutionReason}" VerticalAlignment="Center" Margin="10,0,0,0" Style="{StaticResource DefaultTextBlockStyle}"/>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-        </StackPanel>
+            <TextBlock Grid.Row="2" Text="Fundorte" Style="{StaticResource DefaultHeaderStyle}"/>
+            <ProgressRing Grid.Row="3" IsActive="{Binding CurrentLocations.IsNotCompleted}" Style="{StaticResource progress}"/>
+            <ListView x:Name="locationList" Grid.Row="3" Header="Fundorte" SelectionMode="None"
+                      ItemsSource="{Binding CurrentLocations.Result}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Width="{Binding ElementName=evolutionList, Path=DataContext.LoadFormCommand}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="5"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Location.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Location.AreaName}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            </Grid>
+                            <TextBlock Grid.Column="2" Text="{Binding Rarity}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <Grid Grid.Column="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding MinLevel}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                                <TextBlock Grid.Column="1" Text="-" Style="{StaticResource DefaultTextBlockStyle}"/>
+                                <TextBlock Grid.Column="2" Text="{Binding MaxLevel}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            </Grid>
+                            <TextBlock Grid.Column="6" Text="{Binding EncounterMethod.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.HeaderTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Ort" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="2" Text="%" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="4" Text="Level" Style="{StaticResource DefaultTextBlockStyle}"/>                            
+                            <TextBlock Grid.Column="6" Text="Methode" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.HeaderTemplate>
+            </ListView>
+        </Grid>
+            
 
-        <ListView Grid.Row="1" Grid.Column="7" Header="Attacken" ItemsSource="{Binding CurrentMoveSet.Result}">
+        <ProgressRing Grid.Row="1" Grid.Column="7" IsActive="{Binding CurrentMoveSet.IsNotCompleted}" Style="{StaticResource progress}"/>
+        <ListView Grid.Row="1" Grid.Column="7" Header="Attacken" ItemsSource="{Binding CurrentMoveSet.Result}" Visibility="{Binding CurrentMoveSet.IsCompleted, Converter={StaticResource boolConverter}}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>

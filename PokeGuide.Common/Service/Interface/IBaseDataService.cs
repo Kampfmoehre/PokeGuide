@@ -9,6 +9,7 @@ namespace PokeGuide.Service.Interface
         Task<ElementType> GetTypeAsync(int id, GameVersion version);
         Task<GrowthRate> GetGrowthRateAsync(int id);
         Task<DamageClass> GetDamageClassAsync(int id);
+        Task<EncounterMethod> GetEncounterMethodAsync(int id);
         void InitializeResources(int displayLanguage, CancellationToken token);
     }
 }

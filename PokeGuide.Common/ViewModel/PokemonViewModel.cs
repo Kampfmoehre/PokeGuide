@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,9 +12,6 @@ namespace PokeGuide.ViewModel
 {
     public class PokemonViewModel : ViewModelBase, IPokemonViewModel
     {
-        DateTime _debugStart;
-        DateTime _debugEnd;
-
         CancellationTokenSource _tokenSource;
         IStaticDataService _staticDataService;
         IPokemonService _pokemonService;
@@ -27,8 +22,10 @@ namespace PokeGuide.ViewModel
         INotifyTaskCompletionCollection<PokemonForm> _forms;
         INotifyTaskCompletion<PokemonForm> _currentForm;
         INotifyTaskCompletion<ObservableCollection<PokemonMove>> _currentMoveSet;
+        INotifyTaskCompletion<ObservableCollection<Stat>> _currentStats;
+        INotifyTaskCompletion<ObservableCollection<PokemonEvolution>> _currentEvolutions;
+        INotifyTaskCompletion<ObservableCollection<PokemonLocation>> _currentLocations;
         RelayCommand<int> _loadFormCommand;
-        string _timeConsumed;
         int? _cachedSpeciesId = 1;
         int? _cachedVersionid = 1;
         /// <summary>
@@ -111,9 +108,13 @@ namespace PokeGuide.ViewModel
             Forms = null;
             CurrentForm = null;
             CurrentMoveSet = null;
+            CurrentEvolutions = null;
+            CurrentLocations = null;
             if (e.NewItem != null)
             {
                 Forms = NotifyTaskCompletionCollection<PokemonForm>.Create(LoadFormsAsync(e.NewItem, Versions.SelectedItem, Languages.SelectedItem.Id));
+                CurrentEvolutions = NotifyTaskCompletion.Create(LoadEvolutionsAsync(e.NewItem.Id, Versions.SelectedItem, Languages.SelectedItem.Id));
+                CurrentLocations = NotifyTaskCompletion.Create(LoadLocationsAsync(e.NewItem.Id, Versions.SelectedItem, Languages.SelectedItem.Id));                
                 _cachedSpeciesId = e.NewItem.Id;
             }
         }
@@ -138,10 +139,12 @@ namespace PokeGuide.ViewModel
         {
             CurrentForm = null;
             CurrentMoveSet = null;
+            CurrentStats = null;
             if (e.NewItem != null)
             {
                 CurrentForm = NotifyTaskCompletion.Create(LoadFormAsync(e.NewItem.Id, Versions.SelectedItem, Languages.SelectedItem.Id));
                 CurrentMoveSet = NotifyTaskCompletion.Create(LoadMoveSetAsync(e.NewItem.Id, Versions.SelectedItem, Languages.SelectedItem.Id));
+                CurrentStats = NotifyTaskCompletion.Create(LoadStatsAsync(e.NewItem.Id, Versions.SelectedItem, Languages.SelectedItem.Id));                                
             }
         }
 
@@ -160,6 +163,30 @@ namespace PokeGuide.ViewModel
         {
             get { return _currentMoveSet; }
             set { Set(() => CurrentMoveSet, ref _currentMoveSet, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public INotifyTaskCompletion<ObservableCollection<Stat>> CurrentStats
+        {
+            get { return _currentStats; }
+            set { Set(() => CurrentStats, ref _currentStats, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public INotifyTaskCompletion<ObservableCollection<PokemonEvolution>> CurrentEvolutions
+        {
+            get { return _currentEvolutions; }
+            set { Set(() => CurrentEvolutions, ref _currentEvolutions, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public INotifyTaskCompletion<ObservableCollection<PokemonLocation>> CurrentLocations
+        {
+            get { return _currentLocations; }
+            set { Set(() => CurrentLocations, ref _currentLocations, value); }
         }
 
         public RelayCommand<int> LoadFormCommand
@@ -183,7 +210,6 @@ namespace PokeGuide.ViewModel
             _staticDataService = staticDataService;
             _pokemonService = pokemonService;
             _moveService = moveService;
-            _debugStart = DateTime.Now;
             ResetLanguage(6);            
             Languages = NotifyTaskCompletionCollection<Language>.Create(LoadLanguagesAsync(6), 6);
 
@@ -194,6 +220,9 @@ namespace PokeGuide.ViewModel
                 Forms = NotifyTaskCompletionCollection<PokemonForm>.Create(LoadFormsAsync(new SpeciesName { Id = 1 }, null, 6));
                 CurrentForm = NotifyTaskCompletion.Create(LoadFormAsync(1, null, 6));
                 CurrentMoveSet = NotifyTaskCompletion.Create(LoadMoveSetAsync(6, null, 6));
+                CurrentStats = NotifyTaskCompletion.Create(LoadStatsAsync(6, null, 6));
+                CurrentEvolutions = NotifyTaskCompletion.Create(LoadEvolutionsAsync(6, null, 6));
+                CurrentLocations = NotifyTaskCompletion.Create(LoadLocationsAsync(6, null, 6));
             }
         }
 
@@ -224,20 +253,19 @@ namespace PokeGuide.ViewModel
         }
         async Task<ObservableCollection<PokemonMove>> LoadMoveSetAsync(int formid, GameVersion version, int language)
         {
-            var unused = await _pokemonService.LoadMoveSetAsync(formid, version, language, _tokenSource.Token);
-            _debugEnd = DateTime.Now;
-            TimeSpan span = _debugEnd - _debugStart;
-            TimeConsumed = String.Format("{0} sek und {1} ms", span.Seconds, span.Milliseconds);
-            return unused;
+            return await _pokemonService.LoadMoveSetAsync(formid, version, language, _tokenSource.Token);
         }
-                
-        /// <summary>
-        /// Sets and gets the
-        /// </summary>
-        public string TimeConsumed
+        async Task<ObservableCollection<Stat>> LoadStatsAsync(int formId, GameVersion version, int language)
         {
-            get { return _timeConsumed; }
-            set { Set(() => TimeConsumed, ref _timeConsumed, value); }
+            return await _pokemonService.LoadPokemonStatsAsync(formId, version, language, _tokenSource.Token);
+        }
+        async Task<ObservableCollection<PokemonEvolution>> LoadEvolutionsAsync(int speciesId, GameVersion version, int language)
+        {
+            return await _pokemonService.LoadEvolutionGroupAsync(speciesId, version, language, _tokenSource.Token);
+        }
+        async Task<ObservableCollection<PokemonLocation>> LoadLocationsAsync(int pokemonId, GameVersion version, int language)
+        {
+            return await _pokemonService.LoadPokemonEncountersAsync(pokemonId, version, language, _tokenSource.Token);
         }
     }
 }

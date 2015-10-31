@@ -15,5 +15,11 @@ namespace PokeGuide.Model.Database
         public string EvolutionTrigger { get; set; }
         [Column("evolution_item_id")]
         public int? EvolutionItemId { get; set; }
+        [Column("location_id")]
+        public int? LocationId { get; set; }
+        [Column("min_happiness")]
+        public int? MinHappiness { get; set; }
+        [Column("time_of_day")]
+        public string TimeOfDay { get; set; }
     }
 }

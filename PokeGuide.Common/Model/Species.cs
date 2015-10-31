@@ -12,6 +12,7 @@ namespace PokeGuide.Model
         EggGroup _eggGroup1;
         EggGroup _eggGroup2;
         ObservableCollection<PokemonEvolution> _possibleEvolutions;
+        GenderRate _genderRate;
         /// <summary>
         /// Sets and gets the 
         /// </summary>
@@ -39,7 +40,6 @@ namespace PokeGuide.Model
         /// <summary>
         /// Sets and gets the 
         /// </summary>
-        //[Column("growth_rate_id")]
         public GrowthRate GrowthRate
         {
             get { return _growthRate; }
@@ -76,6 +76,14 @@ namespace PokeGuide.Model
         {
             get { return _possibleEvolutions; }
             set { Set(() => PossibleEvolutions, ref _possibleEvolutions, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public GenderRate GenderRate
+        {
+            get { return _genderRate; }
+            set { Set(() => GenderRate, ref _genderRate, value); }
         }
     }
 }

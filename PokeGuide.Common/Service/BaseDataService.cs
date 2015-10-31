@@ -22,6 +22,7 @@ namespace PokeGuide.Service
         public AsyncLazy<IEnumerable<ElementType>> TypeList { get; private set; }
         public AsyncLazy<IEnumerable<GrowthRate>> GrowthRates { get; private set; }
         public AsyncLazy<IEnumerable<DamageClass>> DamageClasses { get; private set; }
+        public AsyncLazy<IEnumerable<EncounterMethod>> EncounterMethods { get; private set; }
 
         public void InitializeResources(int displayLanguage, CancellationToken token)
         {
@@ -36,6 +37,10 @@ namespace PokeGuide.Service
             DamageClasses = new AsyncLazy<IEnumerable<DamageClass>>(async () =>
             {
                 return await LoadDamageClassesAsync(displayLanguage, token);
+            });
+            EncounterMethods = new AsyncLazy<IEnumerable<EncounterMethod>>(async () =>
+            {
+                return await LoadEncounterMethodsAsync(displayLanguage, token);
             });
         }
 
@@ -55,6 +60,12 @@ namespace PokeGuide.Service
         {
             IEnumerable<DamageClass> classes = await DamageClasses;
             return classes.FirstOrDefault(f => f.Id == id);
+        }
+
+        public async Task<EncounterMethod> GetEncounterMethodAsync(int id)
+        {
+            IEnumerable<EncounterMethod> methods = await EncounterMethods;
+            return methods.FirstOrDefault(f => f.Id == id);
         }
 
         public async Task<IEnumerable<ElementType>>LoadTypesAsync(int displayLanguage, CancellationToken token)
@@ -77,7 +88,7 @@ namespace PokeGuide.Service
             }
             catch (Exception)
             {
-                return new List<ElementType>();
+                return null;
             }
         }
 
@@ -109,6 +120,23 @@ namespace PokeGuide.Service
                     "WHERE e.language_id = 9\nGROUP BY e.move_damage_class_id)\nAS mdcd ON mdc.id = mdcd.id";
                 IEnumerable<DbMoveDamageClass> damageClasses = await _connection.QueryAsync<DbMoveDamageClass>(token, query, new object[] { displayLanguage });
                 return damageClasses.Select(s => new DamageClass { Id = s.Id, Name = s.Name });
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<EncounterMethod>> LoadEncounterMethodsAsync(int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = "SELECT enc.id, emn.name FROM pokemon_v2_encounter enc\n" +
+                    "LEFT JOIN\n(SELECT e.encounter_method_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_encountermethodname e\n" +
+                    "LEFT OUTER JOIN pokemon_v2_encountermethodname o ON e.encounter_method_id = o.encounter_method_id and o.language_id = ?\n" +
+                    "WHERE e.language_id = 9\nGROUP BY e.encounter_method_id)AS emn ON enc.id = emn.id";
+                IEnumerable<DbEncounterMethod> methods = await _connection.QueryAsync<DbEncounterMethod>(token, query, new object[] { displayLanguage });
+                return methods.Select(s => new EncounterMethod { Id = s.Id, Name = s.Name });
             }
             catch (Exception)
             {
