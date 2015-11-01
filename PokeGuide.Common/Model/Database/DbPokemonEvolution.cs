@@ -21,5 +21,11 @@ namespace PokeGuide.Model.Database
         public int? MinHappiness { get; set; }
         [Column("time_of_day")]
         public string TimeOfDay { get; set; }
+        [Column("held_item_id")]
+        public int? HeldItemId { get; set; }
+        [Column("is_baby")]
+        public bool IsBaby { get; set; }
+        [Column("baby_trigger_item_id")]
+        public int? BabyTriggerItemId { get; set; }
     }
 }

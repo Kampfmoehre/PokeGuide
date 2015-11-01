@@ -255,7 +255,7 @@ namespace PokeGuide.Design
                 new PokemonEvolution
                 {
                     EvolutionItem = LoadItemAsync(1, displayLanguage, token).Result,
-                    EvolutionTrigger = "Gegenstand nutzen",
+                    EvolutionTrigger = "Platz im Team und ein Pokéball",
                     EvolvesTo = new SpeciesName { Id = 45, Name = "Arkani" }                    
                 },
                 new PokemonEvolution

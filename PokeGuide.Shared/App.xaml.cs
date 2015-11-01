@@ -15,6 +15,9 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+#if WINDOWS_APP
+using Windows.UI.ApplicationSettings;
+#endif
 
 // Die Vorlage "Leere App" ist unter http://go.microsoft.com/fwlink/?LinkId=234227 dokumentiert.
 
@@ -142,5 +145,24 @@ namespace PokeGuide
             // TODO: Anwendungszustand speichern und alle Hintergrundaktivitäten beenden
             deferral.Complete();
         }
+#if WINDOWS_APP
+        protected override void OnWindowCreated(WindowCreatedEventArgs args)
+        {
+            SettingsPane.GetForCurrentView().CommandsRequested += OnCommandsRequested;
+        }
+
+        private void OnCommandsRequested(SettingsPane sender, SettingsPaneCommandsRequestedEventArgs args)
+        {
+
+            args.Request.ApplicationCommands.Add(new SettingsCommand(
+                "Custom Setting", "Optionen", (handler) => ShowCustomSettingFlyout()));
+        }
+
+        public void ShowCustomSettingFlyout()
+        {
+            var CustomSettingFlyout = new AppSettings();
+            CustomSettingFlyout.Show();
+        }
+#endif
     }
 }

@@ -117,16 +117,19 @@
     <Compile Include="Service\Interface\IDataService.cs" />
     <Compile Include="Service\Interface\IMoveService.cs" />
     <Compile Include="Service\Interface\IPokemonService.cs" />
+    <Compile Include="Service\Interface\ISettingsService.cs" />
     <Compile Include="Service\Interface\IStaticDataService.cs" />
     <Compile Include="Service\Interface\IStorageService.cs" />
     <Compile Include="Service\MoveService.cs" />
     <Compile Include="Service\PokemonService.cs" />
     <Compile Include="Service\StaticDataService.cs" />
-    <Compile Include="ViewModel\IMainViewModel.cs" />
-    <Compile Include="ViewModel\IPokemonViewModel.cs" />
+    <Compile Include="ViewModel\Interface\IMainViewModel.cs" />
+    <Compile Include="ViewModel\Interface\IPokemonViewModel.cs" />
+    <Compile Include="ViewModel\Interface\ISettingsViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\PokemonViewModel.cs" />
     <Compile Include="ViewModel\SelectableCollection.cs" />
+    <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
   </ItemGroup>
   <ItemGroup>

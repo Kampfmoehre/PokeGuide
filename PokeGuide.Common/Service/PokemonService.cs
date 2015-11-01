@@ -338,7 +338,7 @@ namespace PokeGuide.Service
                     Priority = move.Priority
                 };
                 result.Type = await GetTypeAsync(move.Type, version);
-                if (version.Generation > 3)
+                if (version.Generation > 3 || move.MoveDamageClass == 1)
                     result.DamageClass = await GetDamageClassAsync(move.MoveDamageClass);
                 else
                     result.DamageClass = await GetDamageClassAsync(result.Type.DamageClassId);
@@ -466,7 +466,7 @@ namespace PokeGuide.Service
             try
             {
                 string query = "SELECT ps.id, psn.name, pe.min_level, etn.name AS evolution_trigger, pe.evolution_item_id, pe.location_id, ec.baby_trigger_item_id,\n" +
-                    "pe.min_happiness, pe.time_of_day FROM pokemon_v2_pokemonspecies ps\n" +
+                    "pe.min_happiness, pe.time_of_day, pe.held_item_id, ps.is_baby FROM pokemon_v2_pokemonspecies ps\n" +
                     "LEFT JOIN\n(SELECT def.pokemon_species_id AS id, IFNULL(curr.name, def.name) AS name FROM pokemon_v2_pokemonspeciesname def\n" +
                     "LEFT JOIN pokemon_v2_pokemonspeciesname curr ON def.pokemon_species_id = curr.pokemon_species_id AND def.language_id = 9 AND curr.language_id = ?\n" +
                     "GROUP BY def.pokemon_species_id)\nAS psn ON ps.id = psn.id\n" +
@@ -476,7 +476,8 @@ namespace PokeGuide.Service
                     "LEFT OUTER JOIN pokemon_v2_evolutiontriggername o ON e.evolution_trigger_id = o.evolution_trigger_id and o.language_id = ?\n" +
                     "WHERE e.language_id = 9\n\nGROUP BY e.evolution_trigger_id)\nAS etn ON et.id = etn.id\n" +
                     "LEFT JOIN pokemon_v2_evolutionchain ec ON ec.id = ps.evolution_chain_id\n" +
-                    "WHERE ps.evolution_chain_id = (SELECT evolution_chain_id FROM pokemon_v2_pokemonspecies WHERE id = ?) AND ps.generation_id <= ?";
+                    "WHERE ps.evolution_chain_id = (SELECT evolution_chain_id FROM pokemon_v2_pokemonspecies WHERE id = ?) AND ps.generation_id <= ?\n" +
+                    "ORDER BY ps.'order'";
                 IEnumerable<DbPokemonEvolution> evolutions = await _connection.QueryAsync<DbPokemonEvolution>(token, query, new object[] 
                 {
                     displayLanguage,
@@ -491,10 +492,13 @@ namespace PokeGuide.Service
                     {
                         DayTime = evolution.TimeOfDay,
                         EvolutionTrigger = evolution.EvolutionTrigger,
-                        EvolvesTo = new SpeciesName { Id = evolution.Id, Name = evolution.Name },
+                        EvolvesTo = new SpeciesName { Id = evolution.Id, Name = evolution.Name },                        
                         MinLevel = evolution.MinLevel,
                         MinHappiness = evolution.MinHappiness
                     };
+
+                    if (evolution.IsBaby)
+                        evo.EvolutionTrigger = "Zucht";
 
                     if (evolution.LocationId != null)
                     {
@@ -505,6 +509,10 @@ namespace PokeGuide.Service
                     }
                     if (evolution.EvolutionItemId != null)
                         evo.EvolutionItem = await LoadItemAsync((int)evolution.EvolutionItemId, displayLanguage, token);
+                    else if (evolution.HeldItemId != null)
+                        evo.EvolutionItem = await LoadItemAsync((int)evolution.HeldItemId, displayLanguage, token);
+                    else if (evolution.IsBaby && evolution.BabyTriggerItemId != null)
+                        evo.EvolutionItem = await LoadItemAsync((int)evolution.BabyTriggerItemId, displayLanguage, token);
                     result.Add(evo);
                 }
                 return result;
@@ -571,7 +579,7 @@ namespace PokeGuide.Service
                     "LEFT JOIN pokemon_v2_encounterconditionvalue ecv ON ecv.id = ecvm.encounter_condition_value_id\n" +
                     "LEFT JOIN pokemon_v2_encountercondition ec ON ecv.encounter_condition_id = ec.id\n" +
                     "WHERE enc.pokemon_id = ? AND enc.version_id = ?\n" +
-                    "GROUP BY enc.location_area_id, ecvm.encounter_condition_value_id\n" +
+                    "GROUP BY enc.location_area_id, es.encounter_method_id, ecvm.encounter_condition_value_id\n" +
                     "ORDER BY enc.location_area_id, ec.id, ecvm.encounter_condition_value_id";
                 IEnumerable<DbPokemonEncounter> encounters = await _connection.QueryAsync<DbPokemonEncounter>(token, query, new object[] { pokemonId, version.Id });
                 var result = new ObservableCollection<PokemonLocation>();

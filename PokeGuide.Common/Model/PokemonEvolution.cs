@@ -76,12 +76,12 @@ namespace PokeGuide.Model
             get
             {
                 string ret = String.Empty;
+                if (MinHappiness != null)
+                    ret = String.Format("{0} Zufriedenheit", MinHappiness);                
                 if (EvolutionLocation != null)
                     ret += EvolutionLocation.Name;
                 if (EvolutionItem != null)
                     ret += EvolutionItem.Name;
-                if (MinHappiness != null)
-                    ret += "Zufriedenheit";
                 if (!String.IsNullOrWhiteSpace(DayTime))
                 {
                     if (String.IsNullOrWhiteSpace(ret))

@@ -1,12 +1,16 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Views;
 using Nito.AsyncEx;
 using PokeGuide.Model;
 using PokeGuide.Service.Interface;
+using Windows.Storage;
 
 namespace PokeGuide.ViewModel
 {
@@ -15,8 +19,7 @@ namespace PokeGuide.ViewModel
         CancellationTokenSource _tokenSource;
         IStaticDataService _staticDataService;
         IPokemonService _pokemonService;
-        IMoveService _moveService;
-        INotifyTaskCompletionCollection<Language> _languages;
+        INavigationService _navigationService;
         INotifyTaskCompletionCollection<GameVersion> _versions;
         INotifyTaskCompletionCollection<SpeciesName> _speciesList;
         INotifyTaskCompletionCollection<PokemonForm> _forms;
@@ -26,38 +29,11 @@ namespace PokeGuide.ViewModel
         INotifyTaskCompletion<ObservableCollection<PokemonEvolution>> _currentEvolutions;
         INotifyTaskCompletion<ObservableCollection<PokemonLocation>> _currentLocations;
         RelayCommand<int> _loadFormCommand;
+        RelayCommand _openSettingsCommand;
+        RelayCommand _navigateBackCommand;
+        int _currentLanguage;
         int? _cachedSpeciesId = 1;
         int? _cachedVersionid = 1;
-        /// <summary>
-        /// Sets and gets the
-        /// </summary>
-        public INotifyTaskCompletionCollection<Language> Languages
-        {
-            get { return _languages; }
-            set
-            {
-                if (Languages != null)
-                {
-                    Languages.SelectedItemChanged -= SelectedLanguageChanged;
-                }
-                Set(() => Languages, ref _languages, value);
-                if (Languages != null)
-                    Languages.SelectedItemChanged += SelectedLanguageChanged;
-            }
-        }
-        void SelectedLanguageChanged(object sender, SelectedItemChangedEventArgs<Language> e)
-        {
-            Versions = null;
-            SpeciesList = null;
-            Forms = null;
-            CurrentForm = null;
-            CurrentMoveSet = null;
-            if (e.NewItem != null)
-            {
-                ResetLanguage(e.NewItem.Id);
-                Versions = NotifyTaskCompletionCollection<GameVersion>.Create(LoadVersionsAsync(e.NewItem.Id), _cachedVersionid);
-            }
-        }
         /// <summary>
         /// Sets and gets the
         /// </summary>
@@ -77,12 +53,9 @@ namespace PokeGuide.ViewModel
         void Versions_SelectedItemChanged(object sender, SelectedItemChangedEventArgs<GameVersion> e)
         {
             SpeciesList = null;
-            Forms = null;
-            CurrentForm = null;
-            CurrentMoveSet = null;
             if (e.NewItem != null)
             {
-                SpeciesList = NotifyTaskCompletionCollection<SpeciesName>.Create(LoadSpeciesAsync(e.NewItem, Languages.SelectedItem.Id), _cachedSpeciesId);
+                SpeciesList = NotifyTaskCompletionCollection<SpeciesName>.Create(LoadSpeciesAsync(e.NewItem, _currentLanguage), _cachedSpeciesId);
                 _cachedVersionid = e.NewItem.Id;
             }
         }
@@ -106,15 +79,13 @@ namespace PokeGuide.ViewModel
         void SpeciesList_SelectedItemChanged(object sender, SelectedItemChangedEventArgs<SpeciesName> e)
         {
             Forms = null;
-            CurrentForm = null;
-            CurrentMoveSet = null;
             CurrentEvolutions = null;
             CurrentLocations = null;
             if (e.NewItem != null)
             {
-                Forms = NotifyTaskCompletionCollection<PokemonForm>.Create(LoadFormsAsync(e.NewItem, Versions.SelectedItem, Languages.SelectedItem.Id));
-                CurrentEvolutions = NotifyTaskCompletion.Create(LoadEvolutionsAsync(e.NewItem.Id, Versions.SelectedItem, Languages.SelectedItem.Id));
-                CurrentLocations = NotifyTaskCompletion.Create(LoadLocationsAsync(e.NewItem.Id, Versions.SelectedItem, Languages.SelectedItem.Id));                
+                Forms = NotifyTaskCompletionCollection<PokemonForm>.Create(LoadFormsAsync(e.NewItem, Versions.SelectedItem, _currentLanguage));
+                CurrentEvolutions = NotifyTaskCompletion.Create(LoadEvolutionsAsync(e.NewItem.Id, Versions.SelectedItem, _currentLanguage));
+                CurrentLocations = NotifyTaskCompletion.Create(LoadLocationsAsync(e.NewItem.Id, Versions.SelectedItem, _currentLanguage));                
                 _cachedSpeciesId = e.NewItem.Id;
             }
         }
@@ -142,9 +113,9 @@ namespace PokeGuide.ViewModel
             CurrentStats = null;
             if (e.NewItem != null)
             {
-                CurrentForm = NotifyTaskCompletion.Create(LoadFormAsync(e.NewItem.Id, Versions.SelectedItem, Languages.SelectedItem.Id));
-                CurrentMoveSet = NotifyTaskCompletion.Create(LoadMoveSetAsync(e.NewItem.Id, Versions.SelectedItem, Languages.SelectedItem.Id));
-                CurrentStats = NotifyTaskCompletion.Create(LoadStatsAsync(e.NewItem.Id, Versions.SelectedItem, Languages.SelectedItem.Id));                                
+                CurrentForm = NotifyTaskCompletion.Create(LoadFormAsync(e.NewItem.Id, Versions.SelectedItem, _currentLanguage));
+                CurrentMoveSet = NotifyTaskCompletion.Create(LoadMoveSetAsync(e.NewItem.Id, Versions.SelectedItem, _currentLanguage));
+                CurrentStats = NotifyTaskCompletion.Create(LoadStatsAsync(e.NewItem.Id, Versions.SelectedItem, _currentLanguage));                                
             }
         }
 
@@ -203,26 +174,75 @@ namespace PokeGuide.ViewModel
                 return _loadFormCommand;
             }
         }
+        public RelayCommand OpenSettingsCommand
+        {
+            get
+            {
+                if (_openSettingsCommand == null)
+                {
+                    _openSettingsCommand = new RelayCommand(() =>
+                    {
+                        _navigationService.NavigateTo("PhoneSettings");
+                    });
+                }
+                return _openSettingsCommand;
+            }
+        }
+        /// <summary>
+        /// Navigates back
+        /// </summary>
+        public RelayCommand NavigateBackCommand
+        {
+            get
+            {
+                if (_navigateBackCommand == null)
+                    _navigateBackCommand = new RelayCommand(() => _navigationService.GoBack());
+                return _navigateBackCommand;
+            }
+        }
 
-        public PokemonViewModel(IStaticDataService staticDataService, IPokemonService pokemonService, IMoveService moveService)
+        public PokemonViewModel(IStaticDataService staticDataService, IPokemonService pokemonService, INavigationService navigationService)
         {
             _tokenSource = new CancellationTokenSource();
             _staticDataService = staticDataService;
             _pokemonService = pokemonService;
-            _moveService = moveService;
-            ResetLanguage(6);            
-            Languages = NotifyTaskCompletionCollection<Language>.Create(LoadLanguagesAsync(6), 6);
+            _navigationService = navigationService;
+
+            var settings = ApplicationData.Current.LocalSettings;
+            object lang = settings.Values["displayLanguage"];
+            if (lang != null)
+                _currentLanguage = Convert.ToInt32(lang);
+            else
+                _currentLanguage = 6;
+
+            ChangeLanguage(new Language { Id = _currentLanguage });
+            Messenger.Default.Register<Language>(this, (language) => ChangeLanguage(language));
 
             if (IsInDesignMode)
             {
-                Versions = NotifyTaskCompletionCollection<GameVersion>.Create(LoadVersionsAsync(6));
-                SpeciesList = NotifyTaskCompletionCollection<SpeciesName>.Create(LoadSpeciesAsync(null, 6));
-                Forms = NotifyTaskCompletionCollection<PokemonForm>.Create(LoadFormsAsync(new SpeciesName { Id = 1 }, null, 6));
-                CurrentForm = NotifyTaskCompletion.Create(LoadFormAsync(1, null, 6));
-                CurrentMoveSet = NotifyTaskCompletion.Create(LoadMoveSetAsync(6, null, 6));
-                CurrentStats = NotifyTaskCompletion.Create(LoadStatsAsync(6, null, 6));
-                CurrentEvolutions = NotifyTaskCompletion.Create(LoadEvolutionsAsync(6, null, 6));
-                CurrentLocations = NotifyTaskCompletion.Create(LoadLocationsAsync(6, null, 6));
+                Versions = NotifyTaskCompletionCollection<GameVersion>.Create(LoadVersionsAsync(_currentLanguage));
+                SpeciesList = NotifyTaskCompletionCollection<SpeciesName>.Create(LoadSpeciesAsync(null, _currentLanguage));
+                Forms = NotifyTaskCompletionCollection<PokemonForm>.Create(LoadFormsAsync(new SpeciesName { Id = 1 }, null, _currentLanguage));
+                CurrentForm = NotifyTaskCompletion.Create(LoadFormAsync(1, null, _currentLanguage));
+                CurrentMoveSet = NotifyTaskCompletion.Create(LoadMoveSetAsync(6, null, _currentLanguage));
+                CurrentStats = NotifyTaskCompletion.Create(LoadStatsAsync(6, null, _currentLanguage));
+                CurrentEvolutions = NotifyTaskCompletion.Create(LoadEvolutionsAsync(6, null, _currentLanguage));
+                CurrentLocations = NotifyTaskCompletion.Create(LoadLocationsAsync(6, null, _currentLanguage));
+            }
+        }
+
+        void ChangeLanguage(Language newLanguage)
+        {
+            _currentLanguage = newLanguage.Id;
+            Versions = null;
+            SpeciesList = null;
+            Forms = null;
+            CurrentForm = null;
+            CurrentMoveSet = null;
+            if (newLanguage != null)
+            {
+                ResetLanguage(newLanguage.Id);
+                Versions = NotifyTaskCompletionCollection<GameVersion>.Create(LoadVersionsAsync(newLanguage.Id), _cachedVersionid);
             }
         }
 
@@ -231,10 +251,7 @@ namespace PokeGuide.ViewModel
             _pokemonService.InitializeResources(displayLanguage, _tokenSource.Token);
         }
 
-        async Task<ObservableCollection<Language>> LoadLanguagesAsync(int defaultLanguage)
-        {
-            return await _staticDataService.LoadLanguagesAsync(defaultLanguage, _tokenSource.Token);
-        }
+        
         async Task<ObservableCollection<GameVersion>> LoadVersionsAsync(int language)
         {
             return await _staticDataService.LoadVersionsAsync(language, _tokenSource.Token);

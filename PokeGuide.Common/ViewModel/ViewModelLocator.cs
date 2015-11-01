@@ -1,9 +1,12 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
+
 using Microsoft.Practices.ServiceLocation;
+
 using PokeGuide.Design;
 using PokeGuide.Service;
 using PokeGuide.Service.Interface;
+using PokeGuide.ViewModel.Interface;
 
 namespace PokeGuide.ViewModel
 {
@@ -32,28 +35,40 @@ namespace PokeGuide.ViewModel
                 // Create run time view services and models
                 SimpleIoc.Default.Register<IStaticDataService, StaticDataService>();
                 SimpleIoc.Default.Register<IPokemonService, PokemonService>();
-                SimpleIoc.Default.Register<IMoveService, MoveService>();
+                SimpleIoc.Default.Register<IMoveService, MoveService>();                
             }
 
             SimpleIoc.Default.Register<IMainViewModel, MainViewModel>();
             SimpleIoc.Default.Register<IPokemonViewModel, PokemonViewModel>();
+            SimpleIoc.Default.Register<ISettingsViewModel, SettingsViewModel>();
         }
 
+        /// <summary>
+        /// The main view model
+        /// </summary>
         public IMainViewModel MainViewModel
         {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<IMainViewModel>();
-            }
+            get { return ServiceLocator.Current.GetInstance<IMainViewModel>(); }
         }
+        /// <summary>
+        /// Gets the pokemon view model
+        /// </summary>
         public IPokemonViewModel PokemonViewModel
         {
             get { return ServiceLocator.Current.GetInstance<IPokemonViewModel>(); }
         }
-        
+        /// <summary>
+        /// Gets the settings view model
+        /// </summary>
+        public ISettingsViewModel SettingsViewModel
+        {
+            get { return ServiceLocator.Current.GetInstance<ISettingsViewModel>(); }
+        }        
+        /// <summary>
+        /// Cleans up resources that are not needed
+        /// </summary>
         public static void Cleanup()
         {
-            // TODO Clear the ViewModels
         }
     }
 }

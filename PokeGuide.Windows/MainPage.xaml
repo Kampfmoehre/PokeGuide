@@ -28,9 +28,9 @@
             <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="220"/>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="410"/>
+            <ColumnDefinition Width="*" MinWidth="410"/>
             <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -49,10 +49,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <ComboBox Grid.Row="0" Grid.Column="0" Header="Sprache" ItemsSource="{Binding Languages.Collection}"
-                  SelectedItem="{Binding Languages.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
-            <ProgressRing Grid.Row="0" Grid.Column="1" IsActive="{Binding Languages.IsNotCompleted}"/>
-            <ComboBox Grid.Row="1" Grid.Column="0" Header="Version" ItemsSource="{Binding Versions.Collection}" 
+            <ComboBox Grid.Row="1" Grid.Column="0" Header="Spiel" ItemsSource="{Binding Versions.Collection}" 
                   SelectedItem="{Binding Versions.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
             <ProgressRing Grid.Row="1" Grid.Column="1" IsActive="{Binding Versions.IsNotCompleted}"/>
             <ComboBox Grid.Row="2" Grid.Column="0" Header="Pokémon" ItemsSource="{Binding SpeciesList.Collection}"
@@ -62,13 +59,11 @@
                   SelectedItem="{Binding Forms.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
             <ProgressRing Grid.Row="3" Grid.Column="1" IsActive="{Binding Forms.IsNotCompleted}"/>
         </Grid>
-
-        
         
         <Grid Grid.Row="1" Grid.Column="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" MinHeight="220"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -79,7 +74,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -88,15 +83,15 @@
                 <StackPanel Grid.Row="0">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120"/>
@@ -124,12 +119,12 @@
                 <StackPanel Grid.Row="1" Visibility="{Binding Path=Versions.SelectedItem.Generation, Converter={StaticResource genConverter}, ConverterParameter=2}">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120"/>
@@ -159,9 +154,9 @@
                 <StackPanel Grid.Row="2" Visibility="{Binding Path=Versions.SelectedItem.Generation, Converter={StaticResource genConverter}, ConverterParameter=3}">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="120"/>
@@ -181,18 +176,19 @@
             <ProgressRing Grid.Row="3" IsActive="{Binding CurrentStats.IsNotCompleted}" Style="{StaticResource progress}"/>
             <ListView Grid.Row="3" Header="Basiswerte" ItemsSource="{Binding CurrentStats.Result}" SelectionMode="None" HeaderTemplate="{StaticResource pokemonStatListViewHeaderTemplate}"
                       ItemTemplate="{StaticResource pokemonStatListViewItemTemplate}" Visibility="{Binding CurrentStats.IsCompleted, Converter={StaticResource boolConverter}}">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="FrameworkElement">
-                            <Setter Property="Margin" Value="0"/>
-                            <Setter Property="MinHeight" Value="10"/>
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                </ListView>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Height" Value="25"/>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="0"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
         </Grid>
         <Grid Grid.Row="1" Grid.Column="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
@@ -207,8 +203,8 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="25"/>
                                 <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="30"/>
-                                <ColumnDefinition Width="130"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="180"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="#" Style="{StaticResource DefaultTextBlockStyle}" HorizontalAlignment="Center"/>
@@ -225,19 +221,24 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="25"/>
                                 <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="30"/>
-                                <ColumnDefinition Width="130"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="180"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{Binding EvolvesTo.Id}" VerticalAlignment="Center" HorizontalAlignment="Center" Style="{StaticResource DefaultTextBlockStyle}"/>
                             <HyperlinkButton Grid.Column="1" Content="{Binding EvolvesTo.Name}" Command="{Binding ElementName=evolutionList, Path=DataContext.LoadFormCommand}"
-                                        CommandParameter="{Binding EvolvesTo.Id}"/>
+                                        CommandParameter="{Binding EvolvesTo.Id}" VerticalAlignment="Top"/>
                             <TextBlock Grid.Column="2" Text="{Binding MinLevel}" VerticalAlignment="Center" Style="{StaticResource DefaultTextBlockStyle}"/>
                             <TextBlock Grid.Column="3" Text="{Binding EvolutionTrigger}" VerticalAlignment="Center" Style="{StaticResource DefaultTextBlockStyle}"/>
                             <TextBlock Grid.Column="4" Text="{Binding EvolutionReason}" VerticalAlignment="Center" Margin="10,0,0,0" Style="{StaticResource DefaultTextBlockStyle}"/>
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Height" Value="45"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
             </ListView>
             <TextBlock Grid.Row="2" Text="Fundorte" Style="{StaticResource DefaultHeaderStyle}"/>
             <ProgressRing Grid.Row="3" IsActive="{Binding CurrentLocations.IsNotCompleted}" Style="{StaticResource progress}"/>
@@ -297,36 +298,77 @@
                         </Grid>
                     </DataTemplate>
                 </ListView.HeaderTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Height" Value="40"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
             </ListView>
         </Grid>
-            
 
-        <ProgressRing Grid.Row="1" Grid.Column="7" IsActive="{Binding CurrentMoveSet.IsNotCompleted}" Style="{StaticResource progress}"/>
-        <ListView Grid.Row="1" Grid.Column="7" Header="Attacken" ItemsSource="{Binding CurrentMoveSet.Result}" Visibility="{Binding CurrentMoveSet.IsCompleted, Converter={StaticResource boolConverter}}">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="70"/>
-                            <ColumnDefinition Width="30"/>
-                            <ColumnDefinition Width="30"/>
-                            <ColumnDefinition Width="25"/>
-                            <ColumnDefinition Width="25"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Level}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Move.Name}"/>
-                        <TextBlock Grid.Column="2" Text="{Binding Move.Type.Name}"/>
-                        <TextBlock Grid.Column="3" Text="{Binding Move.DamageClass.Name}"/>
-                        <TextBlock Grid.Column="4" Text="{Binding Move.Power}" HorizontalAlignment="Right"/>
-                        <TextBlock Grid.Column="5" Text="{Binding Move.Accuracy}" HorizontalAlignment="Right"/>
-                        <TextBlock Grid.Column="6" Text="{Binding Move.PowerPoints}" HorizontalAlignment="Right"/>
-                        <TextBlock Grid.Column="7" Text="{Binding Move.Priority}" HorizontalAlignment="Right"/>
-                    </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+        <Grid Grid.Row="1" Grid.Column="7">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="Attacken" Style="{StaticResource DefaultHeaderStyle}"/>
+            <ProgressRing Grid.Row="1" IsActive="{Binding CurrentMoveSet.IsNotCompleted}" Style="{StaticResource progress}"/>
+            <ListView Grid.Row="1" Header="Attacken" ItemsSource="{Binding CurrentMoveSet.Result}" SelectionMode="None"
+                      Visibility="{Binding CurrentMoveSet.IsCompleted, Converter={StaticResource boolConverter}}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition Width="25"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Level}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Move.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Move.Type.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="3" Text="{Binding Move.DamageClass.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="4" Text="{Binding Move.Power}" HorizontalAlignment="Right" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="5" Text="{Binding Move.Accuracy}" HorizontalAlignment="Right" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="6" Text="{Binding Move.PowerPoints}" HorizontalAlignment="Right" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="7" Text="{Binding Move.Priority}" HorizontalAlignment="Right" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.HeaderTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="45"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="25"/>
+                                <ColumnDefinition Width="25"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Level" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="1" Text="Attacke" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="2" Text="Typ" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="3" Text="Klasse" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="4" Text="Stärke"  Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="5" Text="Genau" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="6" Text="AP" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="7" Text="Prio" HorizontalAlignment="Right" Style="{StaticResource DefaultTextBlockStyle}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.HeaderTemplate>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Height" Value="25"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </Grid>
     </Grid>
 </Page>
