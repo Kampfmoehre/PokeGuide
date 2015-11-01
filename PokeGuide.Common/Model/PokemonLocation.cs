@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PokeGuide.Model
 {
     public class PokemonLocation : ModelBase
     {
+        public PokemonLocation()
+        {
+            Conditions = new List<EncounterCondition>();
+        }
         Location _location;
         double _rarity;
         int _minLevel;
         int _maxLevel;
         EncounterMethod _encounterMethod;
+        List<EncounterCondition> _conditions;
         /// <summary>
         /// Sets and gets the 
         /// </summary>
@@ -52,6 +55,23 @@ namespace PokeGuide.Model
         {
             get { return _encounterMethod; }
             set { Set(() => EncounterMethod, ref _encounterMethod, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public List<EncounterCondition> Conditions
+        {
+            get { return _conditions; }
+            set { Set(() => Conditions, ref _conditions, value); }
+        }
+        public string ConditionText
+        {
+            get
+            {
+                if (Conditions.Any())
+                    return String.Join(", ", Conditions.Select(s => s.Name));
+                return String.Empty;
+            }
         }
     }
 }

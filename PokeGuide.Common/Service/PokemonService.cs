@@ -564,24 +564,54 @@ namespace PokeGuide.Service
         {
             try
             {
-                string query = "SELECT enc.id, enc.min_level, enc.max_level, es.rarity, es.encounter_method_id, enc.location_area_id FROM pokemon_v2_encounter enc\n" +
+                string query = "SELECT enc.id, MIN(enc.min_level) AS min_level, MAX(enc.max_level) AS max_level, enc.location_area_id, SUM(es.rarity) AS rarity, ecvm.encounter_condition_value_id, ec.id AS condition_id, es.encounter_method_id FROM pokemon_v2_encounter enc\n" +
                     "LEFT JOIN pokemon_v2_encounterslot es ON es.id = enc.encounter_slot_id\n" +
                     "LEFT JOIN pokemon_v2_encountermethod em ON em.id = es.encounter_method_id\n" +
-                    "WHERE pokemon_id = ? AND version_id = ?";
+                    "LEFT JOIN pokemon_v2_encounterconditionvaluemap ecvm ON ecvm.encounter_id = enc.id\n" +
+                    "LEFT JOIN pokemon_v2_encounterconditionvalue ecv ON ecv.id = ecvm.encounter_condition_value_id\n" +
+                    "LEFT JOIN pokemon_v2_encountercondition ec ON ecv.encounter_condition_id = ec.id\n" +
+                    "WHERE enc.pokemon_id = ? AND enc.version_id = ?\n" +
+                    "GROUP BY enc.location_area_id, ecvm.encounter_condition_value_id\n" +
+                    "ORDER BY enc.location_area_id, ec.id, ecvm.encounter_condition_value_id";
                 IEnumerable<DbPokemonEncounter> encounters = await _connection.QueryAsync<DbPokemonEncounter>(token, query, new object[] { pokemonId, version.Id });
                 var result = new ObservableCollection<PokemonLocation>();
                 foreach (DbPokemonEncounter encounter in encounters)
                 {
-                    var location = new PokemonLocation
+                    PokemonLocation location = null;
+                    //Check if there is another encounter on the same area with the same condition or null condition but another slot
+                    PokemonLocation location2 = result.FirstOrDefault(f => f.Location.AreaId == encounter.LocationAreaId
+                        && encounter.EncounterMethodId == f.EncounterMethod.Id && (encounter.EncounterConditionValueId == null || f.Conditions.Any() == false ||
+                        (f.Conditions.Any() && f.Conditions.FirstOrDefault(x => x.Id == (int)encounter.EncounterConditionValueId) != null)));
+                    // Merge encounter with same area and condition
+                    if (location2 != null)
                     {
-                        Id = encounter.Id,
-                        MaxLevel = encounter.MaxLevel,
-                        MinLevel = encounter.MinLevel,
-                        Rarity = encounter.Rarity
-                    };
-                    location.EncounterMethod = await GetEncounterMethodAsync(encounter.EncounterMethodId);
-                    location.Location = await LoadLocationFromAreaAsync(encounter.LocationAreaId, version, displayLanguage, token);
-                    result.Add(location);
+                        location2.Rarity += encounter.Rarity;
+                        location = location2;
+                    }
+                    else
+                        location = result.FirstOrDefault(f => f.Id == encounter.Id);
+
+                    if (location == null)
+                    {
+                        location = new PokemonLocation
+                        {
+                            Id = encounter.Id,
+                            MaxLevel = encounter.MaxLevel,
+                            MinLevel = encounter.MinLevel,
+                            Rarity = encounter.Rarity
+                        };
+
+                        location.EncounterMethod = await GetEncounterMethodAsync(encounter.EncounterMethodId);
+                        location.Location = await LoadLocationFromAreaAsync(encounter.LocationAreaId, version, displayLanguage, token);
+                    }
+
+                    // Filter out double encounter conditions                    
+                    if (encounter.EncounterConditionValueId != null && location.Conditions.FirstOrDefault(f => f.Id == (int)encounter.EncounterConditionValueId) == null)
+                        //if (encounter.EncounterConditionValueId != null)
+                        location.Conditions.Add(await GetEncounterConditionAsync((int)encounter.EncounterConditionValueId));
+
+                    if (location2 == null)
+                        result.Add(location);
                 }
                 return result;
             }

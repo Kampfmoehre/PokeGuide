@@ -15,14 +15,13 @@ namespace PokeGuide.Service
     {
         public BaseDataService(IStorageService storageService, ISQLitePlatform sqlitePlatform)
             : base(storageService, sqlitePlatform)
-        {
-            
-        }
+        { }
 
         public AsyncLazy<IEnumerable<ElementType>> TypeList { get; private set; }
         public AsyncLazy<IEnumerable<GrowthRate>> GrowthRates { get; private set; }
         public AsyncLazy<IEnumerable<DamageClass>> DamageClasses { get; private set; }
         public AsyncLazy<IEnumerable<EncounterMethod>> EncounterMethods { get; private set; }
+        public AsyncLazy<IEnumerable<EncounterCondition>> EncounterConditions { get; private set; }
 
         public void InitializeResources(int displayLanguage, CancellationToken token)
         {
@@ -41,6 +40,10 @@ namespace PokeGuide.Service
             EncounterMethods = new AsyncLazy<IEnumerable<EncounterMethod>>(async () =>
             {
                 return await LoadEncounterMethodsAsync(displayLanguage, token);
+            });
+            EncounterConditions = new AsyncLazy<IEnumerable<EncounterCondition>>(async () =>
+            {
+                return await LoadEncounterConditionsAsync(displayLanguage, token);
             });
         }
 
@@ -66,6 +69,12 @@ namespace PokeGuide.Service
         {
             IEnumerable<EncounterMethod> methods = await EncounterMethods;
             return methods.FirstOrDefault(f => f.Id == id);
+        }
+
+        public async Task<EncounterCondition> GetEncounterConditionAsync(int id)
+        {
+            IEnumerable<EncounterCondition> conditions = await EncounterConditions;
+            return conditions.FirstOrDefault(f => f.Id == id);
         }
 
         public async Task<IEnumerable<ElementType>>LoadTypesAsync(int displayLanguage, CancellationToken token)
@@ -137,6 +146,27 @@ namespace PokeGuide.Service
                     "WHERE e.language_id = 9\nGROUP BY e.encounter_method_id)AS emn ON enc.id = emn.id";
                 IEnumerable<DbEncounterMethod> methods = await _connection.QueryAsync<DbEncounterMethod>(token, query, new object[] { displayLanguage });
                 return methods.Select(s => new EncounterMethod { Id = s.Id, Name = s.Name });
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<EncounterCondition>> LoadEncounterConditionsAsync(int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = "SELECT ec.id AS encounter_id, ecn.name AS encounter_name, ecv.id, ecvn.name FROM pokemon_v2_encounterconditionvalue ecv\n" +
+                    "LEFT JOIN\n(SELECT e.encounter_condition_value_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_encounterconditionvaluename e\n" +
+                    "LEFT OUTER JOIN pokemon_v2_encounterconditionvaluename o ON e.encounter_condition_value_id = o.encounter_condition_value_id and o.language_id = ?\n" +
+                    "WHERE e.language_id = 9\nGROUP BY e.encounter_condition_value_id)\nAS ecvn ON ecv.id = ecvn.id\n" +
+                    "LEFT JOIN pokemon_v2_encountercondition ec ON ec.id = ecv.encounter_condition_id\n" +
+                    "LEFT JOIN\n(SELECT e.encounter_condition_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_encounterconditionname e\n" +
+                    "LEFT OUTER JOIN pokemon_v2_encounterconditionname o ON e.encounter_condition_id = o.encounter_condition_id and o.language_id = ?\n" +
+                    "WHERE e.language_id = 9\nGROUP BY e.encounter_condition_id)\nAS ecn ON ec.id = ecn.id";
+                IEnumerable<DbEncounterCondition> conditions = await _connection.QueryAsync<DbEncounterCondition>(token, query, new object[] { displayLanguage, displayLanguage });
+                return conditions.Select(s => new EncounterCondition { Id = s.Id, Name = s.Name });
             }
             catch (Exception)
             {

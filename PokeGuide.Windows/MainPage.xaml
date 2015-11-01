@@ -30,7 +30,7 @@
             <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="410"/>
             <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -247,35 +247,34 @@
                     <DataTemplate>
                         <Grid Width="{Binding ElementName=evolutionList, Path=DataContext.LoadFormCommand}">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="180"/>
                                 <ColumnDefinition Width="10"/>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="25"/>
                                 <ColumnDefinition Width="10"/>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="50"/>
                                 <ColumnDefinition Width="10"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="5"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
                                 <TextBlock Grid.Column="0" Text="{Binding Location.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
                                 <TextBlock Grid.Column="2" Text="{Binding Location.AreaName}" Style="{StaticResource DefaultTextBlockStyle}"/>
-                            </Grid>
-                            <TextBlock Grid.Column="2" Text="{Binding Rarity}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="2" Text="{Binding Rarity}" HorizontalAlignment="Right" Style="{StaticResource DefaultTextBlockStyle}"/>
                             <Grid Grid.Column="4">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="20"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="20"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding MinLevel}" Style="{StaticResource DefaultTextBlockStyle}"/>
-                                <TextBlock Grid.Column="1" Text="-" Style="{StaticResource DefaultTextBlockStyle}"/>
-                                <TextBlock Grid.Column="2" Text="{Binding MaxLevel}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                                <TextBlock Grid.Column="0" Text="{Binding MinLevel}" HorizontalAlignment="Right" Style="{StaticResource DefaultTextBlockStyle}"/>
+                                <TextBlock Grid.Column="1" Text="-" HorizontalAlignment="Right" Style="{StaticResource DefaultTextBlockStyle}"/>
+                                <TextBlock Grid.Column="2" Text="{Binding MaxLevel}" HorizontalAlignment="Right" Style="{StaticResource DefaultTextBlockStyle}"/>
                             </Grid>
-                            <TextBlock Grid.Column="6" Text="{Binding EncounterMethod.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <StackPanel Grid.Column="6">
+                                <TextBlock Grid.Column="6" Text="{Binding ConditionText}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                                <TextBlock Text="{Binding EncounterMethod.Name}" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            </StackPanel>
+                            
                         </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
@@ -283,17 +282,17 @@
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="180"/>
                                 <ColumnDefinition Width="10"/>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="25"/>
                                 <ColumnDefinition Width="10"/>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="50"/>
                                 <ColumnDefinition Width="10"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="Ort" Style="{StaticResource DefaultTextBlockStyle}"/>
-                            <TextBlock Grid.Column="2" Text="%" Style="{StaticResource DefaultTextBlockStyle}"/>
-                            <TextBlock Grid.Column="4" Text="Level" Style="{StaticResource DefaultTextBlockStyle}"/>                            
+                            <TextBlock Grid.Column="2" Text="%" HorizontalAlignment="Right" Style="{StaticResource DefaultTextBlockStyle}"/>
+                            <TextBlock Grid.Column="4" Text="Level" HorizontalAlignment="Right" Style="{StaticResource DefaultTextBlockStyle}"/>                            
                             <TextBlock Grid.Column="6" Text="Methode" Style="{StaticResource DefaultTextBlockStyle}"/>
                         </Grid>
                     </DataTemplate>

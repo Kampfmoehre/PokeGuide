@@ -64,6 +64,7 @@
     <Compile Include="Model\Ability.cs" />
     <Compile Include="Model\DamageClass.cs" />
     <Compile Include="Model\Database\DbAbility.cs" />
+    <Compile Include="Model\Database\DbEncounterCondition.cs" />
     <Compile Include="Model\Database\DbLocationArea.cs" />
     <Compile Include="Model\Database\DbLocation.cs" />
     <Compile Include="Model\Database\DbItem.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Model\Database\DbVersion.cs" />
     <Compile Include="Model\EggGroup.cs" />
     <Compile Include="Model\ElementType.cs" />
+    <Compile Include="Model\EncounterCondition.cs" />
     <Compile Include="Model\EncounterMethod.cs" />
     <Compile Include="Model\GameVersion.cs" />
     <Compile Include="Model\GenderRate.cs" />

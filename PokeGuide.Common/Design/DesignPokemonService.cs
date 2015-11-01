@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -302,11 +303,51 @@ namespace PokeGuide.Design
             {
                 new PokemonLocation
                 {
-                    EncounterMethod = new EncounterMethod {Id = 1, Name = "Grass" },
+                    Conditions = new List<EncounterCondition> { new EncounterCondition { Id = 1, Name = "Durch Benutzung des Pokéradars" } },
+                    EncounterMethod = new EncounterMethod
+                    {
+                        Id = 1,
+                        Name = "Im hohen Gras oder in einer Höhle laufen"
+                    },
                     Location = LoadLocationFromAreaAsync(1, version, displayLanguage, token).Result,
+                    MaxLevel = 5,
+                    MinLevel = 5,
+                    Rarity = 12
+                },
+                new PokemonLocation
+                {
+                    EncounterMethod = new EncounterMethod
+                    {
+                        Id = 1,
+                        Name = "Mit einer normalen Angel angeln"
+                    },
+                    Location = new Location { Id = 1, Name = "Route 11" },
                     MaxLevel = 30,
                     MinLevel = 20,
-                    Rarity = 12
+                    Rarity = 100
+                },
+                new PokemonLocation
+                {
+                    Conditions = new List<EncounterCondition>
+                    {
+                        new EncounterCondition { Id = 4, Name = "Am Tag" },
+                        new EncounterCondition { Id = 13, Name = "Radio aus" }
+                    },
+                    EncounterMethod = new EncounterMethod
+                    {
+                        Id = 1,
+                        Name = "Im raschelndem Gras laufen"
+                    },
+                    Location = new Location
+                    {
+                        AreaId = 112,
+                        AreaName = "Unten rechts",
+                        Id = 133,
+                        Name = "Safari Zone"
+                    },
+                    MaxLevel = 8,
+                    MinLevel = 6,
+                    Rarity = 40
                 }
             });
             return tcs.Task;
@@ -319,6 +360,17 @@ namespace PokeGuide.Design
             {
                 Id = 12,
                 Name = "Surfer"
+            });
+            return tcs.Task;
+        }
+
+        public Task<EncounterCondition> GetEncounterConditionAsync(int id)
+        {
+            var tcs = new TaskCompletionSource<EncounterCondition>();
+            tcs.SetResult(new EncounterCondition
+            {
+                Id = 12,
+                Name = "Durch Benutzung des Pokéradars"
             });
             return tcs.Task;
         }
