@@ -35,12 +35,14 @@ namespace PokeGuide.ViewModel
                 // Create run time view services and models
                 SimpleIoc.Default.Register<IStaticDataService, StaticDataService>();
                 SimpleIoc.Default.Register<IPokemonService, PokemonService>();
-                SimpleIoc.Default.Register<IMoveService, MoveService>();                
+                SimpleIoc.Default.Register<IMoveService, MoveService>();
+                SimpleIoc.Default.Register<ITestService, TestService>();                
             }
 
             SimpleIoc.Default.Register<IMainViewModel, MainViewModel>();
             SimpleIoc.Default.Register<IPokemonViewModel, PokemonViewModel>();
             SimpleIoc.Default.Register<ISettingsViewModel, SettingsViewModel>();
+            SimpleIoc.Default.Register<ITestViewModel, TestViewModel>();
         }
 
         /// <summary>
@@ -63,6 +65,10 @@ namespace PokeGuide.ViewModel
         public ISettingsViewModel SettingsViewModel
         {
             get { return ServiceLocator.Current.GetInstance<ISettingsViewModel>(); }
+        }
+        public ITestViewModel TestViewModel
+        {
+            get { return ServiceLocator.Current.GetInstance<ITestViewModel>(); }
         }        
         /// <summary>
         /// Cleans up resources that are not needed

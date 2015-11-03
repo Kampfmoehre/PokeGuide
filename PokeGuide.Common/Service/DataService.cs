@@ -16,9 +16,7 @@ namespace PokeGuide.Service
         {
             _storageService = storageService;
             _sqlitePlatform = sqlitePlatform;
-            //Task.Factory.StartNew(() => { InitializeAsync(); }).Wait();
             Task.Run(() => this.InitializeAsync()).Wait();
-            //Initialization = InitializeAsync();
         }
 
         public Task Initialization { get; set; }
@@ -27,7 +25,7 @@ namespace PokeGuide.Service
         {
             if (_connection == null)
             {
-                string database = await _storageService.GetPathForFileAsync("database.sqlite3");
+                string database = await _storageService.GetPathForFileAsync("pokedex.sqlite");
                 _connection = new SQLiteAsyncConnection(() => new SQLiteConnectionWithLock(_sqlitePlatform, new SQLiteConnectionString(database, false)));
             }
         }

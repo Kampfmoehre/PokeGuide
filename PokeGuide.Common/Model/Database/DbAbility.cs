@@ -15,5 +15,11 @@ namespace PokeGuide.Model.Database
         public string Effect { get; set; }
         [Column("flavor_text")]
         public string FlavorText { get; set; }
+        [Column("identifier")]
+        public string Identifier { get; set; }
+        [Column("generation_id")]
+        public int GenerationId { get; set; }
+        [Column("is_main_series")]
+        public bool IsMainSeries { get; set; }
     }
 }

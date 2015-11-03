@@ -107,6 +107,11 @@ namespace PokeGuide
                 // Wenn der Navigationsstapel nicht wiederhergestellt wird, zur ersten Seite navigieren
                 // und die neue Seite konfigurieren, indem die erforderlichen Informationen als Navigationsparameter
                 // übergeben werden
+#if WINDOWS_APP
+                rootFrame.Navigate(typeof(TestPage), e.Arguments);
+                return;
+#endif
+
                 if (!rootFrame.Navigate(typeof(MainPage), e.Arguments))
                 {
                     throw new Exception("Failed to create initial page");
