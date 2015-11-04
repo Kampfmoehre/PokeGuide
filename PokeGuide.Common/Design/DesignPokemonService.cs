@@ -374,5 +374,10 @@ namespace PokeGuide.Design
             });
             return tcs.Task;
         }
+
+        public Task<EggGroup> GetEggGroupAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

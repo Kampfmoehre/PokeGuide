@@ -9,6 +9,8 @@ namespace PokeGuide.Model.Database
         public int Id { get; set; }
         [Column("name")]
         public string Name { get; set; }
+        [Column("genus")]
+        public string Genus { get; set; }
         [Column("order")]
         public int Order { get; set; }
         [Column("gender_rate")]
@@ -39,5 +41,13 @@ namespace PokeGuide.Model.Database
         public int PokemonShapeId { get; set; }
         [Column("growth_rate_id")]
         public int GrowthRateId { get; set; }
+        [Column("growth_rate")]
+        public string GrowthRate { get; set; }
+        [Column("pokedex_number")]
+        public int? PokedexNumber { get; set; }
+        [Column("dex_name")]
+        public string PokedexName { get; set; }
+        [Column("dex_id")]
+        public int? PokedexId { get; set; }
     }
 }

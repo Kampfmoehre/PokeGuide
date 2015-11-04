@@ -11,6 +11,7 @@ namespace PokeGuide.Service.Interface
         Task<DamageClass> GetDamageClassAsync(int id);
         Task<EncounterMethod> GetEncounterMethodAsync(int id);
         Task<EncounterCondition> GetEncounterConditionAsync(int id);
+        Task<EggGroup> GetEggGroupAsync(int id);
         void InitializeResources(int displayLanguage, CancellationToken token);
     }
 }

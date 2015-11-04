@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-
+using Nito.AsyncEx;
 using PokeGuide.Model;
 using PokeGuide.Service.Interface;
 using PokeGuide.ViewModel.Interface;
+using Windows.UI.Core;
 
 namespace PokeGuide.ViewModel
 {
@@ -21,12 +23,22 @@ namespace PokeGuide.ViewModel
         ObservableCollection<Model.Db.Ability> _abilitiesNew;
         ObservableCollection<GameVersion> _versionsOld;
         ObservableCollection<Ability> _abilitiesOld;
+        Species _speciesNew;
+        Species _speciesOld;
+        PokemonForm _formNew;
+        PokemonForm _formOld;
         string _timeConsumedNew;
         string _timeConsumedOld;
         RelayCommand _loadVersionsNewCommand;
         RelayCommand _loadAbililitiesNewCommand;
         RelayCommand _loadVersionsOldCommand;
         RelayCommand _loadAbilitiesOldCommand;
+        RelayCommand _loadSpeciesOldCommand;
+        RelayCommand _loadSpeciesNewCommand;
+        RelayCommand _loadFormOldCommand;
+        RelayCommand _loadFormNewCommand;
+        private CoreDispatcher _dispatcher;
+
         /// <summary>
         /// Sets and gets the 
         /// </summary>
@@ -62,6 +74,22 @@ namespace PokeGuide.ViewModel
         /// <summary>
         /// Sets and gets the 
         /// </summary>
+        public Species SpeciesNew
+        {
+            get { return _speciesNew; }
+            set { Set(() => SpeciesNew, ref _speciesNew, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public Species SpeciesOld
+        {
+            get { return _speciesOld; }
+            set { Set(() => SpeciesOld, ref _speciesOld, value); }
+        }        
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
         public string TimeConsumedNew
         {
             get { return _timeConsumedNew; }
@@ -74,6 +102,22 @@ namespace PokeGuide.ViewModel
         {
             get { return _timeConsumedOld; }
             set { Set(() => TimeConsumedOld, ref _timeConsumedOld, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public PokemonForm FormNew
+        {
+            get { return _formNew; }
+            set { Set(() => FormNew, ref _formNew, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public PokemonForm FormOld
+        {
+            get { return _formOld; }
+            set { Set(() => FormOld, ref _formOld, value); }
         }
         public RelayCommand LoadVersionsNewCommand
         {
@@ -139,10 +183,78 @@ namespace PokeGuide.ViewModel
                 return _loadAbilitiesOldCommand;
             }
         }
+        public RelayCommand LoadSpeciesNewCommand
+        {
+            get
+            {
+                if (_loadSpeciesNewCommand == null)
+                    _loadSpeciesNewCommand = new RelayCommand(async () =>
+                    {
+                        var sw = Stopwatch.StartNew();
+                        SpeciesNew = await LoadSpeciesNew(227, 15, 6);
+                        //Species temp = await LoadSpeciesNew(227, 15, 6);                        
+                        //await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                        //{
+                        //    SpeciesNew = temp;
+                        //});
+                        sw.Stop();
+                        TimeConsumedNew = String.Format("Loaded Species {0:d} in {1:0.00} seconds", 227, (double)sw.ElapsedMilliseconds / 1000);
+                    });
+                return _loadSpeciesNewCommand;
+            }
+        }
+        public RelayCommand LoadSpeciesOldCommand
+        {
+            get
+            {
+                if (_loadSpeciesOldCommand == null)
+                    _loadSpeciesOldCommand = new RelayCommand(async () =>
+                    {
+                        var sw = Stopwatch.StartNew();
+                        SpeciesOld = await LoadSpeciesOld(227, 15, 6);
+                        //SpeciesOld = await LoadSpeciesOld(227, 15, 6);
+                        sw.Stop();
+                        TimeConsumedOld = String.Format("Loaded Species {0:d} in {1:0.00} seconds", 227, (double)sw.ElapsedMilliseconds / 1000);
+                    });
+                return _loadSpeciesOldCommand;
+            }
+        }
+        public RelayCommand LoadFormNewCommand
+        {
+            get
+            {
+                if (_loadFormNewCommand == null)
+                    _loadFormNewCommand = new RelayCommand(async () =>
+                    {
+                        var sw = Stopwatch.StartNew();
+                        FormNew = await LoadFormNewAsync(270, new GameVersion { Generation = 6, Id = 25, VersionGroup = 15 }, 6);
+                        sw.Stop();
+                        TimeConsumedNew = String.Format("Loaded Form {0:d} in {1:0.00} seconds", 270, (double)sw.ElapsedMilliseconds / 1000);
+                    });
+                return _loadFormNewCommand;
+            }
+        }
+        public RelayCommand LoadFormOldCommand
+        {
+            get
+            {
+                if (_loadFormOldCommand == null)
+                    _loadFormOldCommand = new RelayCommand(async () =>
+                    {
+                        var sw = Stopwatch.StartNew();
+                        FormOld = await LoadFormOldAsync(270, new GameVersion { Generation = 6, Id = 25, VersionGroup = 15 }, 6);
+                        sw.Stop();
+                        TimeConsumedOld = String.Format("Loaded Form {0:d} in {1:0.00} seconds", 270, (double)sw.ElapsedMilliseconds / 1000);
+                    });
+                return _loadFormOldCommand;
+            }
+        }
         public TestViewModel(ITestService testService)
         {
             _tokenSource = new CancellationTokenSource();
             _testService = testService;
+            _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
+            _testService.InitializeResources(6, _tokenSource.Token);
         }
 
         async Task<ObservableCollection<Model.Db.GameVersion>> LoadVersionsNewAsync(int language)
@@ -164,6 +276,22 @@ namespace PokeGuide.ViewModel
         {
             IEnumerable<Ability> versions = await _testService.LoadAbilitiesOldAsync(6, language, _tokenSource.Token);
             return new ObservableCollection<Ability>(versions);
+        }
+        async Task<Species> LoadSpeciesNew(int id, int versionGroupId, int language)
+        {
+            return await _testService.LoadSpeciesByIdAsync(id, versionGroupId, language, _tokenSource.Token);
+        }
+        async Task<Species> LoadSpeciesOld(int id, int versionGroupId, int language)
+        {
+            return await _testService.LoadSpeciesByIdOldAsync(id, versionGroupId, language, _tokenSource.Token);
+        }
+        async Task<PokemonForm> LoadFormNewAsync(int id, GameVersion version, int language)
+        {
+            return await _testService.LoadFormByIdAsync(id, version, language, _tokenSource.Token);
+        }
+        async Task<PokemonForm> LoadFormOldAsync(int id, GameVersion version, int language)
+        {
+            return await _testService.LoadFormByIdOldAsync(id, version, language, _tokenSource.Token);
         }
     }
 }

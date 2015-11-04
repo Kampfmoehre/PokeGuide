@@ -2,7 +2,7 @@
 
 namespace PokeGuide.Model.Database
 {
-    [Table("pokemon_v2_pokemondexnumber")]
+    [Table("pokemon_dex_numbers")]
     public class DbPokemonDexNumber
     {
         [Column("id")]

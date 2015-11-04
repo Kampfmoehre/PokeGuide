@@ -9,7 +9,7 @@ namespace PokeGuide.Model.Database
         public int Id { get; set; }
         [Column("name")]
         public string Name { get; set; }
-        [Column("move_damage_class_id")]
+        [Column("damage_class_id")]
         public int MoveDamageClassId { get; set; }
         [Column("generation_id")]
         public int GenerationId { get; set; }

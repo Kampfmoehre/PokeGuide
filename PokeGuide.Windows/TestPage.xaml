@@ -15,6 +15,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -24,17 +26,39 @@
         <StackPanel  Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
             <Button Content="Versions" Command="{Binding LoadVersionsNewCommand}"/>
             <Button Content="Abilities" Command="{Binding LoadAbilitiesNewCommand}"/>
+            <Button Content="Species" Command="{Binding LoadSpeciesNewCommand}"/>
+            <Button Content="Form" Command="{Binding LoadFormNewCommand}"/>
         </StackPanel>
         
         <ListView Grid.Row="2" Grid.Column="0" Header="Stuff new" ItemsSource="{Binding VersionsNew}" DisplayMemberPath="Name"/>
         <ListView Grid.Row="3" Grid.Column="0" Header="Stuff new" ItemsSource="{Binding AbilitiesNew}" DisplayMemberPath="Name"/>
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="{Binding TimeConsumedNew}"/>
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="{Binding SpeciesNew.Name}"/>
+        <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal">
+            <TextBlock Text="{Binding FormNew.Type1.Name}"/>
+            <TextBlock Text="{Binding FormNew.Type2.Name}"/>
+            <TextBlock Text="{Binding FormNew.Ability1.Name}"/>
+            <TextBlock Text="{Binding FormNew.Ability2.Name}"/>
+            <TextBlock Text="{Binding FormNew.HiddenAbility.Name}"/>
+            <TextBlock Text="{Binding FormNew.Item.Name}"/>
+        </StackPanel>
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="{Binding TimeConsumedNew}"/>
         <StackPanel  Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
             <Button Content="Versions" Command="{Binding LoadVersionsOldCommand}"/>
             <Button Content="Abilities" Command="{Binding LoadAbilitiesOldCommand}"/>
+            <Button Content="Species" Command="{Binding LoadSpeciesOldCommand}"/>
+            <Button Content="Form" Command="{Binding LoadFormOldCommand}"/>
         </StackPanel>
         <ListView Grid.Row="2" Grid.Column="1" Header="Stuff old" ItemsSource="{Binding VersionsOld}" DisplayMemberPath="Name"/>
         <ListView Grid.Row="3" Grid.Column="1" Header="Stuff old" ItemsSource="{Binding AbilitiesOld}" DisplayMemberPath="Name"/>
-        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding TimeConsumedOld}"/>
+        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SpeciesOld.Name}"/>
+        <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+            <TextBlock Text="{Binding FormOld.Type1.Name}"/>
+            <TextBlock Text="{Binding FormOld.Type2.Name}"/>
+            <TextBlock Text="{Binding FormOld.Ability1.Name}"/>
+            <TextBlock Text="{Binding FormOld.Ability2.Name}"/>
+            <TextBlock Text="{Binding FormOld.HiddenAbility.Name}"/>
+            <TextBlock Text="{Binding FormOld.Item.Name}"/>
+        </StackPanel>
+        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding TimeConsumedOld}"/>
     </Grid>
 </Page>

@@ -22,6 +22,7 @@ namespace PokeGuide.Service
         public AsyncLazy<IEnumerable<DamageClass>> DamageClasses { get; private set; }
         public AsyncLazy<IEnumerable<EncounterMethod>> EncounterMethods { get; private set; }
         public AsyncLazy<IEnumerable<EncounterCondition>> EncounterConditions { get; private set; }
+        public AsyncLazy<IEnumerable<EggGroup>> EggGroups { get; private set; }
 
         public void InitializeResources(int displayLanguage, CancellationToken token)
         {
@@ -44,6 +45,10 @@ namespace PokeGuide.Service
             EncounterConditions = new AsyncLazy<IEnumerable<EncounterCondition>>(async () =>
             {
                 return await LoadEncounterConditionsAsync(displayLanguage, token);
+            });
+            EggGroups = new AsyncLazy<IEnumerable<EggGroup>>(async () =>
+            {
+                return await LoadEggGroupsAsync(displayLanguage, token);
             });
         }
 
@@ -77,14 +82,20 @@ namespace PokeGuide.Service
             return conditions.FirstOrDefault(f => f.Id == id);
         }
 
+        public async Task<EggGroup> GetEggGroupAsync(int id)
+        {
+            IEnumerable<EggGroup> eggGroups = await EggGroups;
+            return eggGroups.FirstOrDefault(f => f.Id == id);
+        }
+
         public async Task<IEnumerable<ElementType>>LoadTypesAsync(int displayLanguage, CancellationToken token)
         {
             try
             {
-                string query = "SELECT t.id, tn.name, t.move_damage_class_id, t.generation_id FROM pokemon_v2_type t\n" +
-                    "LEFT JOIN\n(SELECT e.type_id AS id, COALESCE(o.name, e.name) AS name FROM pokemon_v2_typename e\n" +
-                    "LEFT OUTER JOIN pokemon_v2_typename o ON e.type_id = o.type_id and o.language_id = ?\n" +
-                    "WHERE e.language_id = 9\nGROUP BY e.type_id)\nAS tn ON t.id = tn.id";
+                string query = "SELECT t.id, tn.name, t.damage_class_id, t.generation_id FROM types t\n" +
+                    "LEFT JOIN\n(SELECT e.type_id AS id, COALESCE(o.name, e.name) AS name FROM type_names e\n" +
+                    "LEFT OUTER JOIN type_names o ON e.type_id = o.type_id and o.local_language_id = ?\n" +
+                    "WHERE e.local_language_id = 9\nGROUP BY e.type_id)\nAS tn ON t.id = tn.id";
                     //"WHERE t.generation_id <= ?";
                     IEnumerable<DbType> types = await _connection.QueryAsync<DbType>(token, query, new object[] { displayLanguage });
                     return types.Select(s => new ElementType
@@ -105,10 +116,10 @@ namespace PokeGuide.Service
         {
             try
             {
-                string query = "SELECT gr.id, grd.name FROM pokemon_v2_growthrate gr\n" +
-                    "LEFT JOIN\n(SELECT e.growth_rate_id AS id, COALESCE(o.description, e.description) AS name FROM pokemon_v2_growthratedescription e\n" +
-                    "LEFT OUTER JOIN pokemon_v2_growthratedescription o ON e.growth_rate_id = o.growth_rate_id and o.language_id = ?\n" +
-                    "WHERE e.language_id = 9\nGROUP BY e.growth_rate_id)\nAS grd ON gr.id = grd.id";
+                string query = "SELECT gr.id, grd.name FROM growth_rates gr\n" +
+                    "LEFT JOIN\n(SELECT e.growth_rate_id AS id, COALESCE(o.name, e.name) AS name FROM growth_rate_prose e\n" +
+                    "LEFT OUTER JOIN growth_rate_prose o ON e.growth_rate_id = o.growth_rate_id and o.local_language_id = ?\n" +
+                    "WHERE e.local_language_id = 9\nGROUP BY e.growth_rate_id)\nAS grd ON gr.id = grd.id";
                     //"WHERE gr.id = ?";
                 IEnumerable<DbGrowthRate> growthRates = await _connection.QueryAsync<DbGrowthRate>(token, query, new object[] { displayLanguage });
                 return growthRates.Select(s => new GrowthRate { Id = s.Id, Name = s.Name });
@@ -167,6 +178,28 @@ namespace PokeGuide.Service
                     "WHERE e.language_id = 9\nGROUP BY e.encounter_condition_id)\nAS ecn ON ec.id = ecn.id";
                 IEnumerable<DbEncounterCondition> conditions = await _connection.QueryAsync<DbEncounterCondition>(token, query, new object[] { displayLanguage, displayLanguage });
                 return conditions.Select(s => new EncounterCondition { Id = s.Id, Name = s.Name });
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<EggGroup>> LoadEggGroupsAsync(int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT eg.id, egn.name 
+                    FROM egg_groups AS eg
+                    LEFT JOIN (SELECT e.egg_group_id AS id, COALESCE(o.name, e.name) AS name FROM egg_group_prose e
+                               LEFT OUTER JOIN egg_group_prose o ON e.egg_group_id = o.egg_group_id and o.local_language_id = {0}
+                               WHERE e.local_language_id = 9
+                               GROUP BY e.egg_group_id)
+                    AS egn ON eg.id = egn.id
+                ", displayLanguage);
+                IEnumerable<DbEggGroup> eggGroups = await _connection.QueryAsync<DbEggGroup>(token, query, new object[0]);
+                return eggGroups.Select(s => new EggGroup { Id = s.Id, Name = s.Name });
             }
             catch (Exception)
             {
