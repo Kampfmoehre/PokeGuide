@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -42,6 +44,70 @@ namespace PokeGuide.Service
                 Name = s.Name,
                 VersionGroup = s.VersionGroupId
             }));
+        }
+
+        public async Task<ObservableCollection<Ability>> LoadAbilitiesAsync(int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT ab.id, abn.name, abft.flavor_text, abp.short_effect, abp.effect
+                    FROM abilities AS ab
+                    LEFT JOIN (SELECT e.ability_id AS id, COALESCE(o.name, e.name) AS name
+                        FROM ability_names e
+                        LEFT OUTER JOIN ability_names o ON e.ability_id = o.ability_id AND o.local_language_id = {0}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.ability_id)
+                    AS abn ON ab.id = abn.id
+                    LEFT JOIN (SELECT e.ability_id AS id, COALESCE(o.flavor_text, e.flavor_text) AS flavor_text, e.version_group_id
+                        FROM ability_flavor_text e
+                        LEFT OUTER JOIN ability_flavor_text o ON e.ability_id = o.ability_id AND o.language_id = {0}
+                        WHERE e.language_id = 9 AND e.version_group_id = 15
+                        GROUP BY e.ability_id)
+                    AS abft ON ab.id = abft.id
+                    LEFT JOIN (SELECT e.ability_id AS id, COALESCE(o.short_effect, e.short_effect) AS short_effect, COALESCE(o.effect, e.effect) AS effect
+                        FROM ability_prose e
+                        LEFT OUTER JOIN ability_prose o ON e.ability_id = o.ability_id AND o.local_language_id = {0}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.ability_id)
+                    AS abp ON ab.id = abp.id
+                    WHERE ab.is_main_series
+                ", displayLanguage);
+                IEnumerable<DbAbility> abilities = await _connection.QueryAsync<DbAbility>(token, query, new object[0]).ConfigureAwait(false);
+                var result = new List<Ability>();
+                foreach (DbAbility ability in abilities)
+                {
+                    var ab = new Ability
+                    {
+                        FlavorText = ability.FlavorText,
+                        Id = ability.Id,
+                        Name = ability.Name
+                    };
+                    ab.Description = ProzessAbilityText(ability.ShortEffect);
+                    result.Add(ab);
+                }
+                return new ObservableCollection<Ability>(result);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        string ProzessAbilityText(string input)
+        {
+            string result = input;
+            string nameRegexString = @"\[[\w\s]*\]";
+            string identifierRegexString = @"{\w*:\w*}";
+            var regex = new Regex(nameRegexString + identifierRegexString);
+            foreach (Match match in regex.Matches(input))
+            {
+                string name = String.Empty;
+                Match nameMatch = Regex.Match(match.Value, nameRegexString);
+                name = nameMatch.Value;
+                result = Regex.Replace(result, nameRegexString + identifierRegexString, name);
+            }
+            return result;
         }
     }
 }

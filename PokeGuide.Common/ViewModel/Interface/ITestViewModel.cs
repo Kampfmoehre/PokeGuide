@@ -11,6 +11,7 @@ namespace PokeGuide.ViewModel.Interface
         ObservableCollection<Model.Db.Ability> AbilitiesNew { get; set; }
         ObservableCollection<GameVersion> VersionsOld { get; set; }        
         ObservableCollection<Ability> AbilitiesOld { get; set; }
+        ObservableCollection<Ability> Abilities { get; set; }
         Species SpeciesNew { get; set; }
         Species SpeciesOld { get; set; }
         PokemonForm FormNew { get; set; }        
@@ -22,6 +23,7 @@ namespace PokeGuide.ViewModel.Interface
         RelayCommand LoadSpeciesOldCommand { get; }
         RelayCommand LoadFormNewCommand { get; }
         RelayCommand LoadFormOldCommand { get; }
+        RelayCommand LoadAbilitiesCommand { get; }
         string TimeConsumedNew { get; set; }
         string TimeConsumedOld { get; set; }
     }

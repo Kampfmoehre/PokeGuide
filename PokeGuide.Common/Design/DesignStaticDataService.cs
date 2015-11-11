@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using PokeGuide.Model;
@@ -10,6 +11,17 @@ namespace PokeGuide.Design
     {
         public void Cleanup()
         { }
+
+        public Task<ObservableCollection<Ability>> LoadAbilitiesAsync(int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<ObservableCollection<Ability>>();
+            tcs.SetResult(new ObservableCollection<Ability>
+            {
+                new Ability { Id = 6, Name = "Duftnote" },
+                new Ability { Id = 9, Name = "Niesel" }
+            });
+            return tcs.Task;
+        }
 
         public Task<ObservableCollection<Language>> LoadLanguagesAsync(int displayLanguage, CancellationToken token)
         {

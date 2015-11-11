@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -568,6 +569,271 @@ namespace PokeGuide.Service
                 IEnumerable<DbItem> items = await _connection.QueryAsync<DbItem>(token, query, new object[0]).ConfigureAwait(false);
                 DbItem item = items.Single();
                 return new Item { Id = item.Id, Name = item.Name };
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<Ability>> LoadAbilitiesAsync(int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT ab.id, abn.name, abft.flavor_text, abp.short_effect, abp.effect
+                    FROM abilities AS ab
+                    LEFT JOIN (SELECT e.ability_id AS id, COALESCE(o.name, e.name) AS name
+                        FROM ability_names e
+                        LEFT OUTER JOIN ability_names o ON e.ability_id = o.ability_id AND o.local_language_id = {0}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.ability_id)
+                    AS abn ON ab.id = abn.id
+                    LEFT JOIN (SELECT e.ability_id AS id, COALESCE(o.flavor_text, e.flavor_text) AS flavor_text, e.version_group_id
+                        FROM ability_flavor_text e
+                        LEFT OUTER JOIN ability_flavor_text o ON e.ability_id = o.ability_id AND o.language_id = {0}
+                        WHERE e.language_id = 9 AND e.version_group_id = 15
+                        GROUP BY e.ability_id)
+                    AS abft ON ab.id = abft.id
+                    LEFT JOIN (SELECT e.ability_id AS id, COALESCE(o.short_effect, e.short_effect) AS short_effect, COALESCE(o.effect, e.effect) AS effect
+                        FROM ability_prose e
+                        LEFT OUTER JOIN ability_prose o ON e.ability_id = o.ability_id AND o.local_language_id = {0}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.ability_id)
+                    AS abp ON ab.id = abp.id
+                    WHERE ab.is_main_series
+                ", displayLanguage);
+                IEnumerable<DbAbility> abilities = await _connection.QueryAsync<DbAbility>(token, query, new object[0]).ConfigureAwait(false);
+                var result = new List<Ability>();
+                foreach (DbAbility ability in abilities)
+                {
+                    var ab = new Ability
+                    {
+                        FlavorText = ability.FlavorText,
+                        Id = ability.Id,
+                        Name = ability.Name
+                    };
+                    ab.Description = await ProzessAbilityText(ability.ShortEffect, displayLanguage, token);
+                    ab.Effect = await ProzessAbilityText(ability.Effect, displayLanguage, token);
+                    result.Add(ab);
+                }
+                return new List<Ability>(result);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        async Task<string> ProzessAbilityText(string input, int language, CancellationToken token)
+        {
+            if (String.IsNullOrWhiteSpace(input))
+                return String.Empty;
+            string result = input;
+            string nameRegexString = @"\[[\w\s]*\]";
+            string identifierRegexString = @"{\w*:\w*}";
+            var regex = new Regex(nameRegexString + identifierRegexString);
+            foreach (Match match in regex.Matches(input))
+            {
+                string name = String.Empty;
+                Match nameMatch = Regex.Match(match.Value, nameRegexString);
+                name = nameMatch.Value.Trim(new char[] { '[', ']' });
+                if (String.IsNullOrWhiteSpace(name))
+                {
+                    Match identifierMatch = Regex.Match(match.Value, identifierRegexString);
+                    string identifier = identifierMatch.Value.Trim(new char[] { '{', '}' });
+                    name = await GetDefaultNameForIdentifier(identifier, language, token);
+                }
+                result = result.Replace(match.Value, name);
+            }
+            return result;
+        }
+
+        async Task<string> GetDefaultNameForIdentifier(string identifier, int language, CancellationToken token)
+        {
+            int splitIndex = identifier.IndexOf(':');
+            string type = identifier.Remove(splitIndex);
+            string element = identifier.Substring(splitIndex + 1);
+
+            switch (type)
+            {
+                case "mechanic":
+                    switch (element)
+                    {
+                        case "rain":
+                            return "Regen";
+                        case "speed":
+                            return "Initiative";
+                        case "hp":
+                            return "KP";
+                        case "weather":
+                            return "Wetter";
+                        case "paralysis":
+                            return "Paralyse";
+                        case "evasion":
+                            return "Fluchtwert";
+                        case "infatuation":
+                            return "Anziehung";
+                        case "accuracy":
+                            return "Genauigkeit";
+                        case "sleep":
+                            return "Schlaf";
+                        case "poison":
+                            return "Vergiftung";
+                        case "confusion":
+                            return "Verwirrung";
+                        case "attack":
+                            return "Angriff";
+                        case "burn":
+                            return "Verbrennung";
+                        case "sandstorm":
+                            return "Sandsturm";
+                        case "pp":
+                            return "AP";
+                        case "fog":
+                            return "Nebel";
+                        case "defense":
+                            return "Verteidigung";
+                        case "hail":
+                            return "Hagel";
+                        default:
+                            break;
+                    }
+                    break;
+                case "move":
+                    return await LoadMoveNameByIdentifierAsync(element, language, token);
+                case "ability":
+                    return await LoadAbilityNameByIdentifierAsync(element, language, token);
+                case "type":
+                    return await LoadTypeNameByIdentifierAsync(element, language, token);
+                case "pokemon":
+                    return await LoadPokemonNameByIdentifierAsync(element, language, token);
+                case "item":
+                    return await LoadItemNameByIdentifierAsync(element, language, token);
+                default:
+                    break;
+            }
+            if (type == "mechanic")
+            {
+                
+            }
+            return String.Empty;
+        }
+
+        async Task<string> LoadMoveNameByIdentifierAsync(string identifier, int language, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT mo.id, mon.name
+                    FROM moves mo
+                    LEFT JOIN (SELECT e.move_id AS id, COALESCE(o.name, e.name) AS name
+                        FROM move_names e
+                        LEFT OUTER JOIN move_names o ON e.move_id = o.move_id AND o.local_language_id = {1}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.move_id)
+                    AS mon ON mo.id = mon.id
+                    WHERE mo.identifier = '{0}'
+                ", identifier, language);
+                IEnumerable<DbMove> moves = await _connection.QueryAsync<DbMove>(token, query, new object[0]).ConfigureAwait(false);
+                DbMove move = moves.Single();
+                return move.Name;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        async Task<string> LoadAbilityNameByIdentifierAsync(string identifier, int language, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT ab.id, abn.name
+                    FROM abilities ab
+                    LEFT JOIN (SELECT e.ability_id AS id, COALESCE(o.name, e.name) AS name
+                        FROM ability_names e
+                        LEFT OUTER JOIN ability_names o ON e.ability_id = o.ability_id AND o.local_language_id = {1}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.ability_id)
+                    AS abn ON ab.id = abn.id
+                    WHERE ab.identifier = '{0}'
+                ", identifier, language);
+                IEnumerable<DbAbility> abilities = await _connection.QueryAsync<DbAbility>(token, query, new object[0]).ConfigureAwait(false);
+                DbAbility ability = abilities.Single();
+                return ability.Name;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        async Task<string> LoadTypeNameByIdentifierAsync(string identifier, int language, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT ty.id, tyn.name
+                    FROM types ty
+                    LEFT JOIN (SELECT e.type_id AS id, COALESCE(o.name, e.name) AS name
+                        FROM type_names e
+                        LEFT OUTER JOIN type_names o ON e.type_id = o.type_id AND o.local_language_id = {1}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.type_id)
+                    AS tyn ON ty.id = tyn.id
+                    WHERE ty.identifier = '{0}'
+                ", identifier, language);
+                IEnumerable<DbAbility> types = await _connection.QueryAsync<DbAbility>(token, query, new object[0]).ConfigureAwait(false);
+                DbAbility type = types.Single();
+                return type.Name;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        async Task<string> LoadPokemonNameByIdentifierAsync(string identifier, int language, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT ps.id, psn.name
+                    FROM pokemon_species ps
+                    LEFT JOIN (SELECT e.pokemon_species_id AS id, COALESCE(o.name, e.name) AS name
+                        FROM pokemon_species_names e
+                        LEFT OUTER JOIN pokemon_species_names o ON e.pokemon_species_id = o.pokemon_species_id AND o.local_language_id = {1}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.pokemon_species_id)
+                    AS psn ON ps.id = psn.id
+                    WHERE ps.identifier = '{0}'
+                ", identifier, language);
+                IEnumerable<DbPokemonSpecies> pokemon = await _connection.QueryAsync<DbPokemonSpecies>(token, query, new object[0]).ConfigureAwait(false);
+                DbPokemonSpecies species = pokemon.Single();
+                return species.Name;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        async Task<string> LoadItemNameByIdentifierAsync(string identifier, int language, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT it.id, itn.name
+                    FROM items it
+                    LEFT JOIN (SELECT e.item_id AS id, COALESCE(o.name, e.name) AS name
+                        FROM item_names e
+                        LEFT OUTER JOIN item_names o ON e.item_id = o.item_id AND o.local_language_id = {1}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.item_id)
+                    AS itn ON it.id = itn.id
+                    WHERE it.identifier = '{0}'
+                ", identifier, language);
+                IEnumerable<DbItem> items = await _connection.QueryAsync<DbItem>(token, query, new object[0]).ConfigureAwait(false);
+                DbItem item = items.Single();
+                return item.Name;
             }
             catch (Exception)
             {

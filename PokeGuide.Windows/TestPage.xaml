@@ -22,8 +22,11 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <StackPanel  Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+        <TextBlock Grid.Row="6" Grid.Column="0" Text="{Binding TimeConsumedNew}"/>
+        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding TimeConsumedOld}"/>
+        <!--<StackPanel  Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
             <Button Content="Versions" Command="{Binding LoadVersionsNewCommand}"/>
             <Button Content="Abilities" Command="{Binding LoadAbilitiesNewCommand}"/>
             <Button Content="Species" Command="{Binding LoadSpeciesNewCommand}"/>
@@ -41,7 +44,7 @@
             <TextBlock Text="{Binding FormNew.HiddenAbility.Name}"/>
             <TextBlock Text="{Binding FormNew.Item.Name}"/>
         </StackPanel>
-        <TextBlock Grid.Row="6" Grid.Column="0" Text="{Binding TimeConsumedNew}"/>
+        
         <StackPanel  Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
             <Button Content="Versions" Command="{Binding LoadVersionsOldCommand}"/>
             <Button Content="Abilities" Command="{Binding LoadAbilitiesOldCommand}"/>
@@ -59,6 +62,29 @@
             <TextBlock Text="{Binding FormOld.HiddenAbility.Name}"/>
             <TextBlock Text="{Binding FormOld.Item.Name}"/>
         </StackPanel>
-        <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding TimeConsumedOld}"/>
+        -->
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
+            <Button Content="Abilities" Command="{Binding LoadAbilitiesCommand}"/>
+        </StackPanel>
+        <ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="4" ItemsSource="{Binding Abilities}" Header="Abilities">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="300"/>
+                            <ColumnDefinition Width="600"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Id}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Name}"/>
+                        <TextBlock Grid.Column="2" Text="{Binding FlavorText}"/>
+                        <TextBlock Grid.Column="3" Text="{Binding Description}" TextWrapping="Wrap"/>
+                        <TextBlock Grid.Column="4" Text="{Binding Effect}" TextWrapping="Wrap"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Page>

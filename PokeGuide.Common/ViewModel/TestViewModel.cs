@@ -23,6 +23,7 @@ namespace PokeGuide.ViewModel
         ObservableCollection<Model.Db.Ability> _abilitiesNew;
         ObservableCollection<GameVersion> _versionsOld;
         ObservableCollection<Ability> _abilitiesOld;
+        ObservableCollection<Ability> _abilities;
         Species _speciesNew;
         Species _speciesOld;
         PokemonForm _formNew;
@@ -37,6 +38,7 @@ namespace PokeGuide.ViewModel
         RelayCommand _loadSpeciesNewCommand;
         RelayCommand _loadFormOldCommand;
         RelayCommand _loadFormNewCommand;
+        RelayCommand _loadAbilitiesCommand;
         private CoreDispatcher _dispatcher;
 
         /// <summary>
@@ -70,6 +72,14 @@ namespace PokeGuide.ViewModel
         {
             get { return _abilitiesOld; }
             set { Set(() => AbilitiesOld, ref _abilitiesOld, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public ObservableCollection<Ability> Abilities
+        {
+            get { return _abilities; }
+            set { Set(() => Abilities, ref _abilities, value); }
         }
         /// <summary>
         /// Sets and gets the 
@@ -249,6 +259,21 @@ namespace PokeGuide.ViewModel
                 return _loadFormOldCommand;
             }
         }
+        public RelayCommand LoadAbilitiesCommand
+        {
+            get
+            {
+                if (_loadAbilitiesCommand == null)
+                    _loadAbilitiesCommand = new RelayCommand(async () =>
+                    {
+                        var sw = Stopwatch.StartNew();
+                        Abilities = await LoadAbilitiesAsync(6);
+                        sw.Stop();
+                        TimeConsumedNew = String.Format("Loaded {0:d} Abilities in {1:0.00} seconds", Abilities.Count, (double)sw.ElapsedMilliseconds / 1000);
+                    });
+                return _loadAbilitiesCommand;
+            }
+        }
         public TestViewModel(ITestService testService)
         {
             _tokenSource = new CancellationTokenSource();
@@ -292,6 +317,11 @@ namespace PokeGuide.ViewModel
         async Task<PokemonForm> LoadFormOldAsync(int id, GameVersion version, int language)
         {
             return await _testService.LoadFormByIdOldAsync(id, version, language, _tokenSource.Token);
+        }
+        async Task<ObservableCollection<Ability>> LoadAbilitiesAsync(int language)
+        {
+            List<Ability> abilities = await _testService.LoadAbilitiesAsync(language, _tokenSource.Token);
+            return new ObservableCollection<Ability>(abilities);
         }
     }
 }
