@@ -2,15 +2,19 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Views;
 using Nito.AsyncEx;
 using PokeGuide.Model;
 using PokeGuide.Service.Interface;
 using PokeGuide.ViewModel.Interface;
+using Windows.Storage;
 using Windows.UI.Core;
 
 namespace PokeGuide.ViewModel
@@ -19,15 +23,20 @@ namespace PokeGuide.ViewModel
     {
         CancellationTokenSource _tokenSource;
         ITestService _testService;
+        INavigationService _navigationService;
+        IStaticDataService _staticDataService;
         ObservableCollection<Model.Db.GameVersion> _versionsNew;
         ObservableCollection<Model.Db.Ability> _abilitiesNew;
         ObservableCollection<GameVersion> _versionsOld;
         ObservableCollection<Ability> _abilitiesOld;
         ObservableCollection<Ability> _abilities;
+        INotifyTaskCompletionCollection<GameVersion> _versions;
         Species _speciesNew;
         Species _speciesOld;
         PokemonForm _formNew;
         PokemonForm _formOld;
+        Ability _selectedAbilityIndex;
+        Ability _selectedAbility;
         string _timeConsumedNew;
         string _timeConsumedOld;
         RelayCommand _loadVersionsNewCommand;
@@ -39,6 +48,8 @@ namespace PokeGuide.ViewModel
         RelayCommand _loadFormOldCommand;
         RelayCommand _loadFormNewCommand;
         RelayCommand _loadAbilitiesCommand;
+        RelayCommand _loadAbilityCommand;
+        RelayCommand _navigateToAbilityCommand;
         private CoreDispatcher _dispatcher;
 
         /// <summary>
@@ -129,15 +140,58 @@ namespace PokeGuide.ViewModel
             get { return _formOld; }
             set { Set(() => FormOld, ref _formOld, value); }
         }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public Ability SelectedAbility
+        {
+            get { return _selectedAbility; }
+            set { Set(() => SelectedAbility, ref _selectedAbility, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public Ability SelectedAbilityIndex
+        {
+            get { return _selectedAbilityIndex; }
+            set
+            {
+                Set(() => SelectedAbilityIndex, ref _selectedAbilityIndex, value);
+                if (value != null)
+                    LoadAbilityCommand.Execute(null);
+            }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public INotifyTaskCompletionCollection<GameVersion> Versions
+        {
+            get { return _versions; }
+            set
+            {
+                if (Versions != null)
+                    Versions.SelectedItemChanged -= Versions_SelectedItemChanged;
+                Set(() => Versions, ref _versions, value);
+                if (Versions != null)
+                    Versions.SelectedItemChanged += Versions_SelectedItemChanged;
+            }
+        }
+
+        void Versions_SelectedItemChanged(object sender, SelectedItemChangedEventArgs<GameVersion> e)
+        {
+            var settings = ApplicationData.Current.LocalSettings;
+            settings.Values["currentVersion"] = e.NewItem.Id;
+        }
+
         public RelayCommand LoadVersionsNewCommand
         {
             get
             {
                 if (_loadVersionsNewCommand == null)
-                    _loadVersionsNewCommand = new RelayCommand(async () => 
+                    _loadVersionsNewCommand = new RelayCommand(() => 
                     {
                         DateTime start = DateTime.Now;
-                        VersionsNew = await LoadVersionsNewAsync(6);
+                        //VersionsNew = await LoadVersionsNewAsync(6);
                         DateTime end = DateTime.Now;
                         TimeSpan span = end - start;
                         TimeConsumedNew = span.TotalMilliseconds.ToString();
@@ -274,18 +328,50 @@ namespace PokeGuide.ViewModel
                 return _loadAbilitiesCommand;
             }
         }
-        public TestViewModel(ITestService testService)
+        public RelayCommand LoadAbilityCommand
+        {
+            get
+            {
+                if (_loadAbilityCommand == null)
+                    _loadAbilityCommand = new RelayCommand(async () =>
+                    {
+                        var sw = Stopwatch.StartNew();
+                        SelectedAbility = await LoadAbilityAsnyc(SelectedAbilityIndex.Id, 8, 6);
+                        sw.Stop();
+                        TimeConsumedNew = String.Format("Loaded Ability {0:d} in {1:0.00} seconds", SelectedAbility.Id, (double)sw.ElapsedMilliseconds / 1000);
+                    });
+                return _loadAbilityCommand;
+            }
+        }
+        public RelayCommand NavigateToAbilityCommand
+        {
+            get
+            {
+                if (_navigateToAbilityCommand == null)
+                    _navigateToAbilityCommand = new RelayCommand(() =>
+                    {
+                        Messenger.Default.Send<Language>(new Language { Id = 6 });
+                        Messenger.Default.Send<GameVersion>(new GameVersion { Id = 8 });
+                        _navigationService.NavigateTo("AbilityView");
+                    });
+                return _navigateToAbilityCommand;
+            }
+        }
+        public TestViewModel(ITestService testService, INavigationService navigationService, IStaticDataService staticDataService)
         {
             _tokenSource = new CancellationTokenSource();
             _testService = testService;
+            _navigationService = navigationService;
+            _staticDataService = staticDataService;
             _dispatcher = CoreWindow.GetForCurrentThread().Dispatcher;
             _testService.InitializeResources(6, _tokenSource.Token);
+            Versions = NotifyTaskCompletionCollection<GameVersion>.Create(LoadVersionsNewAsync(6));
         }
 
-        async Task<ObservableCollection<Model.Db.GameVersion>> LoadVersionsNewAsync(int language)
+        async Task<ObservableCollection<GameVersion>> LoadVersionsNewAsync(int language)
         {
             IEnumerable<Model.Db.GameVersion> versions = await _testService.LoadVersionsNewAsync(language, _tokenSource.Token);
-            return new ObservableCollection<Model.Db.GameVersion>(versions);
+            return new ObservableCollection<GameVersion>(versions.Select(s => new GameVersion { Generation = s.VersionGroup.GenerationId, Id = s.Id, Name = s.Name, VersionGroup = s.VersionGroupId }));
         }
         async Task<ObservableCollection<GameVersion>> LoadVersionsOldAsync(int language)
         {
@@ -322,6 +408,10 @@ namespace PokeGuide.ViewModel
         {
             List<Ability> abilities = await _testService.LoadAbilitiesAsync(language, _tokenSource.Token);
             return new ObservableCollection<Ability>(abilities);
+        }
+        async Task<Ability> LoadAbilityAsnyc(int id, int versionGroup, int language)
+        {
+            return await _testService.LoadAbilityAsync(id, versionGroup, language, _tokenSource.Token);
         }
     }
 }

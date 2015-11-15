@@ -34,6 +34,16 @@ namespace PokeGuide.Design
             return tcs.Task;
         }
 
+        public Task<GameVersion> LoadVersionAsync(int id, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<GameVersion>();
+            tcs.SetResult(new GameVersion
+            {
+                Id = 6, Name = "Platin"
+            });
+            return tcs.Task;
+        }
+
         public Task<ObservableCollection<GameVersion>> LoadVersionsAsync(int displayLanguage, CancellationToken token)
         {
             var tcs = new TaskCompletionSource<ObservableCollection<GameVersion>>();

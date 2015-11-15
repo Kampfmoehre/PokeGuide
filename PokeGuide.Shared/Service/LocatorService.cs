@@ -5,6 +5,7 @@ using GalaSoft.MvvmLight.Views;
 using Microsoft.Practices.ServiceLocation;
 
 using PokeGuide.Service.Interface;
+using PokeGuide.View;
 
 using SQLite.Net.Interop;
 using SQLite.Net.Platform.WinRT;
@@ -25,10 +26,10 @@ namespace PokeGuide.Service
             { }
 
             if (!SimpleIoc.Default.IsRegistered<IStorageService>())
-                SimpleIoc.Default.Register<IStorageService, StorageService>();
+                SimpleIoc.Default.Register<IStorageService, StorageService>(true);
 
             if (!SimpleIoc.Default.IsRegistered<ISQLitePlatform>())
-                SimpleIoc.Default.Register<ISQLitePlatform, SQLitePlatformWinRT>();
+                SimpleIoc.Default.Register<ISQLitePlatform, SQLitePlatformWinRT>(true);
             if (!SimpleIoc.Default.IsRegistered<INavigationService>())
             {
                 INavigationService navigationService = CreateNavigationService();
@@ -44,6 +45,7 @@ namespace PokeGuide.Service
             navigationService.Configure("PhoneSettings", typeof(PhoneSettings));
             navigationService.Configure("PokemonView", typeof(PokemonView));
 #endif
+            navigationService.Configure("AbilityView", typeof(AbilitiesView));
             return navigationService;
         }
 

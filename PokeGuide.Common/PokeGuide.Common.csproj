@@ -130,15 +130,18 @@
     <Compile Include="Service\SQLiteAsyncLocalisableExtension.cs" />
     <Compile Include="Service\StaticDataService.cs" />
     <Compile Include="Service\TestService.cs" />
+    <Compile Include="ViewModel\AbilityViewModel.cs" />
+    <Compile Include="ViewModel\Interface\IAbilityViewModel.cs" />
     <Compile Include="ViewModel\Interface\IMainViewModel.cs" />
+    <Compile Include="ViewModel\Interface\INavigable.cs" />
     <Compile Include="ViewModel\Interface\IPokemonViewModel.cs" />
     <Compile Include="ViewModel\Interface\ISettingsViewModel.cs" />
     <Compile Include="ViewModel\Interface\ITestViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\PokemonViewModel.cs" />
-    <Compile Include="ViewModel\SelectableCollection.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewModel\TestViewModel.cs" />
+    <Compile Include="ViewModel\ViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
   </ItemGroup>
   <ItemGroup>

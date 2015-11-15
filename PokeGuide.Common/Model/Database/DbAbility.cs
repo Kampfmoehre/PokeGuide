@@ -21,5 +21,7 @@ namespace PokeGuide.Model.Database
         public int GenerationId { get; set; }
         [Column("is_main_series")]
         public bool IsMainSeries { get; set; }
+        [Column("effect_change")]
+        public string EffectChange { get; set; }
     }
 }

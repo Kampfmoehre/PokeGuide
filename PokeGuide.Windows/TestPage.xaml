@@ -6,6 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    xmlns:con="using:PokeGuide.Converter"
+    xmlns:ctl="using:PokeGuide.Control"
     DataContext="{Binding TestViewModel, Source={StaticResource Locator}}"
     >
 
@@ -33,7 +35,6 @@
             <Button Content="Form" Command="{Binding LoadFormNewCommand}"/>
         </StackPanel>
         
-        <ListView Grid.Row="2" Grid.Column="0" Header="Stuff new" ItemsSource="{Binding VersionsNew}" DisplayMemberPath="Name"/>
         <ListView Grid.Row="3" Grid.Column="0" Header="Stuff new" ItemsSource="{Binding AbilitiesNew}" DisplayMemberPath="Name"/>
         <TextBlock Grid.Row="4" Grid.Column="0" Text="{Binding SpeciesNew.Name}"/>
         <StackPanel Grid.Row="5" Grid.Column="0" Orientation="Horizontal">
@@ -63,28 +64,67 @@
             <TextBlock Text="{Binding FormOld.Item.Name}"/>
         </StackPanel>
         -->
-        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal">
             <Button Content="Abilities" Command="{Binding LoadAbilitiesCommand}"/>
+            <Button Content="Navigieren" Command="{Binding NavigateToAbilityCommand}"/>
         </StackPanel>
-        <ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="4" ItemsSource="{Binding Abilities}" Header="Abilities">
+        <ComboBox Grid.Row="2" Grid.Column="0" Header="Versionen" ItemsSource="{Binding Versions.Collection}" SelectedItem="{Binding Versions.SelectedItem, Mode=TwoWay}" DisplayMemberPath="Name"/>
+        <Grid Grid.Row="2" Grid.Column="1" Grid.RowSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <ComboBox x:Name="abilitySelector" Header="Fähigkeit" ItemsSource="{Binding Abilities}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedAbilityIndex, Mode=TwoWay}"/>
+            <ctl:AbilityView Grid.Row="1" DataContext="{Binding SelectedAbility}"/>
+            <!--<Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="ID" Margin="0,5"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Name" Margin="0,5"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Ingame Text" Margin="0,5"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Effekt" Margin="0,5"/>
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Beschreibung" Margin="0,5"/>
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Änderung in dieser Version" Margin="0,5"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAbility.Id}" Margin="0,5"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedAbility.Name}" Margin="0,5"/>
+                <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding SelectedAbility.FlavorText}" Margin="0,5"/>
+                <TextBlock Grid.Row="3" Grid.Column="3" x:Name="txtShortEffect" Text="{Binding SelectedAbility.Description}" TextWrapping="Wrap" Margin="0,5"/>
+                <TextBlock Grid.Row="4" Grid.Column="4" x:Name="txtEffect" TextWrapping="Wrap" Margin="0,5"/>
+                <TextBlock Grid.Row="5" Grid.Column="4" x:Name="txtEffectChange" TextWrapping="Wrap" Margin="0,5"/>
+            </Grid>-->
+        </Grid>
+        <!--<ListView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="4" ItemsSource="{Binding Abilities}" Header="Abilities">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="35"/>
                             <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="300"/>
-                            <ColumnDefinition Width="600"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="500"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="{Binding Id}"/>
                         <TextBlock Grid.Column="1" Text="{Binding Name}"/>
                         <TextBlock Grid.Column="2" Text="{Binding FlavorText}"/>
                         <TextBlock Grid.Column="3" Text="{Binding Description}" TextWrapping="Wrap"/>
-                        <TextBlock Grid.Column="4" Text="{Binding Effect}" TextWrapping="Wrap"/>
+                        <TextBlock Grid.Column="4" x:Name="TextBlockWithHyperlink" Text="{Binding Effect, Converter={StaticResource textConverter}, Mode=OneWay}" DataContextChanged="TextBlockWithHyperlink_DataContextChanged">
+                            
+                        </TextBlock>
+                        --><!--<TextBlock Grid.Column="4" Text="{Binding Effect}" TextWrapping="Wrap"/>--><!--
                     </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
-        </ListView>
+        </ListView>-->
     </Grid>
 </Page>

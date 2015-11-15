@@ -16,5 +16,6 @@ namespace PokeGuide.Service.Interface
         Task<PokemonForm> LoadFormByIdAsync(int id, GameVersion version, int language, CancellationToken token);
         Task<PokemonForm> LoadFormByIdOldAsync(int formId, GameVersion version, int displayLanguage, CancellationToken token);
         Task<List<Ability>> LoadAbilitiesAsync(int displayLanguage, CancellationToken token);
+        Task<Ability> LoadAbilityAsync(int id, int versionGroup, int displayLanguage, CancellationToken token);
     }
 }

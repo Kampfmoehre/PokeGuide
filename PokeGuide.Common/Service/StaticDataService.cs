@@ -46,6 +46,34 @@ namespace PokeGuide.Service
             }));
         }
 
+        public async Task<GameVersion> LoadVersionAsync(int id, int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT v.id, vn.name
+                    FROM versions AS v
+                    LEFT JOIN (SELECT e.version_id AS id, COALESCE(o.name, e.name) AS name
+                        FROM version_names e
+                        LEFT OUTER JOIN version_names o ON e.version_id = o.version_id AND o.local_language_id = {1}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.version_id)
+                    AS vn ON v.id = vn.id
+                    WHERE v.id = {0}
+                ", id, displayLanguage);
+                IEnumerable<DbVersion> versions = await _connection.QueryAsync<DbVersion>(token, query, new object[0]).ConfigureAwait(false);
+                DbVersion version = versions.FirstOrDefault();
+                if (version == null)
+                    return null;
+
+                return new GameVersion { Generation = version.Generation, Id = version.Id, Name = version.Name, VersionGroup = version.VersionGroupId };
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<ObservableCollection<Ability>> LoadAbilitiesAsync(int displayLanguage, CancellationToken token)
         {
             try

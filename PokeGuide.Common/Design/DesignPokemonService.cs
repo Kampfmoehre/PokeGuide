@@ -91,7 +91,7 @@ namespace PokeGuide.Design
             return tcs.Task;
         }
 
-        public Task<Ability> LoadAbilityAsync(int id, GameVersion version, int displayLanguage, CancellationToken token)
+        public Task<Ability> LoadAbilityAsync(int id, int versionGroup, int displayLanguage, CancellationToken token)
         {
             var tcs = new TaskCompletionSource<Ability>();
             tcs.SetResult(new Ability { Description = "Awesome Description", Effect = "Strange effect", FlavorText = "Fancy ingame text", Id = 12, Name = "Temposchub" });
@@ -126,7 +126,7 @@ namespace PokeGuide.Design
             tcs.SetResult(new PokemonForm
             {
                 Ability1 = new Ability { Description = "blub", Effect = "blob", FlavorText = "blubber", Id = 12, Name = "Adlerauge" },
-                Ability2 = LoadAbilityAsync(1, version, displayLanguage, token).Result,
+                Ability2 = LoadAbilityAsync(1, version.VersionGroup, displayLanguage, token).Result,
                 BaseExperience = 255,
                 Height = 12,
                 HeldItem = new Item { Id = 15, Name = "Beere" },
@@ -378,6 +378,17 @@ namespace PokeGuide.Design
         public Task<EggGroup> GetEggGroupAsync(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Ability>> LoadAbilitiesAsync(int generation, int displayLanguage, CancellationToken token)
+        {
+            var tcs = new TaskCompletionSource<IEnumerable<Ability>>();
+            tcs.SetResult(new List<Ability>
+            {
+                new Ability {Id = 12, Name = "Dösigkeit" },
+                new Ability {Id = 24, Name = "Rauhaut" },
+            });
+            return tcs.Task;
         }
     }
 }

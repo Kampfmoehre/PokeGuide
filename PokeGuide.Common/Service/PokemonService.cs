@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using PokeGuide.Model;
@@ -17,7 +18,222 @@ namespace PokeGuide.Service
         public PokemonService(IStorageService storageService, ISQLitePlatform sqlitePlatform) 
             : base(storageService, sqlitePlatform)
         { }
-        
+
+        public async Task<IEnumerable<Ability>> LoadAbilitiesAsync(int generation, int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT ab.id, abn.name
+                    FROM abilities AS ab
+                    LEFT JOIN (SELECT e.ability_id AS id, COALESCE(o.name, e.name) AS name
+                        FROM ability_names e
+                        LEFT OUTER JOIN ability_names o ON e.ability_id = o.ability_id AND o.local_language_id = {0}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.ability_id)
+                    AS abn ON ab.id = abn.id
+                    WHERE ab.is_main_series AND ab.generation_id <= {1}
+                ", displayLanguage, generation);
+                IEnumerable<DbAbility> abilities = await _connection.QueryAsync<DbAbility>(token, query, new object[0]).ConfigureAwait(false);
+                return abilities.Select(s => new Ability { Id = s.Id, Name = s.Name }).ToList();
+            }
+            catch (Exception)
+            {
+                return new List<Ability>();
+            }
+        }
+
+        public async Task<Ability> LoadAbilityAsync(int id, int versionGroup, int displayLanguage, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT ab.id, abn.name, abft.flavor_text, abp.short_effect, abp.effect, acp.effect_change
+                    FROM abilities AS ab
+                    LEFT JOIN (SELECT e.ability_id AS id, COALESCE(o.name, e.name) AS name
+                        FROM ability_names e
+                        LEFT OUTER JOIN ability_names o ON e.ability_id = o.ability_id AND o.local_language_id = {2}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.ability_id)
+                    AS abn ON ab.id = abn.id
+                    LEFT JOIN (SELECT e.ability_id AS id, COALESCE(o.flavor_text, e.flavor_text) AS flavor_text, e.version_group_id
+                        FROM ability_flavor_text e
+                        LEFT OUTER JOIN ability_flavor_text o ON e.ability_id = o.ability_id AND o.language_id = {2}
+                        WHERE e.language_id = 9 AND e.version_group_id = 15
+                        GROUP BY e.ability_id)
+                    AS abft ON ab.id = abft.id
+                    LEFT JOIN (SELECT e.ability_id AS id, COALESCE(o.short_effect, e.short_effect) AS short_effect, COALESCE(o.effect, e.effect) AS effect
+                        FROM ability_prose e
+                        LEFT OUTER JOIN ability_prose o ON e.ability_id = o.ability_id AND o.local_language_id = {2}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.ability_id)
+                    AS abp ON ab.id = abp.id
+                    LEFT JOIN ability_changelog ac ON ab.id = ac.ability_id AND ac.changed_in_version_group_id <= {1}
+                    LEFT JOIN (SELECT e.ability_changelog_id AS id, COALESCE(o.effect, e.effect) AS effect_change
+                        FROM ability_changelog_prose e
+                        LEFT OUTER JOIN ability_changelog_prose o ON e.ability_changelog_id = o.ability_changelog_id AND o.local_language_id = {2}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.ability_changelog_id)
+                    AS acp ON ac.id = acp.id
+                    WHERE ab.is_main_series AND ab.id = {0}
+                    ORDER BY ac.changed_in_version_group_id DESC
+                    LIMIT 1
+                ", id, versionGroup, displayLanguage);
+                IEnumerable<DbAbility> abilities = await _connection.QueryAsync<DbAbility>(token, query, new object[0]).ConfigureAwait(false);
+                DbAbility ability = abilities.FirstOrDefault();
+                if (ability == null)
+                    return null;
+
+                var ab = new Ability
+                {
+                    FlavorText = ability.FlavorText,
+                    Id = ability.Id,
+                    Name = ability.Name
+                };
+                ab.Description = await ProzessAbilityText(ability.ShortEffect, displayLanguage, token);
+                ab.Effect = await ProzessAbilityText(ability.Effect, displayLanguage, token);
+                ab.EffectChange = await ProzessAbilityText(ability.EffectChange, displayLanguage, token);
+                return ab;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        async Task<string> ProzessAbilityText(string input, int language, CancellationToken token)
+        {
+            if (String.IsNullOrWhiteSpace(input))
+                return String.Empty;
+            string result = input;
+            string nameRegexString = @"\[\]";
+            string identifierRegexString = @"{\w*:\w*-*\w*}";
+            var regex = new Regex(nameRegexString + identifierRegexString);
+            var processed = new List<string>();
+            foreach (Match match in regex.Matches(input))
+            {
+                if (processed.Contains(match.Value))
+                    continue;
+
+                Match nameMatch = Regex.Match(match.Value, nameRegexString);
+                Match identifierMatch = Regex.Match(match.Value, identifierRegexString);
+                string identifier = identifierMatch.Value.Trim(new char[] { '{', '}' });
+                string name = await GetDefaultNameForIdentifier(identifier, language, token);
+                result = result.Replace(match.Value, "[" + name + "]" + identifierMatch.Value);
+                processed.Add(match.Value);
+            }
+            return result;
+        }
+
+        async Task<string> GetDefaultNameForIdentifier(string identifier, int language, CancellationToken token)
+        {
+            int splitIndex = identifier.IndexOf(':');
+            string type = identifier.Remove(splitIndex);
+            string element = identifier.Substring(splitIndex + 1);
+
+            switch (type)
+            {
+                case "mechanic":
+                    switch (element)
+                    {
+                        case "rain":
+                            return "Regen";
+                        case "speed":
+                            return "Initiative";
+                        case "hp":
+                            return "KP";
+                        case "weather":
+                            return "Wetter";
+                        case "paralysis":
+                            return "Paralyse";
+                        case "evasion":
+                            return "Fluchtwert";
+                        case "infatuation":
+                            return "Anziehung";
+                        case "accuracy":
+                            return "Genauigkeit";
+                        case "sleep":
+                            return "Schlaf";
+                        case "poison":
+                            return "Vergiftung";
+                        case "confusion":
+                            return "Verwirrung";
+                        case "attack":
+                            return "Angriff";
+                        case "burn":
+                            return "Verbrennung";
+                        case "sandstorm":
+                            return "Sandsturm";
+                        case "pp":
+                            return "AP";
+                        case "fog":
+                            return "Nebel";
+                        case "defense":
+                            return "Verteidigung";
+                        case "hail":
+                            return "Hagel";
+                        case "status-ailment":
+                            return "Statusänderung";
+                        case "status-ailments":
+                            return "Statusänderungen";
+                        case "stat-modifier":
+                        case "stat-modifiers":
+                            return "Statuswerteänderung";
+                        case "special-attack":
+                            return "Spezialangriff";
+                        case "strong-sunlight":
+                            return "Starkes Sonnenlicht";
+                        case "hatch-counter":
+                            return "Schlüpfzähler";
+                        case "step-cycle":
+                            return "Schrittzyklus";
+                        case "regular-damage":
+                            return "Regulärer Schaden";
+                        default:
+                            break;
+                    }
+                    break;
+                case "move":
+                    return await LoadObjectNameByIdentifierAsync("moves", "move_names", "move_id", element, language, token);
+                case "ability":
+                    return await LoadObjectNameByIdentifierAsync("abilities", "ability_names", "ability_id", element, language, token);
+                case "type":
+                    return await LoadObjectNameByIdentifierAsync("types", "type_names", "type_id", element, language, token);
+                case "pokemon":
+                    return await LoadObjectNameByIdentifierAsync("pokemon_species", "pokemon_species_names", "pokemon_species_id", element, language, token);
+                case "item":
+                    return await LoadObjectNameByIdentifierAsync("items", "item_names", "item_id", element, language, token);
+                default:
+                    break;
+            }
+            return String.Empty;
+        }
+
+        async Task<string> LoadObjectNameByIdentifierAsync(string table, string nameTable, string idColumn, string identifier, int language, CancellationToken token)
+        {
+            try
+            {
+                string query = String.Format(@"
+                    SELECT t.id, tn.name
+                    FROM {0} t
+                    LEFT JOIN (SELECT e.{2} AS id, COALESCE(o.name, e.name) AS name
+                        FROM {1} e
+                        LEFT OUTER JOIN {1} o ON e.{2} = o.{2} AND o.local_language_id = {3}
+                        WHERE e.local_language_id = 9
+                        GROUP BY e.{2})
+                    AS tn ON t.id = tn.id
+                    WHERE t.identifier = '{4}'
+                ", table, nameTable, idColumn, language, identifier);
+                IEnumerable<DbMove> objects = await _connection.QueryAsync<DbMove>(token, query, new object[0]).ConfigureAwait(false);
+                DbMove result = objects.Single();
+                return result.Name;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         public async Task<PokedexEntry> LoadPokedexEntryAsync(int dexId, int speciesId, int displayLanguage, CancellationToken token)
         {
             try
@@ -150,48 +366,7 @@ namespace PokeGuide.Service
             }
         }
 
-        public async Task<Ability> LoadAbilityAsync(int id, GameVersion version, int displayLanguage, CancellationToken token)
-        {
-            try
-            {
-                string query = "SELECT a.id, an.name, ad.short_effect, ad.effect, aft.flavor_text FROM pokemon_v2_ability AS a\n" +
-                    "LEFT JOIN\n(SELECT def.ability_id AS id, IFNULL(curr.name, def.name) AS name FROM pokemon_v2_abilityname def\n" +
-                    "LEFT JOIN pokemon_v2_abilityname curr ON def.ability_id = curr.ability_id AND def.language_id = 9 AND curr.language_id = ?\n" +
-                    "GROUP BY def.ability_id)\nAS an ON a.id = an.id\n" +
-                    "LEFT JOIN\n(SELECT def.ability_id AS id, IFNULL(curr.short_effect, def.short_effect) AS short_effect, IFNULL(curr.effect, def.effect) AS effect FROM pokemon_v2_abilitydescription def\n" +
-                    "LEFT JOIN pokemon_v2_abilitydescription curr ON def.ability_id = curr.ability_id AND def.language_id = 9 AND curr.language_id = ?\n" +
-                    "GROUP BY def.ability_id)\nAS ad ON a.id = ad.id\n" +
-                    "LEFT JOIN\n(SELECT e.ability_id AS id, COALESCE(o.flavor_text, e.flavor_text) AS flavor_text, e.version_group_id FROM pokemon_v2_abilityflavortext e\n" +
-                    "LEFT OUTER JOIN pokemon_v2_abilityflavortext o ON e.ability_id = o.ability_id and o.language_id = ?\n" +
-                    "WHERE e.language_id = 9 AND e.version_group_id = ?\n" +
-                    "GROUP BY e.ability_id)\nAS aft ON a.id = aft.id\n" +
-                    "WHERE aft.version_group_id = ? AND a.id = ?";
-                IEnumerable<DbAbility> abilities = await _connection.QueryAsync<DbAbility>(token, query, new object[]
-                    {
-                        displayLanguage,
-                        displayLanguage,
-                        displayLanguage,
-                        version.VersionGroup,
-                        version.VersionGroup,
-                        id
-                    });
-                DbAbility dbAbility = abilities.FirstOrDefault();
-                if (dbAbility == null)
-                    return null;
-                return new Ability
-                {
-                    Description = dbAbility.Effect,
-                    Effect = dbAbility.ShortEffect,
-                    FlavorText = dbAbility.FlavorText,
-                    Id = dbAbility.Id,
-                    Name = dbAbility.Name
-                };
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
+        
 
         public async Task<EggGroup> LoadEggGroupAsync(int id, int displayLanguage, CancellationToken token)
         {
@@ -296,11 +471,11 @@ namespace PokeGuide.Service
 
                 if (version.Generation >= 3)
                 {
-                    form.Ability1 = await LoadAbilityAsync(f.Ability1, version, displayLanguage, token);
-                    if (f.Ability2 != null)
-                        form.Ability2 = await LoadAbilityAsync((int)f.Ability2, version, displayLanguage, token);
-                    if (version.Generation >= 5 && f.HiddenAbility != null)
-                        form.HiddenAbility = await LoadAbilityAsync((int)f.HiddenAbility, version, displayLanguage, token);
+                    //form.Ability1 = await LoadAbilityAsync(f.Ability1, version, displayLanguage, token);
+                    //if (f.Ability2 != null)
+                    //    form.Ability2 = await LoadAbilityAsync((int)f.Ability2, version, displayLanguage, token);
+                    //if (version.Generation >= 5 && f.HiddenAbility != null)
+                    //    form.HiddenAbility = await LoadAbilityAsync((int)f.HiddenAbility, version, displayLanguage, token);
                 }
                 if (f.ItemId != null)
                     form.HeldItem = await LoadItemAsync((int)f.ItemId, displayLanguage, token);

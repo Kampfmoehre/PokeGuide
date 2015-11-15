@@ -5,6 +5,7 @@
         string _description;
         string _effect;
         string _flavorText;
+        string _effectChange;
         /// <summary>
         /// Sets and gets the 
         /// </summary>
@@ -28,6 +29,14 @@
         {
             get { return _flavorText; }
             set { Set(() => FlavorText, ref _flavorText, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public string EffectChange
+        {
+            get { return _effectChange; }
+            set { Set(() => EffectChange, ref _effectChange, value); }
         }
     }
 }

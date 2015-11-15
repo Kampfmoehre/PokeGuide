@@ -43,6 +43,7 @@ namespace PokeGuide.ViewModel
             SimpleIoc.Default.Register<IPokemonViewModel, PokemonViewModel>();
             SimpleIoc.Default.Register<ISettingsViewModel, SettingsViewModel>();
             SimpleIoc.Default.Register<ITestViewModel, TestViewModel>();
+            SimpleIoc.Default.Register<IAbilityViewModel, AbilityViewModel>();
         }
 
         /// <summary>
@@ -70,6 +71,10 @@ namespace PokeGuide.ViewModel
         {
             get { return ServiceLocator.Current.GetInstance<ITestViewModel>(); }
         }        
+        public IAbilityViewModel AbilityViewModel
+        {
+            get { return ServiceLocator.Current.GetInstance<IAbilityViewModel>(); }
+        }
         /// <summary>
         /// Cleans up resources that are not needed
         /// </summary>
