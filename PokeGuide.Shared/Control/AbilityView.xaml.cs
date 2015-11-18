@@ -1,9 +1,7 @@
-﻿using PokeGuide.Model;
+﻿using PokeGuide.Core.Model;
 
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-
-// Die Elementvorlage "Benutzersteuerelement" ist unter http://go.microsoft.com/fwlink/?LinkId=234236 dokumentiert.
 
 namespace PokeGuide.Control
 {
@@ -24,9 +22,9 @@ namespace PokeGuide.Control
             if (ability == null)
                 return;
 
-            PlaceholderTextConverter.ConvertTextWithPlaceholders(txtEffect, ability.Effect);
-            PlaceholderTextConverter.ConvertTextWithPlaceholders(txtEffectChange, ability.EffectChange);
-            PlaceholderTextConverter.ConvertTextWithPlaceholders(txtShortEffect, ability.Description);
+            PlaceholderTextConverter.ConvertTextWithPlaceholders(txtEffect, ability.Description);
+            PlaceholderTextConverter.ConvertTextWithPlaceholders(txtEffectChange, ability.VersionChangelog);
+            PlaceholderTextConverter.ConvertTextWithPlaceholders(txtShortEffect, ability.ShortDescription);
         }
     }
 }

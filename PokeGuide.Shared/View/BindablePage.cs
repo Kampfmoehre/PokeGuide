@@ -1,4 +1,4 @@
-﻿using PokeGuide.ViewModel.Interface;
+﻿using PokeGuide.Core.ViewModel.Interface;
 
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;

@@ -1,5 +1,4 @@
-﻿using PokeGuide.ViewModel.Interface;
-
+﻿
 using Windows.Phone.UI.Input;
 using Windows.UI.Xaml.Controls;
 
@@ -17,12 +16,12 @@ namespace PokeGuide
 
         void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
         {
-            var datacontext = DataContext as ISettingsViewModel;
-            if (datacontext != null)
-            {
-                datacontext.NavigateBackCommand.Execute(null);
-                e.Handled = true;
-            }
+            //var datacontext = DataContext as ISettingsViewModel;
+            //if (datacontext != null)
+            //{
+            //    datacontext.NavigateBackCommand.Execute(null);
+            //    e.Handled = true;
+            //}
         }
     }
 }

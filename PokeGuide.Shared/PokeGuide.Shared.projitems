@@ -22,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Converter\BooleanToVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\GenerationToVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Service\LocatorService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Service\SettingsService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Service\StorageService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)View\AbilitiesView.xaml.cs">
       <DependentUpon>AbilitiesView.xaml</DependentUpon>

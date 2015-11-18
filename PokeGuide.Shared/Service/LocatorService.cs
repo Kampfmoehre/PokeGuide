@@ -4,7 +4,7 @@ using GalaSoft.MvvmLight.Views;
 
 using Microsoft.Practices.ServiceLocation;
 
-using PokeGuide.Service.Interface;
+using PokeGuide.Core.Service.Interface;
 using PokeGuide.View;
 
 using SQLite.Net.Interop;
@@ -23,7 +23,10 @@ namespace PokeGuide.Service
             if (ViewModelBase.IsInDesignModeStatic)
             { }
             else
-            { }
+            {
+                if (!SimpleIoc.Default.IsRegistered<ISettingsService>())
+                    SimpleIoc.Default.Register<ISettingsService, SettingsService>(true);
+            }
 
             if (!SimpleIoc.Default.IsRegistered<IStorageService>())
                 SimpleIoc.Default.Register<IStorageService, StorageService>(true);
@@ -35,7 +38,6 @@ namespace PokeGuide.Service
                 INavigationService navigationService = CreateNavigationService();
                 SimpleIoc.Default.Register<INavigationService>(() => navigationService);
             }
-                
         }
 
         static INavigationService CreateNavigationService()
