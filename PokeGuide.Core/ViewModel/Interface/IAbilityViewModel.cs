@@ -1,4 +1,5 @@
 ﻿using Nito.AsyncEx;
+
 using PokeGuide.Core.Model;
 
 namespace PokeGuide.Core.ViewModel.Interface
@@ -16,5 +17,9 @@ namespace PokeGuide.Core.ViewModel.Interface
         /// The ability that was selected in the list
         /// </summary>
         INotifyTaskCompletion<Ability> CurrentAbility { get; set; }
+        /// <summary>
+        /// A list of Pokémon with the selected ability
+        /// </summary>
+        INotifyTaskCompletionCollection<PokemonAbility> PokemonList { get; set; }
     }
 }

@@ -20,6 +20,7 @@ namespace PokeGuide.Core.ViewModel
         IDataService _dataService;
         INotifyTaskCompletionCollection<ModelNameBase> _abilityList;
         INotifyTaskCompletion<Ability> _currentAbility;
+        INotifyTaskCompletionCollection<PokemonAbility> _pokemonList;
         int? _cachedAbilityId;
 
         /// <summary>
@@ -55,6 +56,14 @@ namespace PokeGuide.Core.ViewModel
             get { return _currentAbility; }
             set { Set(() => CurrentAbility, ref _currentAbility, value); }
         }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public INotifyTaskCompletionCollection<PokemonAbility> PokemonList
+        {
+            get { return _pokemonList; }
+            set { Set(() => PokemonList, ref _pokemonList, value); }
+        }
 
         public void Activate(object param)
         {
@@ -65,7 +74,7 @@ namespace PokeGuide.Core.ViewModel
                 AbilityList.SelectItem(abilityId);
             }
         }
-        public void Deactivate(object abilityId)
+        public void Deactivate(object param)
         { }
 
         /// <summary>
@@ -80,19 +89,27 @@ namespace PokeGuide.Core.ViewModel
         void SelectedAbilityChanged(object sender, SelectedItemChangedEventArgs<ModelNameBase> e)
         {
             CurrentAbility = null;
+            PokemonList = null;
             if (e.NewItem != null)
+            {
                 CurrentAbility = NotifyTaskCompletion.Create(LoadAbilityByIdAsync(e.NewItem.Id));
+                PokemonList = NotifyTaskCompletionCollection<PokemonAbility>.Create(LoadPokemonByAbilityAsync(e.NewItem.Id));
+            }
         }
 
         async Task<ObservableCollection<ModelNameBase>> LoadAbilitiesAsync()
         {
             IEnumerable<ModelNameBase> list = await _dataService.LoadAbilityNamesAsync(CurrentLanguage.Id, CurrentVersion.Generation, TokenSource.Token);
             return new ObservableCollection<ModelNameBase>(list);
-        }
-        
+        }        
         async Task<Ability> LoadAbilityByIdAsync(int id)
         {
             return await _dataService.LoadAbilityByIdAsync(id, CurrentVersion.VersionGroup, CurrentLanguage.Id, TokenSource.Token);
+        }
+        async Task<ObservableCollection<PokemonAbility>> LoadPokemonByAbilityAsync(int abilityId)
+        {
+            IEnumerable<PokemonAbility> list = await _dataService.LoadPokemonByAbilityAsync(abilityId, CurrentVersion.VersionGroup, CurrentLanguage.Id, TokenSource.Token);
+            return new ObservableCollection<PokemonAbility>(list);
         }
     }
 }

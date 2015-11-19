@@ -44,17 +44,25 @@
   <ItemGroup>
     <Compile Include="Database\DbAbility.cs" />
     <Compile Include="Database\DbLanguage.cs" />
+    <Compile Include="Database\DbMove.cs" />
+    <Compile Include="Database\DbMoveDamageClass.cs" />
     <Compile Include="Database\DbName.cs" />
+    <Compile Include="Database\DbPokemonAbility.cs" />
+    <Compile Include="Database\DbType.cs" />
     <Compile Include="Database\DbVersion.cs" />
     <Compile Include="Database\Queries.cs" />
     <Compile Include="Event\SelectedItemChangedEventArgs.cs" />
     <Compile Include="Model\Ability.cs" />
+    <Compile Include="Model\DamageClass.cs" />
+    <Compile Include="Model\ElementType.cs" />
     <Compile Include="Model\GameVersion.cs" />
     <Compile Include="Model\INotifyTaskCompletionCollection.cs" />
     <Compile Include="Model\DisplayLanguage.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Model\ModelNameBase.cs" />
+    <Compile Include="Model\Move.cs" />
     <Compile Include="Model\NotifyTaskCompletionCollection.cs" />
+    <Compile Include="Model\PokemonAbility.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\DataService.cs" />
@@ -64,8 +72,10 @@
     <Compile Include="ViewModel\AbilityViewModel.cs" />
     <Compile Include="ViewModel\Interface\IAbilityViewModel.cs" />
     <Compile Include="ViewModel\Interface\IMainViewModel.cs" />
+    <Compile Include="ViewModel\Interface\IMoveViewModel.cs" />
     <Compile Include="ViewModel\Interface\INavigable.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\MoveViewModel.cs" />
     <Compile Include="ViewModel\SingleObjectViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
   </ItemGroup>
