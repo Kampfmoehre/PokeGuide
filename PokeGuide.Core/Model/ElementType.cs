@@ -5,20 +5,11 @@ namespace PokeGuide.Core.Model
     /// <summary>
     /// Represents a type a Pokémon or a move can have
     /// </summary>
-    public class ElementType : ModelNameBase
-    {
-        Uri _iconUri;
+    public class ElementType : ModelUriBase
+    {        
         int _generation;
         int _damageClassId;
-        string _identifier;
-        /// <summary>
-        /// Sets and gets the URI to the icon
-        /// </summary>
-        public Uri IconUri
-        {
-            get { return _iconUri; }
-            set { Set(() => IconUri, ref _iconUri, value); }
-        }
+        string _identifier;        
         /// <summary>
         /// Sets and gets the 
         /// </summary>

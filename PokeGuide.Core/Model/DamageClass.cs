@@ -5,19 +5,10 @@ namespace PokeGuide.Core.Model
     /// <summary>
     /// Represents a damage category a move can have
     /// </summary>
-    public class DamageClass : ModelNameBase
+    public class DamageClass : ModelUriBase
     {
-        Uri _iconUri;
         string _description;
         string _identifier;
-        /// <summary>
-        /// Sets and gets the URI to the icon
-        /// </summary>
-        public Uri IconUri
-        {
-            get { return _iconUri; }
-            set { Set(() => IconUri, ref _iconUri, value); }
-        }
         /// <summary>
         /// Sets and gets the description
         /// </summary>

@@ -82,5 +82,30 @@ namespace PokeGuide.Core.Service.Interface
         /// <param name="token">A token to cancel the operation</param>
         /// <returns>A list of <see cref="PokemonAbility"/> objects</returns>
         Task<IEnumerable<PokemonAbility>> LoadPokemonByAbilityAsync(int abilityId, int versionGroupId, int language, CancellationToken token);
+        /// <summary>
+        /// Loads a list of Pokémon that occur in a given generation
+        /// </summary>
+        /// <param name="generation">The ID of the generation</param>
+        /// <param name="language">The ID of the language in which to display to name</param>
+        /// <param name="token">A token to cancel the operation</param>
+        /// <returns>A list of <see cref="ModelNameBase"/> with Pokémon IDs and names</returns>
+        Task<IEnumerable<ModelNameBase>> LoadPokemonAsync(int generation, int language, CancellationToken token);
+        /// <summary>
+        /// Loads a list of Pokémon forms that occur in a given version group
+        /// </summary>
+        /// <param name="versionGroupId">The ID of the version group</param>
+        /// <param name="language">The ID of the language</param>
+        /// <param name="token">A token to cancel the operation</param>
+        /// <returns>A list of <see cref="ModelNameBase"/> with Pokémon forms names and IDs</returns>
+        Task<IEnumerable<ModelNameBase>> LoadPokemonFormsAsync(int versionGroupId, int language, CancellationToken token);
+        /// <summary>
+        /// Loads a Pokémon form by its ID
+        /// </summary>
+        /// <param name="id">The ID of the Pokémon form</param>
+        /// <param name="version">The version</param>
+        /// <param name="language">The ID of the language in which to display all names</param>
+        /// <param name="token">A token to cancel the operation</param>
+        /// <returns>A <see cref="PokemonForm"/> object</returns>
+        Task<PokemonForm> LoadPokemonFormByIdAsync(int id, GameVersion version, int language, CancellationToken token);
     }
 }

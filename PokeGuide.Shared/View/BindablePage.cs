@@ -11,7 +11,7 @@ namespace PokeGuide.View
         {
             base.OnNavigatedTo(e);
 
-            var navigableViewModel = this.DataContext as INavigable;
+            var navigableViewModel = DataContext as INavigable;
             if (navigableViewModel != null)
                 navigableViewModel.Activate(e.Parameter);
         }
@@ -20,7 +20,7 @@ namespace PokeGuide.View
         {
             base.OnNavigatedFrom(e);
 
-            var navigableViewModel = this.DataContext as INavigable;
+            var navigableViewModel = DataContext as INavigable;
             if (navigableViewModel != null)
                 navigableViewModel.Deactivate(e.Parameter);
         }

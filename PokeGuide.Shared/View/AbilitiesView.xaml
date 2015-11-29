@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ctl="using:PokeGuide.Control"
     mc:Ignorable="d"
-    DataContext="{Binding AbilityViewModel, Source={StaticResource Locator}}">
+    DataContext="{Binding Ability, Source={StaticResource Locator}}">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>

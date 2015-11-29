@@ -45,10 +45,13 @@ namespace PokeGuide.Core.Service
         public AsyncLazy<IEnumerable<ElementType>> TypeList { get; private set; }
         public AsyncLazy<IEnumerable<DamageClass>> DamageClassList { get; private set; }
 
-        async Task<ElementType> GetTypeById(int id)
+        async Task<ElementType> GetTypeById(int id, int generation = 0)
         {
             IEnumerable<ElementType> types = await TypeList;
-            return types.Single(s => s.Id == id);
+            // Change fairy to normal for all generations < 6
+            if (generation < 6 && id == 18)
+                id = 1;
+            return types.SingleOrDefault(s => s.Id == id && (generation == 0 || s.Generation <= generation));
         }
         async Task<ElementType> GetTypeById(string identifier)
         {
@@ -157,14 +160,10 @@ namespace PokeGuide.Core.Service
             }
         }
 
-        public async Task<IEnumerable<ModelNameBase>> LoadAbilityNamesAsync(int language, int generation, CancellationToken token)
+        async Task<IEnumerable<ModelNameBase>> LoadNamedListAsync(string query, CancellationToken token)
         {
             try
             {
-                string query = Queries.LocalizedNameQuery(language, "ability", "abilities");
-                query = String.Format(@"{0}
-                    WHERE t.generation_id <= {1}
-                    ", query, generation);
                 IEnumerable<DbName> list = await _connection.QueryAsync<DbName>(token, query, new object[0]).ConfigureAwait(false);
                 return list.Select(s => new ModelNameBase { Id = s.Id, Name = s.Name });
             }
@@ -172,6 +171,83 @@ namespace PokeGuide.Core.Service
             {
                 return new List<ModelNameBase>();
             }
+        }
+
+        public async Task<IEnumerable<ModelNameBase>> LoadPokemonAsync(int generation, int language, CancellationToken token)
+        {
+            string query = Queries.LocalizedNameQuery(language, "pokemon_species", "pokemon_species");
+            query = String.Format(@"{0}
+                WHERE t.generation_id <= {1}
+                ", query, generation);
+            return await LoadNamedListAsync(query, token).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<ModelNameBase>> LoadPokemonFormsAsync(int versionGroupId, int language, CancellationToken token)
+        {
+            return await LoadNamedListAsync(Queries.PokemonFormNamesQuery(versionGroupId, language), token).ConfigureAwait(false);
+        }
+
+        public async Task<PokemonForm> LoadPokemonFormByIdAsync(int id, GameVersion version, int language, CancellationToken token)
+        {
+            try
+            {
+                string query = Queries.PokemonFormByIdQuery(id, version.Id, version.VersionGroup, version.Generation, language);
+                IEnumerable<DbForm> forms = await _connection.QueryAsync<DbForm>(token, query, new object[0]).ConfigureAwait(false);
+                DbForm form = forms.Single();
+                var result = new PokemonForm
+                {                    
+                    BaseExperience = form.BaseExperience,
+                    BaseHappiness = form.BaseHappiness,
+                    CaptureRate = form.CaptureRate,
+                    Color = new PokemonColor { Id = form.ColorId, Name = form.ColorName },
+                    Genus = form.Genus,
+                    GrowthRate = new ModelNameBase { Id = form.GrowthRateId, Name = form.GrowthRateName },
+                    Habitat = new ModelNameBase { Id = form.Habitat, Name = form.HabitatName },
+                    HatchCounter = form.HatchCounter,
+                    Height = form.Height,
+                    Id = form.Id,
+                    IsBaby = form.IsBaby,
+                    ItemRarity = form.ItemRarity,
+                    Name = form.Name,
+                    Shape = new ModelUriBase { Id = form.ShapeId, Name = form.ShapeName },
+                    Species = new ModelNameBase { Id = form.SpeciesId },
+                    Weight = form.Weight
+                };
+                result.Type1 = await GetTypeById(form.Type1Id, version.Generation);
+                if (form.Type2Id != null)
+                    result.Type2 = await GetTypeById((int)form.Type2Id, version.Generation);
+
+                if (form.PokedexId != null)
+                    result.DexEntry = new PokedexEntry { DexNumber = form.PokedexNumber, Id = (int)form.PokedexId, Name = form.PokedexName };                                
+                if (version.Generation >= 2 && form.ItemId != null)
+                    result.HeldItem = new ModelNameBase { Id = (int)form.ItemId, Name = form.ItemName };
+                if (version.Generation >= 3)
+                {
+                    result.Ability1 = new ModelNameBase { Id = form.Ability1Id, Name = form.Ability1Name };
+                    if (form.Ability2Id != null && !String.IsNullOrWhiteSpace(form.Ability2Name))
+                        result.Ability2 = new ModelNameBase { Id = (int)form.Ability2Id, Name = form.Ability2Name };
+                }
+                if (version.Generation >= 5)
+                {
+                    if (form.HiddenAbility != null && !String.IsNullOrWhiteSpace(form.HiddenAbilityName))
+                        result.HiddenAbility = new ModelNameBase { Id = (int)form.HiddenAbility, Name = form.HiddenAbilityName };
+                }
+                
+                return result;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<IEnumerable<ModelNameBase>> LoadAbilityNamesAsync(int language, int generation, CancellationToken token)
+        {
+            string query = Queries.LocalizedNameQuery(language, "ability", "abilities");
+            query = String.Format(@"{0}
+                    WHERE t.generation_id <= {1}
+                    ", query, generation);
+            return await LoadNamedListAsync(query, token).ConfigureAwait(false);
         }
 
         public async Task<Ability> LoadAbilityByIdAsync(int id, int versionGroup, int language, CancellationToken token)
@@ -201,19 +277,11 @@ namespace PokeGuide.Core.Service
 
         public async Task<IEnumerable<ModelNameBase>> LoadMoveNamesAsync(int language, int generation, CancellationToken token)
         {
-            try
-            {
-                string query = Queries.LocalizedNameQuery(language, "move");
-                query = String.Format(@"{0}
+            string query = Queries.LocalizedNameQuery(language, "move");
+            query = String.Format(@"{0}
                     WHERE t.generation_id <= {1}
                     ", query, generation);
-                IEnumerable<DbName> moves = await _connection.QueryAsync<DbName>(token, query, new object[0]).ConfigureAwait(false);
-                return moves.Select(s => new ModelNameBase { Id = s.Id, Name = s.Name });
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            return await LoadNamedListAsync(query, token).ConfigureAwait(false);
         }
 
         public async Task<Move> LoadMoveByIdAsync(int id, GameVersion version, int language, CancellationToken token)

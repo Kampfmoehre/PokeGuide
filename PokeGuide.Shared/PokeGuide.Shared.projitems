@@ -19,6 +19,9 @@
       <DependentUpon>AbilityView.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Control\PlaceholderTextConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Control\PokemonView.xaml.cs">
+      <DependentUpon>PokemonView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Converter\BooleanToVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converter\GenerationToVisibilityConverter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Service\LocatorService.cs" />
@@ -28,9 +31,16 @@
       <DependentUpon>AbilitiesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)View\BindablePage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)View\PokemonView.xaml.cs">
+      <DependentUpon>PokemonView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Include="$(MSBuildThisFileDirectory)Control\AbilityView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Control\PokemonView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -43,6 +53,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)View\AbilitiesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)View\PokemonView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

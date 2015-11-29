@@ -208,5 +208,88 @@ namespace PokeGuide.Core.Database
                 WHERE pa.ability_id = {0} AND pf.introduced_in_version_group_id <= {1}
                 ", abilityId, versionGroupId, languageId);
         }
+
+        /// <summary>
+        /// Returns a query to load all Pokémon forms for a given generation
+        /// </summary>
+        /// <param name="versionGroupId">The ID of the version group</param>
+        /// <param name="languageId">The ID of the language in which to display the names</param>
+        /// <returns>The query</returns>
+        internal static string PokemonFormNamesQuery(int versionGroupId, int languageId)
+        {
+            return String.Format(@"
+                SELECT pf.id, COALESCE(pfn.form_name, psn.name) AS name
+                FROM pokemon_forms pf
+                LEFT JOIN (SELECT e.pokemon_form_id AS id, COALESCE(o.form_name, e.form_name) AS form_name
+                           FROM pokemon_form_names e
+                           LEFT OUTER JOIN pokemon_form_names o ON e.pokemon_form_id = o.pokemon_form_id AND o.local_language_id = {1}
+                           WHERE e.local_language_id = 9
+                           GROUP BY e.pokemon_form_id)
+                AS pfn ON pf.id = pfn.id
+                LEFT JOIN pokemon p ON pa.pokemon_id = p.id
+                LEFT JOIN pokemon_species ps ON p.species_id = ps.id
+                LEFT JOIN (SELECT e.pokemon_species_id AS id, COALESCE(o.name, e.name) AS name
+                           FROM pokemon_species_names e
+                           LEFT OUTER JOIN pokemon_species_names o ON e.pokemon_species_id = o.pokemon_species_id AND o.local_language_id = {1}
+                           WHERE e.local_language_id = 9
+                           GROUP BY e.pokemon_species_id)
+                AS psn ON ps.id = psn.id
+                WHERE pf.introduced_in_version_group_id <= {0}
+                ", versionGroupId, languageId);
+        }
+
+        /// <summary>
+        /// Returns a query to load every information about a Pokémon form
+        /// </summary>
+        /// <param name="formId">The ID of the form</param>
+        /// <param name="versionId">The ID of the version</param>
+        /// <param name="versionGroupId">The ID of the version group</param>
+        /// <param name="generationid">The ID of the generation</param>
+        /// <param name="languageId">The ID of the language</param>
+        /// <returns>The query</returns>
+        internal static string PokemonFormByIdQuery(int formId, int versionId, int versionGroupId, int generationid, int languageId)
+        {
+            return String.Format(@"
+                SELECT pf.id, p.species_id, COALESCE(pfn.form_name, psn.name) AS name, psn.genus, p.height, p.weight, p.base_experience, ps.base_happiness, ps.hatch_counter, pc.id AS color_id, 
+                       pcn.name AS color_name, ps.shape_id, psp.name AS shape_name, ps.habitat_id, phn.name AS habitat_name, ps.capture_rate, ps.is_baby, pt1.type_id AS type1, pt2.type_id AS type2, 
+                       pa1.ability_id AS ability1, an1.name AS ability1_name, pa2.ability_id AS ability2, an2.name AS ability2_name, pa3.ability_id AS hidden_ability, an3.name AS hidden_ability_name, 
+                       pi.rarity, pi.item_id, ina.name AS item_name, ps.growth_rate_id, grp.name AS growth_rate_name, dexEntry.id AS pokedex_id, dexentry.pokedex_number, dexentry.name AS pokedex_name
+                FROM pokemon_forms pf
+                    LEFT JOIN pokemon_form_names pfn ON pf.id = pfn.pokemon_form_id AND pfn.local_language_id = {4}
+                    LEFT JOIN pokemon p ON pf.pokemon_id = p.id
+                    LEFT JOIN pokemon_species ps ON p.species_id = ps.id
+                    LEFT JOIN pokemon_species_names psn ON ps.id = psn.pokemon_species_id AND psn.local_language_id = {4}
+                    LEFT JOIN pokemon_types AS pt1 ON p.id = pt1.pokemon_id AND pt1.slot = 1
+                    LEFT JOIN pokemon_types AS pt2 ON p.id = pt2.pokemon_id AND pt2.slot = 2
+                    LEFT JOIN pokemon_colors pc ON ps.color_id = pc.id
+                    LEFT JOIN pokemon_color_names pcn ON pc.id = pcn.pokemon_color_id AND pcn.local_language_id = {4}
+                    LEFT JOIN pokemon_shapes psh ON ps.shape_id = psh.id
+                    LEFT JOIN pokemon_shape_prose psp ON psh.id = psp.pokemon_shape_id AND psp.local_language_id = {4}
+                    LEFT JOIN pokemon_habitats ph ON ps.habitat_id = ph.id
+                    LEFT JOIN pokemon_habitat_names phn ON ph.id = phn.pokemon_habitat_id AND phn.local_language_id = {4}
+                    LEFT JOIN growth_rates gr ON ps.growth_rate_id = gr.id
+                    LEFT JOIN growth_rate_prose grp ON gr.id = grp.growth_rate_id AND grp.local_language_id = {4}
+                    LEFT JOIN pokemon_abilities AS pa1 ON p.id = pa1.pokemon_id AND pa1.slot = 1
+                    LEFT JOIN abilities a1 ON pa1.ability_id = a1.id AND a1.generation_id <= {3}
+                    LEFT JOIN ability_names an1 ON a1.id = an1.ability_id AND an1.local_language_id = {4}
+                    LEFT JOIN pokemon_abilities AS pa2 ON p.id = pa2.pokemon_id AND pa2.slot = 2
+                    LEFT JOIN abilities a2 ON pa2.ability_id = a2.id AND a2.generation_id <= {3}
+                    LEFT JOIN ability_names an2 ON a2.id = an2.ability_id AND an2.local_language_id = {4}
+                    LEFT JOIN pokemon_abilities AS pa3 ON p.id = pa3.pokemon_id AND pa3.slot = 3
+                    LEFT JOIN abilities a3 ON pa3.ability_id = a3.id  AND a3.generation_id <= {3}
+                    LEFT JOIN ability_names an3 ON a3.id = an3.ability_id AND an3.local_language_id = {4}
+                    LEFT JOIN pokemon_items AS pi ON p.id = pi.pokemon_id AND pi.version_id = {1}
+                    LEFT JOIN items i ON pi.item_id = i.id
+                    LEFT JOIN item_names ina ON i.id = ina.item_id AND ina.local_language_id = {4}
+                    LEFT JOIN (SELECT dex.id, pdn.species_id, pdn.pokedex_number, pp.name
+                               FROM pokemon_dex_numbers pdn
+                               LEFT JOIN pokedexes dex ON pdn.pokedex_id = dex.id
+                               LEFT JOIN pokedex_version_groups pvg ON dex.id = pvg.pokedex_id
+                               LEFT JOIN pokedex_prose pp ON dex.id = pp.pokedex_id AND pp.local_language_id = {4}
+                               WHERE pvg.version_group_id = {2})
+                    AS dexEntry ON ps.id = dexEntry.species_id                
+                WHERE pf.id = {0}
+                ", formId, versionId, versionGroupId, generationid, languageId);
+        }
     }
 }

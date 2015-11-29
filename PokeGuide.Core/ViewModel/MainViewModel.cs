@@ -23,6 +23,8 @@ namespace PokeGuide.Core.ViewModel
         ISettingsService _settingsService;
         INotifyTaskCompletionCollection<GameVersion> _versionList;
         RelayCommand _navigateToAbilitiesCommand;
+        RelayCommand _navigateToMovesCommand;
+        RelayCommand _navigateToPokemonCommand;
         DisplayLanguage _currentLanguage;
         int _cachedVersionId;
 
@@ -65,6 +67,24 @@ namespace PokeGuide.Core.ViewModel
                 if (_navigateToAbilitiesCommand == null)
                     _navigateToAbilitiesCommand = new RelayCommand(() => _navigationService.NavigateTo("AbilityView"));
                 return _navigateToAbilitiesCommand;
+            }
+        }
+        public RelayCommand NavigateToMovesCommand
+        {
+            get
+            {
+                if (_navigateToMovesCommand == null)
+                    _navigateToMovesCommand = new RelayCommand(() => _navigationService.NavigateTo("MoveView"));
+                return _navigateToMovesCommand;
+            }
+        }
+        public RelayCommand NavigateToPokemonCommand
+        {
+            get
+            {
+                if (_navigateToPokemonCommand == null)
+                    _navigateToPokemonCommand = new RelayCommand(() => _navigationService.NavigateTo("PokemonView"));
+                return _navigateToPokemonCommand;
             }
         }
 
