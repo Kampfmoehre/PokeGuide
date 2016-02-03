@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeGuide.Common", "PokeGuide.Common\PokeGuide.Common.csproj", "{DBC4FA01-FE9D-4379-B050-87F956B03930}"
 EndProject
@@ -53,8 +53,6 @@ Global
 		{DBC4FA01-FE9D-4379-B050-87F956B03930}.Release|x86.ActiveCfg = Release|Any CPU
 		{DBC4FA01-FE9D-4379-B050-87F956B03930}.Release|x86.Build.0 = Release|Any CPU
 		{7551DF20-9E0B-4240-A229-329085F45EA2}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{7551DF20-9E0B-4240-A229-329085F45EA2}.Debug|Any CPU.Build.0 = Debug|x86
-		{7551DF20-9E0B-4240-A229-329085F45EA2}.Debug|Any CPU.Deploy.0 = Debug|x86
 		{7551DF20-9E0B-4240-A229-329085F45EA2}.Debug|ARM.ActiveCfg = Debug|ARM
 		{7551DF20-9E0B-4240-A229-329085F45EA2}.Debug|ARM.Build.0 = Debug|ARM
 		{7551DF20-9E0B-4240-A229-329085F45EA2}.Debug|ARM.Deploy.0 = Debug|ARM
@@ -101,7 +99,6 @@ Global
 		{E4547F10-A00F-4382-AA53-4D841BEA41B0}.Release|x86.Build.0 = Release|x86
 		{E4547F10-A00F-4382-AA53-4D841BEA41B0}.Release|x86.Deploy.0 = Release|x86
 		{A25792E9-DFEF-4A7A-82A4-FFEF6D6562D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A25792E9-DFEF-4A7A-82A4-FFEF6D6562D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A25792E9-DFEF-4A7A-82A4-FFEF6D6562D5}.Debug|ARM.ActiveCfg = Debug|Any CPU
 		{A25792E9-DFEF-4A7A-82A4-FFEF6D6562D5}.Debug|ARM.Build.0 = Debug|Any CPU
 		{A25792E9-DFEF-4A7A-82A4-FFEF6D6562D5}.Debug|x64.ActiveCfg = Debug|Any CPU
