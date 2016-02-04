@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="NUnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\TestCalculationHelperService.cs" />
     <Compile Include="Service\TestCalculationService.cs" />
     <Compile Include="Service\TestDataService.cs" />
   </ItemGroup>

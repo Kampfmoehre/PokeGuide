@@ -91,8 +91,16 @@ namespace PokeGuide.Core.Tests.Service
             return _service.CalculateExperience(1, baseExperience, enemyLevel, participatedPokemon, isWild, isTraded, false, useExpShare, teamCount);
         }
 
+        [TestCase((ushort)57, 3, 1, true, false, false, false, ExpectedResult = 24, Description = "Wild Sentret Level 3 defeated by one Pokémon")]
+        [TestCase((ushort)189, 33, 1, true, false, false, false, ExpectedResult = 891, Description = "Wild Donphan Level 33 defeated by one Pokémon")]
+        [TestCase((ushort)189, 33, 1, true, false, false, true, ExpectedResult = 443, Description = "Wild Donphan Level 33 defeated by one Pokémon")]
+        public int ShouldCalculateExperienceForGen2(ushort baseExperience, byte enemyLevel, byte participatedPokemon, bool isWild, bool isTraded, bool holdsLuckyEgg, bool useExpShare)
+        {
+            return _service.CalculateExperience(2, baseExperience, enemyLevel, participatedPokemon, isWild, isTraded, holdsLuckyEgg, useExpShare);
+        }
 
-        //[TestCase((byte)2, (ushort)57, (byte)3, (byte)1, true, false, false, false, 0, ExpectedResult = 24, Description = "Wild Sentret Level 3 in Gen II")]
+
+        //
         ////[TestCase((byte)2, (ushort)54, (byte)2, (byte)1, true, false, false, false, 0, ExpectedResult = 11, Description = "Wild Spinarak Level 2 in Gen II")]
         //[TestCase((byte)2, (ushort)86, (byte)3, (byte)1, true, false, false, false, 0, ExpectedResult = 36, Description = "Wild Geodude Level 3 in Gen II")]
         //[TestCase((byte)3, (ushort)55, (byte)2, (byte)1, true, false, false, false, 0, ExpectedResult = 15, Description = "Wild Poochyena Level 2 in Gen III")]
