@@ -88,26 +88,44 @@ namespace PokeGuide.Core.Tests.Service
         [TestCase((ushort)58, 20, 1, true, true, true, 3, ExpectedResult = 37, Description = "Wild Spearow Level 20 defeated by one traded Pokémon with Exp.All and 3 Team members (output from Exp.All.)")]
         public int ShouldCalculateExperienceForGen1(ushort baseExperience, byte enemyLevel, byte participatedPokemon, bool isWild, bool isTraded, bool useExpShare, byte teamCount)
         {
-            return _service.CalculateExperience(1, baseExperience, enemyLevel, participatedPokemon, isWild, isTraded, false, useExpShare, teamCount);
+            return _service.CalculateExperienceForFirstGen(baseExperience, enemyLevel, participatedPokemon, isWild, isTraded, useExpShare, teamCount);
         }
 
-        [TestCase((ushort)57, 3, 1, true, false, false, false, ExpectedResult = 24, Description = "Wild Sentret Level 3 defeated by one Pokémon")]
-        [TestCase((ushort)189, 33, 1, true, false, false, false, ExpectedResult = 891, Description = "Wild Donphan Level 33 defeated by one Pokémon")]
-        [TestCase((ushort)189, 33, 1, true, false, false, true, ExpectedResult = 443, Description = "Wild Donphan Level 33 defeated by one Pokémon")]
-        public int ShouldCalculateExperienceForGen2(ushort baseExperience, byte enemyLevel, byte participatedPokemon, bool isWild, bool isTraded, bool holdsLuckyEgg, bool useExpShare)
+        [TestCase((ushort)57, 3, 1, true, false, false, 0, ExpectedResult = 24, Description = "Wild Sentret Level 3 defeated by one Pokémon")]
+        [TestCase((ushort)189, 33, 1, true, false, false, 0, ExpectedResult = 891, Description = "Wild Donphan Level 33 defeated by one Pokémon")]
+        [TestCase((ushort)189, 33, 1, true, false, false, 1, ExpectedResult = 443, Description = "Wild Donphan Level 33 defeated by one Pokémon while another Pokémon holds Exp.Share")]
+        [TestCase((ushort)86, 3, 1, true, false, false, 0, ExpectedResult = 36, Description = "Wild Geodude Level 3 defeated by one Pokémon")]
+        public int ShouldCalculateExperienceForGen2(ushort baseExperience, byte enemyLevel, byte participatedPokemon, bool isWild, bool isTraded, bool holdsLuckyEgg, byte expShareCount)
         {
-            return _service.CalculateExperience(2, baseExperience, enemyLevel, participatedPokemon, isWild, isTraded, holdsLuckyEgg, useExpShare);
+            return _service.CalculateExperience(2, baseExperience, enemyLevel, participatedPokemon, isWild, isTraded, holdsLuckyEgg, expShareCount);
         }
 
+        [TestCase((ushort)55, 2, 1, true, false, false, 0, ExpectedResult = 15, Description = "Wild Poochyena Level 2 defeated by one Pokémon")]
+        [TestCase((ushort)60, 3, 1, true, false, false, 0, ExpectedResult = 25, Description = "Wild Zigzagoon Level 3 defeated by one Pokémon")]
+        [TestCase((ushort)74, 4, 1, true, false, false, 0, ExpectedResult = 42, Description = "Wild Mankey Level 4 defeated by one Pokémon")]
+        [TestCase((ushort)65, 5, 1, false, false, false, 0, ExpectedResult = 69, Description = "Trainer Torchic Level 5 defeated by one Pokémon")]
+        public int ShouldCalculateExperienceForGen3(ushort baseExperience, byte enemyLevel, byte participatedPokemon, bool isWild, bool isTraded, bool holdsLuckyEgg, byte expShareCount)
+        {
+            return _service.CalculateExperience(3, baseExperience, enemyLevel, participatedPokemon, isWild, isTraded, holdsLuckyEgg, expShareCount);
+        }
 
-        //
-        ////[TestCase((byte)2, (ushort)54, (byte)2, (byte)1, true, false, false, false, 0, ExpectedResult = 11, Description = "Wild Spinarak Level 2 in Gen II")]
-        //[TestCase((byte)2, (ushort)86, (byte)3, (byte)1, true, false, false, false, 0, ExpectedResult = 36, Description = "Wild Geodude Level 3 in Gen II")]
-        //[TestCase((byte)3, (ushort)55, (byte)2, (byte)1, true, false, false, false, 0, ExpectedResult = 15, Description = "Wild Poochyena Level 2 in Gen III")]
-        //[TestCase((byte)3, (ushort)60, (byte)3, (byte)1, true, false, false, false, 0, ExpectedResult = 25, Description = "Wild Zigzagoon Level 3 in Gen III")]
-        //[TestCase((byte)3, (ushort)74, (byte)4, (byte)1, true, false, false, false, 0, ExpectedResult = 42, Description = "Wild Mankey Level 4 in Gen III")]
-        //[TestCase((byte)3, (ushort)65, (byte)5, (byte)1, false, false, false, false, 0, ExpectedResult = 69, Description = "Trainer Torchic Level 5 in Gen III")]
-        //[TestCase((byte)4, (ushort)58, (byte)2, (byte)1, true, false, false, false, 0, ExpectedResult = 16, Description = "Wild Bidoof Level 2 in Gen IV")]
-        //[TestCase((byte)4, (ushort)63, (byte)5, (byte)1, false, false, false, false, 0, ExpectedResult = 67, Description = "Trainer Turtwig Level 5 in Gen IV")]
+        [TestCase((ushort)58, 2, 1, true, false, false, 0, ExpectedResult = 16, Description = "Wild Bidoof Level 2 defeated by one Pokémon")]
+        [TestCase((ushort)63, 5, 1, false, false, false, 0, ExpectedResult = 67, Description = "Trainer Turtwig Level 5 defeated by one Pokémon")]
+        //[TestCase((ushort)177, 23, 1, true, false, false, 0, ExpectedResult = 384, Description = "Wild Nidorina Level 23 defeated by one Pokémon")]
+        public int ShouldCalculateExperienceForGen4(ushort baseExperience, byte enemyLevel, byte participatedPokemon, bool isWild, bool isTraded, bool holdsLuckyEgg, byte expShareCount)
+        {
+            return _service.CalculateExperience(4, baseExperience, enemyLevel, participatedPokemon, isWild, isTraded, holdsLuckyEgg, expShareCount);
+        }
+
+        [Test]
+        public void CalculateExperienceShouldThrowExceptionIfWrongGeneration()
+        {
+            byte wrongGen = 1;
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateExperience(wrongGen, 2, 3, 4));
+            // Todo find out how to remove default .NET exception that is added to the custom message
+            Assert.True(exception.Message.StartsWith("Generation must be between 2 and 6"));
+            Assert.AreEqual("generation", exception.ParamName);
+            Assert.AreEqual(wrongGen, exception.ActualValue);
+        }
     }
 }

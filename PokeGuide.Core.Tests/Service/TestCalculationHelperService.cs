@@ -30,8 +30,12 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyIsWild = false,
                 EnemyLevel = 54,
                 ExpAllActive = false,
-                Team = SetUpFirstGenTeam(true, false, false, false, true, false)
+                Team = SetUpTeam()
             };
+            fightInfo.Team[0].HasParticipated = true;
+            fightInfo.Team[0].IsTraded = true;
+            fightInfo.Team[4].HasParticipated = true;
+            fightInfo.Team[4].IsTraded = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(1, fightInfo);
 
@@ -52,8 +56,15 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyIsWild = false,
                 EnemyLevel = 56,
                 ExpAllActive = false,
-                Team = SetUpFirstGenTeam(true, false, true, false, true, true)
+                Team = SetUpTeam()
             };
+            fightInfo.Team[0].HasParticipated = true;
+            fightInfo.Team[0].IsTraded = true;
+            fightInfo.Team[2].HasParticipated = true;
+            fightInfo.Team[4].HasParticipated = true;
+            fightInfo.Team[4].IsTraded = true;
+            fightInfo.Team[5].HasParticipated = true;
+            fightInfo.Team[5].IsTraded = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(1, fightInfo);
 
@@ -74,8 +85,13 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyIsWild = true,
                 EnemyLevel = 30,
                 ExpAllActive = true,
-                Team = SetUpFirstGenTeam(true, false, false, false, false, false)
+                Team = SetUpTeam()
             };
+            fightInfo.Team[0].HasParticipated = true;
+            fightInfo.Team[0].IsTraded = true;
+            fightInfo.Team[1].IsTraded = true;
+            fightInfo.Team[4].IsTraded = true;
+            fightInfo.Team[5].IsTraded = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(1, fightInfo);
 
@@ -96,8 +112,14 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyIsWild = false,
                 EnemyLevel = 53,
                 ExpAllActive = true,
-                Team = SetUpFirstGenTeam(true, false, true, false, false, false)
+                Team = SetUpTeam()
             };
+            fightInfo.Team[0].HasParticipated = true;
+            fightInfo.Team[0].IsTraded = true;
+            fightInfo.Team[1].IsTraded = true;
+            fightInfo.Team[2].HasParticipated = true;
+            fightInfo.Team[4].IsTraded = true;
+            fightInfo.Team[5].IsTraded = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(1, fightInfo);
 
@@ -117,7 +139,7 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 189, // Donphan
                 EnemyIsWild = true,
                 EnemyLevel = 33,
-                Team = SetUpSecondGenTeam1()
+                Team = SetUpTeam()
             };
             fightInfo.Team[4].HasParticipated = true;
             fightInfo.Team[4].HoldsExpShare = true;
@@ -140,9 +162,10 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 108, // Onix
                 EnemyIsWild = true,
                 EnemyLevel = 36,
-                Team = SetUpSecondGenTeam1()
+                Team = SetUpTeam()
             };
             fightInfo.Team[2].HoldsExpShare = true;
+            fightInfo.Team[2].IsTraded = true;
             fightInfo.Team[5].HasParticipated = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(2, fightInfo);
@@ -163,10 +186,11 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 189, // Donphan
                 EnemyIsWild = true,
                 EnemyLevel = 33,
-                Team = SetUpSecondGenTeam1()
+                Team = SetUpTeam()
             };
             fightInfo.Team[0].HoldsExpShare = true;
             fightInfo.Team[1].HasParticipated = true;
+            fightInfo.Team[1].IsTraded = true;
             fightInfo.Team[4].HasParticipated = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(2, fightInfo);
@@ -187,9 +211,10 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 171, // Golbat
                 EnemyIsWild = true,
                 EnemyLevel = 32,
-                Team = SetUpSecondGenTeam1()
+                Team = SetUpTeam()
             };
             fightInfo.Team[0].HoldsExpShare = true;
+            fightInfo.Team[3].IsTraded = true;
             fightInfo.Team[3].HasParticipated = true;
             fightInfo.Team[3].HoldsLuckyEgg = true;
 
@@ -211,9 +236,10 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 134, // Graveler
                 EnemyIsWild = true,
                 EnemyLevel = 32,
-                Team = SetUpSecondGenTeam1()
+                Team = SetUpTeam()
             };
             fightInfo.Team[2].HoldsExpShare = true;
+            fightInfo.Team[2].IsTraded = true;
             fightInfo.Team[5].HasParticipated = true;
             fightInfo.Team[5].HoldsLuckyEgg = true;
 
@@ -235,7 +261,7 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 171, // Xatu
                 EnemyIsWild = false,
                 EnemyLevel = 40,
-                Team = SetUpSecondGenTeam2()
+                Team = SetUpTeam()
             };
             fightInfo.Team[0].HoldsLuckyEgg = true;
             fightInfo.Team[0].HasParticipated = true;
@@ -259,10 +285,11 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 137, // Jynx
                 EnemyIsWild = false,
                 EnemyLevel = 41,
-                Team = SetUpSecondGenTeam2()
+                Team = SetUpTeam()
             };
             fightInfo.Team[0].HoldsLuckyEgg = true;
             fightInfo.Team[0].HasParticipated = true;
+            fightInfo.Team[1].IsTraded = true;
             fightInfo.Team[1].HasParticipated = true;
             fightInfo.Team[3].HasParticipated = true;
             fightInfo.Team[5].HoldsExpShare = true;
@@ -285,9 +312,10 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 171, // Xatu
                 EnemyIsWild = false,
                 EnemyLevel = 42,
-                Team = SetUpSecondGenTeam2()
+                Team = SetUpTeam()
             };
             fightInfo.Team[2].HasParticipated = true;
+            fightInfo.Team[2].IsTraded = true;
             fightInfo.Team[5].HasParticipated= true;
             fightInfo.Team[5].HoldsExpShare = true;
 
@@ -301,117 +329,206 @@ namespace PokeGuide.Core.Tests.Service
             Assert.AreEqual(1143, result[5].EarnedExperience);
         }
 
-        List<Fighter> SetUpFirstGenTeam(bool part1, bool part2, bool part3, bool part4, bool part5, bool part6)
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForThirdGen1()
         {
-            return new List<Fighter>
+            var fightInfo = new FightInformation
             {
-                new Fighter
-                {
-                    HasParticipated = part1,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = true,
-                    Pokemon = new TeamPokemon { Name = "Machoke" }
-                },
-                new Fighter
-                {
-                    HasParticipated = part2,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = true,
-                    Pokemon = new TeamPokemon { Name = "Porenta" }
-                },
-                new Fighter
-                {
-                    HasParticipated = part3,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = false,
-                    Pokemon = new TeamPokemon { Name = "Lapras" }
-                },
-                new Fighter
-                {
-                    HasParticipated = part4,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = false,
-                    Pokemon = new TeamPokemon { Name = "Dugtrio" }
-                },
-                new Fighter
-                {
-                    HasParticipated = part5,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = true,
-                    Pokemon = new TeamPokemon { Name = "Mr.Mime" }
-                },
-                new Fighter
-                {
-                    HasParticipated = part6,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = true,
-                    Pokemon = new TeamPokemon { Name = "Scyther" }
-                }
+                EnemyBaseExperience = 126, // Loudred
+                EnemyIsWild = true,
+                EnemyLevel = 40,
+                Team = SetUpTeam()
             };
+            fightInfo.Team[0].HasParticipated = true;
+            fightInfo.Team[0].HoldsLuckyEgg = true;
+            fightInfo.Team[2].HasParticipated = true;
+            fightInfo.Team[2].IsTraded = true;
+            fightInfo.Team[2].HoldsLuckyEgg = true;
+            fightInfo.Team[4].HoldsExpShare = true;
+            fightInfo.Team[4].IsTraded = true;
+
+            IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
+
+            Assert.AreEqual(270, result[0].EarnedExperience);
+            Assert.AreEqual(0, result[1].EarnedExperience);
+            Assert.AreEqual(405, result[2].EarnedExperience);
+            Assert.AreEqual(0, result[3].EarnedExperience);
+            Assert.AreEqual(540, result[4].EarnedExperience);
+            Assert.AreEqual(0, result[5].EarnedExperience);
         }
 
-        List<Fighter> SetUpSecondGenTeam1()
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForThirdGen2()
         {
-            return new List<Fighter>
+            var fightInfo = new FightInformation
             {
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = false,
-                    Pokemon = new TeamPokemon { Name = "Typhlosion" }
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = true,
-                    Pokemon = new TeamPokemon { Name = "Parasect" }
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = true,
-                    Pokemon = new TeamPokemon { Name = "Pidgeot" }
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = true,
-                    Pokemon = new TeamPokemon { Name = "Seaking" }
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = false,
-                    Pokemon = new TeamPokemon { Name = "Feraligatr" }
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = false,
-                    Pokemon = new TeamPokemon { Name = "Meganium" }
-                }
-            };
+                EnemyBaseExperience = 171, // Golbat
+                EnemyIsWild = true,
+                EnemyLevel = 40,
+                Team = SetUpTeam()
+            };            
+            fightInfo.Team[1].HasParticipated = true;
+            fightInfo.Team[3].HasParticipated = true;
+            fightInfo.Team[4].HasParticipated = true;
+            fightInfo.Team[4].IsTraded = true;
+            fightInfo.Team[4].HoldsExpShare = true;
+            fightInfo.Team[5].HasParticipated = true;
+            fightInfo.Team[5].IsTraded = true;
+
+            IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
+
+            Assert.AreEqual(0, result[0].EarnedExperience);
+            Assert.AreEqual(122, result[1].EarnedExperience);
+            Assert.AreEqual(0, result[2].EarnedExperience);
+            Assert.AreEqual(122, result[3].EarnedExperience);
+            Assert.AreEqual(915, result[4].EarnedExperience);
+            Assert.AreEqual(183, result[5].EarnedExperience);
         }
 
-        List<Fighter> SetUpSecondGenTeam2()
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForThirdGen3()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 128, // Mightyena
+                EnemyIsWild = false,
+                EnemyLevel = 46,
+                Team = SetUpTeam()
+            };
+            fightInfo.Team[0].HoldsLuckyEgg = true;
+            fightInfo.Team[0].HasParticipated = true;
+            fightInfo.Team[1].HasParticipated = true;
+            fightInfo.Team[2].HasParticipated = true;
+            fightInfo.Team[2].HoldsLuckyEgg = true;
+            fightInfo.Team[2].IsTraded = true;
+            fightInfo.Team[3].HasParticipated = true;
+            fightInfo.Team[4].HasParticipated = true;
+            fightInfo.Team[4].IsTraded = true;
+            fightInfo.Team[4].HoldsExpShare = true;
+            fightInfo.Team[5].HasParticipated = true;
+            fightInfo.Team[5].IsTraded = true;
+
+            IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
+
+            Assert.AreEqual(157, result[0].EarnedExperience);
+            Assert.AreEqual(105, result[1].EarnedExperience);
+            Assert.AreEqual(235, result[2].EarnedExperience);
+            Assert.AreEqual(105, result[3].EarnedExperience);
+            Assert.AreEqual(1102, result[4].EarnedExperience);
+            Assert.AreEqual(157, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForThirdGen4()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 181, // Shiftry
+                EnemyIsWild = false,
+                EnemyLevel = 48,
+                Team = SetUpTeam()
+            };
+            fightInfo.Team[0].HoldsLuckyEgg = true;
+            fightInfo.Team[0].HasParticipated = true;
+            fightInfo.Team[1].HasParticipated = true;
+            fightInfo.Team[2].HasParticipated = true;
+            fightInfo.Team[2].HoldsLuckyEgg = true;
+            fightInfo.Team[2].IsTraded = true;
+            fightInfo.Team[3].HasParticipated = true;
+            fightInfo.Team[4].IsTraded = true;
+            fightInfo.Team[4].HoldsExpShare = true;
+
+            IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
+
+            Assert.AreEqual(348, result[0].EarnedExperience);
+            Assert.AreEqual(232, result[1].EarnedExperience);
+            Assert.AreEqual(522, result[2].EarnedExperience);
+            Assert.AreEqual(232, result[3].EarnedExperience);
+            Assert.AreEqual(1395, result[4].EarnedExperience);
+            Assert.AreEqual(0, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForFourthGen1()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 117, // Nidorina
+                EnemyIsWild = true,
+                EnemyLevel = 23,
+                Team = SetUpTeam()
+            };
+            fightInfo.Team[0].HasParticipated = true;
+            fightInfo.Team[2].HasParticipated = true;
+            fightInfo.Team[3].HoldsExpShare = true;
+            fightInfo.Team[3].IsTraded = true;
+            fightInfo.Team[5].HasParticipated = true;
+            fightInfo.Team[5].HoldsExpShare = true;
+
+            IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
+
+            Assert.AreEqual(64, result[0].EarnedExperience);
+            Assert.AreEqual(0, result[1].EarnedExperience);
+            Assert.AreEqual(64, result[2].EarnedExperience);
+            Assert.AreEqual(144, result[3].EarnedExperience);
+            Assert.AreEqual(0, result[4].EarnedExperience);
+            Assert.AreEqual(160, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForFourthGen2()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 90, // Grimer
+                EnemyIsWild = true,
+                EnemyLevel = 28,
+                Team = SetUpTeam()
+            };
+            fightInfo.Team[1].HasParticipated = true;
+            fightInfo.Team[3].HoldsExpShare = true;
+            fightInfo.Team[3].IsTraded = true;
+            fightInfo.Team[5].HoldsExpShare = true;
+
+            IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
+
+            Assert.AreEqual(0, result[0].EarnedExperience);
+            Assert.AreEqual(180, result[1].EarnedExperience);
+            Assert.AreEqual(0, result[2].EarnedExperience);
+            Assert.AreEqual(135, result[3].EarnedExperience);
+            Assert.AreEqual(0, result[4].EarnedExperience);
+            Assert.AreEqual(90, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForFourthGen3()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 162, // Noctowl
+                EnemyIsWild = true,
+                EnemyLevel = 25,
+                Team = SetUpTeam()
+            };
+            fightInfo.Team[1].HasParticipated = true;
+            fightInfo.Team[3].HasParticipated = true;
+            fightInfo.Team[3].HoldsExpShare = true;
+            fightInfo.Team[3].IsTraded = true;
+            fightInfo.Team[4].HasParticipated = true;
+            fightInfo.Team[4].IsTraded = true;
+            fightInfo.Team[5].HoldsExpShare = true;
+
+            IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
+
+            Assert.AreEqual(0, result[0].EarnedExperience);
+            Assert.AreEqual(96, result[1].EarnedExperience);
+            Assert.AreEqual(0, result[2].EarnedExperience);
+            Assert.AreEqual(360, result[3].EarnedExperience);
+            Assert.AreEqual(144, result[4].EarnedExperience);
+            Assert.AreEqual(144, result[5].EarnedExperience);
+        }
+
+        List<Fighter> SetUpTeam()
         {
             return new List<Fighter>
             {
@@ -421,23 +538,7 @@ namespace PokeGuide.Core.Tests.Service
                     HoldsExpShare = false,
                     HoldsLuckyEgg = false,
                     IsTraded = false,
-                    Pokemon = new TeamPokemon { Name = "Meganium" }
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = true,
-                    Pokemon = new TeamPokemon { Name = "Seaking" }
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = true,
-                    Pokemon = new TeamPokemon { Name = "Pidgeot" }
+                    Pokemon = new TeamPokemon()
                 },
                 new Fighter
                 {
@@ -445,7 +546,7 @@ namespace PokeGuide.Core.Tests.Service
                     HoldsExpShare = false,
                     HoldsLuckyEgg = false,
                     IsTraded = false,
-                    Pokemon = new TeamPokemon { Name = "Typhlosion" }
+                    Pokemon = new TeamPokemon()
                 },
                 new Fighter
                 {
@@ -453,7 +554,7 @@ namespace PokeGuide.Core.Tests.Service
                     HoldsExpShare = false,
                     HoldsLuckyEgg = false,
                     IsTraded = false,
-                    Pokemon = new TeamPokemon { Name = "Feraligatr" }
+                    Pokemon = new TeamPokemon()
                 },
                 new Fighter
                 {
@@ -461,7 +562,23 @@ namespace PokeGuide.Core.Tests.Service
                     HoldsExpShare = false,
                     HoldsLuckyEgg = false,
                     IsTraded = false,
-                    Pokemon = new TeamPokemon { Name = "Raikou" }
+                    Pokemon = new TeamPokemon()
+                },
+                new Fighter
+                {
+                    HasParticipated = false,
+                    HoldsExpShare = false,
+                    HoldsLuckyEgg = false,
+                    IsTraded = false,
+                    Pokemon = new TeamPokemon()
+                },
+                new Fighter
+                {
+                    HasParticipated = false,
+                    HoldsExpShare = false,
+                    HoldsLuckyEgg = false,
+                    IsTraded = false,
+                    Pokemon = new TeamPokemon()
                 }                
             };
         }

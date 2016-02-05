@@ -20,26 +20,38 @@ namespace PokeGuide.Core.Service
         {
             byte participated = Convert.ToByte(fightInfo.Team.Count(c => c.HasParticipated));
             if (participated == 0)
-                return fightInfo.Team;
+                throw new Exception("There can be no fight without participants");
 
-            byte teamCount = 0;            
-            if (fightInfo.ExpAllActive && generation == 1)
-                teamCount = Convert.ToByte(fightInfo.Team.Count);
+            byte teamCount = 0;
+            byte expShareCount = 0;
+
+            if (generation == 1)
+            {
+                if (fightInfo.ExpAllActive)
+                    teamCount = Convert.ToByte(fightInfo.Team.Count);
+            }
+            else
+                expShareCount = Convert.ToByte(fightInfo.Team.Count(c => c.HoldsExpShare));
             
+            // Loop through all team members
             foreach (Fighter fighter in fightInfo.Team)
             {
-                bool expShare = generation == 1 ? fightInfo.ExpAllActive : fightInfo.Team.Any(a => a.HoldsExpShare);
-
                 if (fighter.HasParticipated)
-                    fighter.EarnedExperience = _calculator.CalculateExperience(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.IsTraded, fighter.HoldsLuckyEgg, expShare, 0);
-
-                // if the active fighter also holds Exp.Share he will be given both direct exp from fight and Exp.Share output
+                {
+                    // Calculate experience that is earned directly through actively defeating the enemy
+                    if (generation == 1)
+                        fighter.EarnedExperience = _calculator.CalculateExperienceForFirstGen(fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.IsTraded, fightInfo.ExpAllActive, 0);
+                    else
+                        fighter.EarnedExperience = _calculator.CalculateExperience(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.IsTraded, fighter.HoldsLuckyEgg, expShareCount);
+                }
+                
+                // if the active fighter also holds Exp.Share he will be given both direct exp from fight and Exp.Share output, so we sum them
                 if (fighter.HoldsExpShare && generation > 1)
-                    fighter.EarnedExperience += _calculator.CalculateExperience(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, 1, fightInfo.EnemyIsWild, fighter.IsTraded, fighter.HoldsLuckyEgg, expShare, 0);
+                    fighter.EarnedExperience += _calculator.CalculateExperience(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, 1, fightInfo.EnemyIsWild, fighter.IsTraded, fighter.HoldsLuckyEgg, expShareCount, true);
 
                 // In first gen with activated Exp.All you get half the Exp + the Exp.All output so we calculate both and sum them
                 if (teamCount > 0 && generation == 1)
-                    fighter.EarnedExperience += _calculator.CalculateExperience(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.IsTraded, fighter.HoldsLuckyEgg, fightInfo.ExpAllActive, teamCount);
+                    fighter.EarnedExperience += _calculator.CalculateExperienceForFirstGen(fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.IsTraded, fightInfo.ExpAllActive, teamCount);
             }
 
             return fightInfo.Team;
