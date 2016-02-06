@@ -72,6 +72,6 @@ namespace PokeGuide.Core.Service.Interface
         /// <param name="holdsExpShare"><c>True</c> if the Pokémon holds an Exp.Share</param>
         /// <param name="ExpPower">The state of Pass Power (5th Gen C-Gear feature)</param>
         /// <returns>The calculated experience points for the Pokémon</returns>
-        int CalculateExperienceForFifthGen(ushort baseExperience, byte enemyLevel, byte ownLevel, byte participatedPokemon, bool isWild, TradeState tradingState, bool holdsLuckyEgg, byte expShareCount, bool holdsExpShare, ExpPower passPower);
+        int CalculateExperienceForFifthGen(ushort baseExperience, byte enemyLevel, byte ownLevel, byte participatedPokemon, bool isWild, TradeState tradingState, bool holdsLuckyEgg, byte expShareCount, bool holdsExpShare, ExpPower expPower);
     }
 }

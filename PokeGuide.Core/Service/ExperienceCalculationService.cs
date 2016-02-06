@@ -128,22 +128,20 @@ namespace PokeGuide.Core.Service
         /// <returns>The calculated experience points for the Pokémon</returns>
         public int CalculateExperienceForFifthGen(ushort baseExperience, byte enemyLevel, byte ownLevel, byte participatedPokemon, bool isWild, TradeState tradingState, bool holdsLuckyEgg, byte expShareCount, bool holdsExpShare, ExpPower expPower)
         {
-            double enemyCount = CalculateEnemyCount(participatedPokemon, expShareCount, holdsExpShare);
-            double a = baseExperience * enemyLevel;
-            double b = 5.0 * enemyCount;
-            double c = a / b;
+            double a = (enemyLevel * 2.0) + 10;
+            double c = enemyLevel + ownLevel + 10.0;
+            double b = (baseExperience * enemyLevel) / 5.0;
+            if (!isWild)
+                b = b * 1.5;
+            if (expShareCount > 0)
+                b = b / (expShareCount * 2.0);
+            b = Math.Floor(b / participatedPokemon);
+            double experience = Math.Floor(Math.Floor(Math.Sqrt(a) * (a * a)) * b / Math.Floor(Math.Sqrt(c) * (c * c))) + 1.0;
 
-            double d = Math.Pow((2.0 * enemyLevel) + 10.0, 2.5);
-            double e = Math.Pow(enemyLevel + ownLevel + 10.0, 2.5);
-            double f = d / e;
+            experience = ApplyExperienceBonus(experience, holdsLuckyEgg, tradingState, expPower);
 
-            double g = (c * f) + 1.0;
-
-            double experience = ApplyExperienceBonus(g, isWild, holdsLuckyEgg, tradingState, expPower);
-
-            return Convert.ToInt32(experience);
+            return Convert.ToInt32(Math.Floor(experience));
         }
-
         /// <summary>
         /// Calculates the divisor for experience calculations
         /// </summary>
@@ -169,8 +167,8 @@ namespace PokeGuide.Core.Service
         /// <param name="isTraded"><c>True</c> if the Pokémon has a different Trainer ID then the player</param>
         /// <param name="holdsLuckyEgg"><c>True</c> if the Pokémon holds a Lucky Egg</param>
         /// <returns>The experience with applied bonus</returns>
-        double ApplyExperienceBonus(double experience, bool isWild, bool holdsLuckyEgg, TradeState tradingState, ExpPower expPower = ExpPower.None)
-        {            
+        double ApplyExperienceBonus(double experience, bool isWild, bool holdsLuckyEgg, TradeState tradingState)
+        {
             // These must be rounded down for all generations
             if (!isWild) // Modifier for Trainer Battle
                 experience = Math.Floor(experience * 1.5);
@@ -182,6 +180,26 @@ namespace PokeGuide.Core.Service
                 experience = Math.Floor(experience * 1.5);
             else if (tradingState == TradeState.TradedInternational)
                 experience = Math.Floor(experience * 1.7);
+            return experience;
+        }
+        /// <summary>
+        /// Takes calculated experience and applies bonus multiplier for some conditions
+        /// </summary>
+        /// <param name="experience">The experience</param>
+        /// <param name="isWild"><c>True</c> if the Pokémon is a wild Pokémon</param>
+        /// <param name="isTraded"><c>True</c> if the Pokémon has a different Trainer ID then the player</param>
+        /// <param name="holdsLuckyEgg"><c>True</c> if the Pokémon holds a Lucky Egg</param>
+        /// <returns>The experience with applied bonus</returns>
+        double ApplyExperienceBonus(double experience, bool holdsLuckyEgg, TradeState tradingState, ExpPower expPower)
+        {
+            if (holdsLuckyEgg) // Modifier for lucky egg
+                experience = experience * 1.5;
+
+            // Modifier for traded Pokémon
+            if (tradingState == TradeState.TradedNational)
+                experience = experience * 1.5;
+            else if (tradingState == TradeState.TradedInternational)
+                experience = experience * 1.7;
 
             if (expPower != ExpPower.None)
             {

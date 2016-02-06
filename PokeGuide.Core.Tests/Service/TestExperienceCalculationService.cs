@@ -79,5 +79,20 @@ namespace PokeGuide.Core.Tests.Service
         {
             return _service.CalculateExperienceForFourthGen(baseExperience, enemyLevel, participatedPokemon, isWild, tradeState, holdsLuckyEgg, expShareCount, holdsExpShare);
         }
+
+        [TestCase((ushort)55, 4, 5, 1, true, TradeState.Original, false, 0, false, ExpPower.None, ExpectedResult = 39, Description = "Wild Lillipup Level 4 defeated by one Level 5 Pokémon")]
+        [TestCase((ushort)56, 8, 8, 1, false, TradeState.Original, false, 0, false, ExpPower.None, ExpectedResult = 135, Description = "Trainer Purrloin Level 8 defeated by one Level 8 Pokémon")]
+        [TestCase((ushort)51, 4, 7, 1, false, TradeState.Original, false, 0, false, ExpPower.None, ExpectedResult = 42, Description = "Trainer Patrat Level 4 defeated by one Level 7 Pokémon")]
+        [TestCase((ushort)38, 5, 5, 1, true, TradeState.Original, false, 0, false, ExpPower.None, ExpectedResult = 39, Description = "Wild Azurill Level 5 defeated by one Level 5 Pokémon")]
+        [TestCase((ushort)64, 5, 6, 1, true, TradeState.Original, false, 0, false, ExpPower.None, ExpectedResult = 57, Description = "Wild Psyduck Level 5 defeated by one Level 6 Pokémon")]
+        [TestCase((ushort)163, 62, 67, 2, false, TradeState.Original, false, 0, false, ExpPower.None, ExpectedResult = 1383, Description = "Trainer Sawk Level 62 defeated by two Pokémon Level 67")]
+        [TestCase((ushort)163, 62, 31, 2, false, TradeState.TradedNational, false, 0, false, ExpPower.None, ExpectedResult = 4387, Description = "Trainer Throh Level 62 defeated by two Pokémon traded Level 31")]
+        [TestCase((ushort)163, 62, 76, 2, false, TradeState.Original, false, 0, false, ExpPower.None, ExpectedResult = 1182, Description = "Trainer Sawk Level 62 defeated by two Pokémon Level 67")]
+        [TestCase((ushort)163, 62, 32, 2, false, TradeState.TradedNational, false, 0, false, ExpPower.None, ExpectedResult = 4282, Description = "Trainer Throh Level 62 defeated by two Pokémon traded Level 32")]
+        [TestCase((ushort)166, 62, 66, 1, false, TradeState.Original, true, 0, false, ExpPower.None, ExpectedResult = 4303, Description = "Trainer Hariyama Level 62 defeated by one Level 66 Pokémon")]
+        public int ShouldCalculateExperienceForGen5(ushort baseExperience, byte enemyLevel, byte ownLevel, byte participatedPokemon, bool isWild, TradeState tradeState, bool holdsLuckyEgg, byte expShareCount, bool holdsExpShare, ExpPower expPowerState)
+        {
+            return _service.CalculateExperienceForFifthGen(baseExperience, enemyLevel, ownLevel, participatedPokemon, isWild, tradeState, holdsLuckyEgg, expShareCount, holdsExpShare, expPowerState);
+        }
     }
 }
