@@ -44,7 +44,7 @@ namespace PokeGuide.Core.Service
                     else
                         fighter.EarnedExperience = CalculateExperienceYield(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, fighter.Level, participated, fightInfo.EnemyIsWild, fighter.TradeState, fighter.HoldsLuckyEgg, expShareCount, false, fightInfo.ExpPowerState);
                 }
-                
+
                 // if the active fighter also holds Exp.Share he will be given both direct exp from fight and Exp.Share output, so we sum them
                 if (fighter.HoldsExpShare && generation > 1)
                     fighter.EarnedExperience += CalculateExperienceYield(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, fighter.Level, 1, fightInfo.EnemyIsWild, fighter.TradeState, fighter.HoldsLuckyEgg, expShareCount, true, fightInfo.ExpPowerState);
@@ -52,6 +52,11 @@ namespace PokeGuide.Core.Service
                 // In first gen with activated Exp.All you get half the Exp + the Exp.All output so we calculate both and sum them
                 if (teamCount > 0 && generation == 1)
                     fighter.EarnedExperience += _experienceCalculator.CalculateExperienceForFirstGen(fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.TradeState == TradeState.TradedNational, fightInfo.ExpAllActive, teamCount);
+
+                // Not sure about this, but all tests seemed to have shown that this is neccessary
+                // More tests are needed to evaluate this, maybe Exp Calc is wrong somewhere
+                if (generation == 5 && fighter.HasParticipated && fighter.HoldsExpShare && expShareCount > 1)
+                    fighter.EarnedExperience = fighter.EarnedExperience - 1;
             }
 
             return fightInfo.Team;

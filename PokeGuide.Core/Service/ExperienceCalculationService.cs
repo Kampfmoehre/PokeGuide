@@ -130,14 +130,17 @@ namespace PokeGuide.Core.Service
         {
             double a = (enemyLevel * 2.0) + 10;
             double c = enemyLevel + ownLevel + 10.0;
-            double b = (baseExperience * enemyLevel) / 5.0;
+            double enemyCount = CalculateEnemyCount(participatedPokemon, expShareCount, holdsExpShare);
+            
+            double b = (baseExperience * enemyLevel) / (5.0 * enemyCount);
+            // Trainer Bonus must be applied here
             if (!isWild)
                 b = b * 1.5;
-            if (expShareCount > 0)
-                b = b / (expShareCount * 2.0);
-            b = Math.Floor(b / participatedPokemon);
-            double experience = Math.Floor(Math.Floor(Math.Sqrt(a) * (a * a)) * b / Math.Floor(Math.Sqrt(c) * (c * c))) + 1.0;
 
+            // Adapted formula from http://www.serebii.net/games/exp.shtml
+            double experience = Math.Floor(Math.Floor(Math.Sqrt(a) * (a * a)) * Math.Floor(b) / Math.Floor(Math.Sqrt(c) * (c * c))) + 1.0;
+            
+            // Apply all other experience bonuses
             experience = ApplyExperienceBonus(experience, holdsLuckyEgg, tradingState, expPower);
 
             return Convert.ToInt32(Math.Floor(experience));
@@ -153,9 +156,9 @@ namespace PokeGuide.Core.Service
         {
             double count = participatedPokemon;
             if (expShareCount == 1.0 || holdsExpShare)
-                count = count * 2.0;
-            if (expShareCount > 1.0)
-                count = count * 2.0;
+                count = count * 2.0 * expShareCount;
+            else if (expShareCount > 1.0)
+                count = count * expShareCount;
 
             return count;
         }

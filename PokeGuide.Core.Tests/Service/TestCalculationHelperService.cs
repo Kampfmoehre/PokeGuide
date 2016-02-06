@@ -509,7 +509,7 @@ namespace PokeGuide.Core.Tests.Service
                 }
             };
 
-            IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
+            IList<Fighter> result = _service.CalculateBattleResult(4, fightInfo);
 
             Assert.AreEqual(64, result[0].EarnedExperience);
             Assert.AreEqual(0, result[1].EarnedExperience);
@@ -538,7 +538,7 @@ namespace PokeGuide.Core.Tests.Service
                 }
             };
 
-            IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
+            IList<Fighter> result = _service.CalculateBattleResult(4, fightInfo);
 
             Assert.AreEqual(0, result[0].EarnedExperience);
             Assert.AreEqual(180, result[1].EarnedExperience);
@@ -567,7 +567,7 @@ namespace PokeGuide.Core.Tests.Service
                 }
             };
 
-            IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
+            IList<Fighter> result = _service.CalculateBattleResult(4, fightInfo);
 
             Assert.AreEqual(0, result[0].EarnedExperience);
             Assert.AreEqual(96, result[1].EarnedExperience);
@@ -575,6 +575,238 @@ namespace PokeGuide.Core.Tests.Service
             Assert.AreEqual(360, result[3].EarnedExperience);
             Assert.AreEqual(144, result[4].EarnedExperience);
             Assert.AreEqual(144, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForFourthGen4()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 91, // Growlithe
+                EnemyIsWild = true,
+                EnemyLevel = 18,
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, HoldsExpShare = true },
+                    new Fighter { HasParticipated = true },
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsExpShare = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter()
+                }
+            };
+
+            IList<Fighter> result = _service.CalculateBattleResult(4, fightInfo);
+
+            Assert.AreEqual(97, result[0].EarnedExperience);
+            Assert.AreEqual(39, result[1].EarnedExperience);
+            Assert.AreEqual(0, result[2].EarnedExperience);
+            Assert.AreEqual(145, result[3].EarnedExperience);
+            Assert.AreEqual(0, result[4].EarnedExperience);
+            Assert.AreEqual(0, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForFifthGen1()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 87, // Tangela
+                EnemyIsWild = true,
+                EnemyLevel = 36,
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, Level = 31, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true, Level = 66 },
+                    new Fighter { HasParticipated = true, Level = 67 },
+                    new Fighter { HasParticipated = true, Level = 76 },
+                    new Fighter { HoldsExpShare = true, Level = 15, TradeState = TradeState.TradedNational }
+                }
+            };
+
+            IList<Fighter> result = _service.CalculateBattleResult(5, fightInfo);
+
+            Assert.AreEqual(138, result[0].EarnedExperience);
+            Assert.AreEqual(0, result[1].EarnedExperience);
+            Assert.AreEqual(54, result[2].EarnedExperience);
+            Assert.AreEqual(35, result[3].EarnedExperience);
+            Assert.AreEqual(29, result[4].EarnedExperience);
+            Assert.AreEqual(984, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForFifthGen2()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 77, // Lickitung
+                EnemyIsWild = false,
+                EnemyLevel = 62,
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, Level = 31, TradeState = TradeState.TradedNational },
+                    new Fighter { HasParticipated = true, Level = 65 },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HoldsExpShare = true, Level = 16, TradeState = TradeState.TradedNational }
+                }
+            };
+
+            IList<Fighter> result = _service.CalculateBattleResult(5, fightInfo);
+
+            Assert.AreEqual(1038, result[0].EarnedExperience);
+            Assert.AreEqual(339, result[1].EarnedExperience);
+            Assert.AreEqual(0, result[2].EarnedExperience);
+            Assert.AreEqual(0, result[3].EarnedExperience);
+            Assert.AreEqual(0, result[4].EarnedExperience);
+            Assert.AreEqual(3073, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForFifthGen3()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 168, // Darmanitan
+                EnemyIsWild = false,
+                EnemyLevel = 62,
+                Team = new List<Fighter>
+                {
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true, Level = 66 },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HoldsExpShare = true, Level = 25, TradeState = TradeState.TradedNational }
+                }
+            };
+
+            IList<Fighter> result = _service.CalculateBattleResult(5, fightInfo);
+
+            Assert.AreEqual(0, result[0].EarnedExperience);
+            Assert.AreEqual(0, result[1].EarnedExperience);
+            Assert.AreEqual(2178, result[2].EarnedExperience);
+            Assert.AreEqual(0, result[3].EarnedExperience);
+            Assert.AreEqual(0, result[4].EarnedExperience);
+            Assert.AreEqual(5256, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForFifthGen4()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 179, // Mienshao
+                EnemyIsWild = true,
+                EnemyLevel = 57,
+                Team = new List<Fighter>
+                {
+                    new Fighter { HoldsExpShare = true, Level = 68 },
+                    new Fighter { HasParticipated = true, Level = 65 },
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true, Level = 67 },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HoldsExpShare = true, Level = 27, TradeState = TradeState.TradedNational }
+                }
+            };
+
+            IList<Fighter> result = _service.CalculateBattleResult(5, fightInfo);
+
+            Assert.AreEqual(413, result[0].EarnedExperience);
+            Assert.AreEqual(437, result[1].EarnedExperience);
+            Assert.AreEqual(631, result[2].EarnedExperience);
+            Assert.AreEqual(0, result[3].EarnedExperience);
+            Assert.AreEqual(0, result[4].EarnedExperience);
+            Assert.AreEqual(1530, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForFifthGen5()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 125, // Tranquill
+                EnemyIsWild = true,
+                EnemyLevel = 55,
+                Team = new List<Fighter>
+                {
+                    new Fighter { HoldsExpShare = true, Level = 68 },
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true, Level = 67 },
+                    new Fighter { HasParticipated = true, Level = 34, TradeState = TradeState.TradedNational },
+                    new Fighter { HasParticipated = true, Level = 76 },
+                    new Fighter { HoldsExpShare = true, Level = 28, TradeState = TradeState.TradedNational }
+                }
+            };
+
+            IList<Fighter> result = _service.CalculateBattleResult(5, fightInfo);
+
+            Assert.AreEqual(266, result[0].EarnedExperience);
+            Assert.AreEqual(0, result[1].EarnedExperience);
+            Assert.AreEqual(271, result[2].EarnedExperience);
+            Assert.AreEqual(556, result[3].EarnedExperience);
+            Assert.AreEqual(154, result[4].EarnedExperience);
+            Assert.AreEqual(973, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForFifthGen6()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 166, // Sawsbuck
+                EnemyIsWild = true,
+                EnemyLevel = 55,
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, HoldsExpShare = true, Level = 68 },
+                    new Fighter { HasParticipated = true, Level = 66 },
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true, Level = 67 },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HoldsExpShare = true, Level = 28, TradeState = TradeState.TradedNational }
+                }
+            };
+
+            IList<Fighter> result = _service.CalculateBattleResult(5, fightInfo);
+
+            Assert.AreEqual(588, result[0].EarnedExperience);
+            Assert.AreEqual(245, result[1].EarnedExperience);
+            Assert.AreEqual(360, result[2].EarnedExperience);
+            Assert.AreEqual(0, result[3].EarnedExperience);
+            Assert.AreEqual(0, result[4].EarnedExperience);
+            Assert.AreEqual(1294, result[5].EarnedExperience);
+        }
+
+        [Test]
+        public void ShouldCalculateTeamResultCorrectForFifthGen7()
+        {
+            var fightInfo = new FightInformation
+            {
+                EnemyBaseExperience = 179, // Mienshao
+                EnemyIsWild = true,
+                EnemyLevel = 56,
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, HoldsExpShare = true, Level = 68 },
+                    new Fighter { HasParticipated = true, Level = 66 },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsExpShare = true, Level = 29, TradeState = TradeState.TradedNational }
+                }
+            };
+
+            IList<Fighter> result = _service.CalculateBattleResult(5, fightInfo);
+
+            Assert.AreEqual(661, result[0].EarnedExperience);
+            Assert.AreEqual(275, result[1].EarnedExperience);
+            Assert.AreEqual(0, result[2].EarnedExperience);
+            Assert.AreEqual(0, result[3].EarnedExperience);
+            Assert.AreEqual(0, result[4].EarnedExperience);
+            Assert.AreEqual(2341, result[5].EarnedExperience);
         }
     }
 }
