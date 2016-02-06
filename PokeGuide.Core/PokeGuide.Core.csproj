@@ -50,6 +50,8 @@
     <Compile Include="Database\DbVersion.cs" />
     <Compile Include="Database\Queries.cs" />
     <Compile Include="Design\DesginDataService.cs" />
+    <Compile Include="Enum\ExpPower.cs" />
+    <Compile Include="Enum\TradeState.cs" />
     <Compile Include="Event\SelectedItemChangedEventArgs.cs" />
     <Compile Include="Model\Ability.cs" />
     <Compile Include="Model\DamageClass.cs" />
@@ -74,9 +76,11 @@
     <Compile Include="Service\CalculationHelperService.cs" />
     <Compile Include="Service\CalculationService.cs" />
     <Compile Include="Service\DataService.cs" />
+    <Compile Include="Service\ExperienceCalculationService.cs" />
     <Compile Include="Service\Interface\ICalculationHelperService.cs" />
     <Compile Include="Service\Interface\ICalculationService.cs" />
     <Compile Include="Service\Interface\IDataService.cs" />
+    <Compile Include="Service\Interface\IExperienceCalculationService.cs" />
     <Compile Include="Service\Interface\ISettingsService.cs" />
     <Compile Include="Service\Interface\IStorageService.cs" />
     <Compile Include="ViewModel\AbilityViewModel.cs" />

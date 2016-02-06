@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using PokeGuide.Core.Enum;
 using PokeGuide.Core.Model;
 using PokeGuide.Core.Service.Interface;
 
@@ -9,11 +9,11 @@ namespace PokeGuide.Core.Service
 {
     public class CalculationHelperService : ICalculationHelperService
     {
-        readonly ICalculationService _calculator;
+        readonly IExperienceCalculationService _experienceCalculator;
 
-        public CalculationHelperService(ICalculationService calculator)
+        public CalculationHelperService(IExperienceCalculationService experienceCalculator)
         {
-            _calculator = calculator;
+            _experienceCalculator = experienceCalculator;
         }
 
         public IList<Fighter> CalculateBattleResult(byte generation, FightInformation fightInfo)
@@ -40,21 +40,39 @@ namespace PokeGuide.Core.Service
                 {
                     // Calculate experience that is earned directly through actively defeating the enemy
                     if (generation == 1)
-                        fighter.EarnedExperience = _calculator.CalculateExperienceForFirstGen(fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.IsTraded, fightInfo.ExpAllActive, 0);
+                        fighter.EarnedExperience = _experienceCalculator.CalculateExperienceForFirstGen(fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.TradeState == TradeState.TradedNational, fightInfo.ExpAllActive, 0);
                     else
-                        fighter.EarnedExperience = _calculator.CalculateExperience(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.IsTraded, fighter.HoldsLuckyEgg, expShareCount);
+                        fighter.EarnedExperience = CalculateExperienceYield(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.TradeState, fighter.HoldsLuckyEgg, expShareCount, false);
                 }
                 
                 // if the active fighter also holds Exp.Share he will be given both direct exp from fight and Exp.Share output, so we sum them
                 if (fighter.HoldsExpShare && generation > 1)
-                    fighter.EarnedExperience += _calculator.CalculateExperience(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, 1, fightInfo.EnemyIsWild, fighter.IsTraded, fighter.HoldsLuckyEgg, expShareCount, true);
+                    fighter.EarnedExperience += CalculateExperienceYield(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, 1, fightInfo.EnemyIsWild, fighter.TradeState, fighter.HoldsLuckyEgg, expShareCount, true);
 
                 // In first gen with activated Exp.All you get half the Exp + the Exp.All output so we calculate both and sum them
                 if (teamCount > 0 && generation == 1)
-                    fighter.EarnedExperience += _calculator.CalculateExperienceForFirstGen(fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.IsTraded, fightInfo.ExpAllActive, teamCount);
+                    fighter.EarnedExperience += _experienceCalculator.CalculateExperienceForFirstGen(fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.TradeState == TradeState.TradedNational, fightInfo.ExpAllActive, teamCount);
             }
 
             return fightInfo.Team;
+        }
+
+        int CalculateExperienceYield(int generation, ushort baseExperience, byte enemyLevel, byte participated, bool isWild, TradeState tradeState, bool holdsLuckyEgg, byte expShareCount, bool holdsExpShare)
+        {
+            bool isTraded = tradeState == TradeState.TradedNational;
+            switch (generation)
+            {
+                case 2:
+                    return _experienceCalculator.CalculateExperienceForSecondGen(baseExperience, enemyLevel, participated, isWild, isTraded, holdsLuckyEgg, expShareCount, holdsExpShare);
+                case 3:
+                    return _experienceCalculator.CalculateExperienceForThirdGen(baseExperience, enemyLevel, participated, isWild, isTraded, holdsLuckyEgg, expShareCount, holdsExpShare);
+                case 4:
+                    return _experienceCalculator.CalculateExperienceForFourthGen(baseExperience, enemyLevel, participated, isWild, tradeState, holdsLuckyEgg, expShareCount, holdsExpShare);
+                //case 5:
+                //    return _experienceCalculator.CalculateExperienceForFifthGen(baseExperience, enemyLevel, participated,)
+            }
+
+            return 0;
         }
     }
 }

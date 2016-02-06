@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using PokeGuide.Core.Enum;
 using PokeGuide.Core.Model;
 using PokeGuide.Core.Service;
 using PokeGuide.Core.Service.Interface;
@@ -17,7 +18,7 @@ namespace PokeGuide.Core.Tests.Service
         [SetUp]
         public void SetUp()
         {
-            ICalculationService calculator = new CalculationService();
+            IExperienceCalculationService calculator = new ExperienceCalculationService();
             _service = new CalculationHelperService(calculator);
         }
 
@@ -30,12 +31,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyIsWild = false,
                 EnemyLevel = 54,
                 ExpAllActive = false,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational },
+                    new Fighter()
+                }
             };
-            fightInfo.Team[0].HasParticipated = true;
-            fightInfo.Team[0].IsTraded = true;
-            fightInfo.Team[4].HasParticipated = true;
-            fightInfo.Team[4].IsTraded = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(1, fightInfo);
 
@@ -56,15 +61,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyIsWild = false,
                 EnemyLevel = 56,
                 ExpAllActive = false,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter { HasParticipated = true },
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational },
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational }
+                }
             };
-            fightInfo.Team[0].HasParticipated = true;
-            fightInfo.Team[0].IsTraded = true;
-            fightInfo.Team[2].HasParticipated = true;
-            fightInfo.Team[4].HasParticipated = true;
-            fightInfo.Team[4].IsTraded = true;
-            fightInfo.Team[5].HasParticipated = true;
-            fightInfo.Team[5].IsTraded = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(1, fightInfo);
 
@@ -85,13 +91,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyIsWild = true,
                 EnemyLevel = 30,
                 ExpAllActive = true,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational },
+                    new Fighter { TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { TradeState = TradeState.TradedNational },
+                    new Fighter { TradeState = TradeState.TradedNational }
+                }
             };
-            fightInfo.Team[0].HasParticipated = true;
-            fightInfo.Team[0].IsTraded = true;
-            fightInfo.Team[1].IsTraded = true;
-            fightInfo.Team[4].IsTraded = true;
-            fightInfo.Team[5].IsTraded = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(1, fightInfo);
 
@@ -112,14 +121,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyIsWild = false,
                 EnemyLevel = 53,
                 ExpAllActive = true,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational },
+                    new Fighter { TradeState = TradeState.TradedNational },
+                    new Fighter { HasParticipated = true },
+                    new Fighter(),
+                    new Fighter { TradeState = TradeState.TradedNational },
+                    new Fighter { TradeState = TradeState.TradedNational }
+                }
             };
-            fightInfo.Team[0].HasParticipated = true;
-            fightInfo.Team[0].IsTraded = true;
-            fightInfo.Team[1].IsTraded = true;
-            fightInfo.Team[2].HasParticipated = true;
-            fightInfo.Team[4].IsTraded = true;
-            fightInfo.Team[5].IsTraded = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(1, fightInfo);
 
@@ -139,10 +150,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 189, // Donphan
                 EnemyIsWild = true,
                 EnemyLevel = 33,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsExpShare = true },
+                    new Fighter()
+                }
             };
-            fightInfo.Team[4].HasParticipated = true;
-            fightInfo.Team[4].HoldsExpShare = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(2, fightInfo);
 
@@ -162,11 +179,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 108, // Onix
                 EnemyIsWild = true,
                 EnemyLevel = 36,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HoldsExpShare = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HasParticipated = true }
+                }
             };
-            fightInfo.Team[2].HoldsExpShare = true;
-            fightInfo.Team[2].IsTraded = true;
-            fightInfo.Team[5].HasParticipated = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(2, fightInfo);
 
@@ -186,12 +208,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 189, // Donphan
                 EnemyIsWild = true,
                 EnemyLevel = 33,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HoldsExpShare = true },
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HasParticipated = true },
+                    new Fighter()
+                }
             };
-            fightInfo.Team[0].HoldsExpShare = true;
-            fightInfo.Team[1].HasParticipated = true;
-            fightInfo.Team[1].IsTraded = true;
-            fightInfo.Team[4].HasParticipated = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(2, fightInfo);
 
@@ -211,12 +237,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 171, // Golbat
                 EnemyIsWild = true,
                 EnemyLevel = 32,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HoldsExpShare = true },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter()
+                }
             };
-            fightInfo.Team[0].HoldsExpShare = true;
-            fightInfo.Team[3].IsTraded = true;
-            fightInfo.Team[3].HasParticipated = true;
-            fightInfo.Team[3].HoldsLuckyEgg = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(2, fightInfo);
 
@@ -236,12 +266,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 134, // Graveler
                 EnemyIsWild = true,
                 EnemyLevel = 32,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HoldsExpShare = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true }
+                }
             };
-            fightInfo.Team[2].HoldsExpShare = true;
-            fightInfo.Team[2].IsTraded = true;
-            fightInfo.Team[5].HasParticipated = true;
-            fightInfo.Team[5].HoldsLuckyEgg = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(2, fightInfo);
 
@@ -261,11 +295,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 171, // Xatu
                 EnemyIsWild = false,
                 EnemyLevel = 40,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HoldsExpShare = true }
+                }
             };
-            fightInfo.Team[0].HoldsLuckyEgg = true;
-            fightInfo.Team[0].HasParticipated = true;
-            fightInfo.Team[5].HoldsExpShare = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(2, fightInfo);
 
@@ -285,14 +324,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 137, // Jynx
                 EnemyIsWild = false,
                 EnemyLevel = 41,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true },
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter { HasParticipated = true },
+                    new Fighter(),
+                    new Fighter { HoldsExpShare = true }
+                }
             };
-            fightInfo.Team[0].HoldsLuckyEgg = true;
-            fightInfo.Team[0].HasParticipated = true;
-            fightInfo.Team[1].IsTraded = true;
-            fightInfo.Team[1].HasParticipated = true;
-            fightInfo.Team[3].HasParticipated = true;
-            fightInfo.Team[5].HoldsExpShare = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(2, fightInfo);
 
@@ -312,12 +353,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 171, // Xatu
                 EnemyIsWild = false,
                 EnemyLevel = 42,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsExpShare = true }
+                }
             };
-            fightInfo.Team[2].HasParticipated = true;
-            fightInfo.Team[2].IsTraded = true;
-            fightInfo.Team[5].HasParticipated= true;
-            fightInfo.Team[5].HoldsExpShare = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(2, fightInfo);
 
@@ -337,15 +382,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 126, // Loudred
                 EnemyIsWild = true,
                 EnemyLevel = 40,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true },
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter { HoldsExpShare = true, TradeState = TradeState.TradedNational },
+                    new Fighter()
+                }
             };
-            fightInfo.Team[0].HasParticipated = true;
-            fightInfo.Team[0].HoldsLuckyEgg = true;
-            fightInfo.Team[2].HasParticipated = true;
-            fightInfo.Team[2].IsTraded = true;
-            fightInfo.Team[2].HoldsLuckyEgg = true;
-            fightInfo.Team[4].HoldsExpShare = true;
-            fightInfo.Team[4].IsTraded = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
 
@@ -365,15 +411,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 171, // Golbat
                 EnemyIsWild = true,
                 EnemyLevel = 40,
-                Team = SetUpTeam()
-            };            
-            fightInfo.Team[1].HasParticipated = true;
-            fightInfo.Team[3].HasParticipated = true;
-            fightInfo.Team[4].HasParticipated = true;
-            fightInfo.Team[4].IsTraded = true;
-            fightInfo.Team[4].HoldsExpShare = true;
-            fightInfo.Team[5].HasParticipated = true;
-            fightInfo.Team[5].IsTraded = true;
+                Team = new List<Fighter>
+                {
+                    new Fighter(),
+                    new Fighter { HasParticipated = true },
+                    new Fighter(),
+                    new Fighter { HasParticipated = true },
+                    new Fighter { HasParticipated = true, HoldsExpShare = true, TradeState = TradeState.TradedNational },
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational }
+                }
+            };
 
             IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
 
@@ -393,20 +440,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 128, // Mightyena
                 EnemyIsWild = false,
                 EnemyLevel = 46,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true },
+                    new Fighter { HasParticipated = true },
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true, TradeState = TradeState.TradedNational },
+                    new Fighter { HasParticipated = true },
+                    new Fighter { HasParticipated = true, HoldsExpShare = true, TradeState = TradeState.TradedNational },
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational }
+                }
             };
-            fightInfo.Team[0].HoldsLuckyEgg = true;
-            fightInfo.Team[0].HasParticipated = true;
-            fightInfo.Team[1].HasParticipated = true;
-            fightInfo.Team[2].HasParticipated = true;
-            fightInfo.Team[2].HoldsLuckyEgg = true;
-            fightInfo.Team[2].IsTraded = true;
-            fightInfo.Team[3].HasParticipated = true;
-            fightInfo.Team[4].HasParticipated = true;
-            fightInfo.Team[4].IsTraded = true;
-            fightInfo.Team[4].HoldsExpShare = true;
-            fightInfo.Team[5].HasParticipated = true;
-            fightInfo.Team[5].IsTraded = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
 
@@ -426,17 +469,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 181, // Shiftry
                 EnemyIsWild = false,
                 EnemyLevel = 48,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true },
+                    new Fighter { HasParticipated = true },
+                    new Fighter { HasParticipated = true, HoldsLuckyEgg = true, TradeState = TradeState.TradedNational },
+                    new Fighter { HasParticipated = true },
+                    new Fighter { HoldsExpShare = true, TradeState = TradeState.TradedNational },
+                    new Fighter()
+                }
             };
-            fightInfo.Team[0].HoldsLuckyEgg = true;
-            fightInfo.Team[0].HasParticipated = true;
-            fightInfo.Team[1].HasParticipated = true;
-            fightInfo.Team[2].HasParticipated = true;
-            fightInfo.Team[2].HoldsLuckyEgg = true;
-            fightInfo.Team[2].IsTraded = true;
-            fightInfo.Team[3].HasParticipated = true;
-            fightInfo.Team[4].IsTraded = true;
-            fightInfo.Team[4].HoldsExpShare = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
 
@@ -456,14 +498,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 117, // Nidorina
                 EnemyIsWild = true,
                 EnemyLevel = 23,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter { HasParticipated = true },
+                    new Fighter(),
+                    new Fighter { HasParticipated = true },
+                    new Fighter { HoldsExpShare = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsExpShare = true }
+                }
             };
-            fightInfo.Team[0].HasParticipated = true;
-            fightInfo.Team[2].HasParticipated = true;
-            fightInfo.Team[3].HoldsExpShare = true;
-            fightInfo.Team[3].IsTraded = true;
-            fightInfo.Team[5].HasParticipated = true;
-            fightInfo.Team[5].HoldsExpShare = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
 
@@ -483,12 +527,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 90, // Grimer
                 EnemyIsWild = true,
                 EnemyLevel = 28,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter(),
+                    new Fighter { HasParticipated = true },
+                    new Fighter(),
+                    new Fighter { HoldsExpShare = true, TradeState = TradeState.TradedNational },
+                    new Fighter(),
+                    new Fighter { HoldsExpShare = true }
+                }
             };
-            fightInfo.Team[1].HasParticipated = true;
-            fightInfo.Team[3].HoldsExpShare = true;
-            fightInfo.Team[3].IsTraded = true;
-            fightInfo.Team[5].HoldsExpShare = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
 
@@ -508,15 +556,16 @@ namespace PokeGuide.Core.Tests.Service
                 EnemyBaseExperience = 162, // Noctowl
                 EnemyIsWild = true,
                 EnemyLevel = 25,
-                Team = SetUpTeam()
+                Team = new List<Fighter>
+                {
+                    new Fighter(),
+                    new Fighter { HasParticipated = true },
+                    new Fighter(),
+                    new Fighter { HasParticipated = true, HoldsExpShare = true, TradeState = TradeState.TradedNational },
+                    new Fighter { HasParticipated = true, TradeState = TradeState.TradedNational },
+                    new Fighter { HoldsExpShare = true }
+                }
             };
-            fightInfo.Team[1].HasParticipated = true;
-            fightInfo.Team[3].HasParticipated = true;
-            fightInfo.Team[3].HoldsExpShare = true;
-            fightInfo.Team[3].IsTraded = true;
-            fightInfo.Team[4].HasParticipated = true;
-            fightInfo.Team[4].IsTraded = true;
-            fightInfo.Team[5].HoldsExpShare = true;
 
             IList<Fighter> result = _service.CalculateBattleResult(3, fightInfo);
 
@@ -526,61 +575,6 @@ namespace PokeGuide.Core.Tests.Service
             Assert.AreEqual(360, result[3].EarnedExperience);
             Assert.AreEqual(144, result[4].EarnedExperience);
             Assert.AreEqual(144, result[5].EarnedExperience);
-        }
-
-        List<Fighter> SetUpTeam()
-        {
-            return new List<Fighter>
-            {
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = false,
-                    Pokemon = new TeamPokemon()
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = false,
-                    Pokemon = new TeamPokemon()
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = false,
-                    Pokemon = new TeamPokemon()
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = false,
-                    Pokemon = new TeamPokemon()
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = false,
-                    Pokemon = new TeamPokemon()
-                },
-                new Fighter
-                {
-                    HasParticipated = false,
-                    HoldsExpShare = false,
-                    HoldsLuckyEgg = false,
-                    IsTraded = false,
-                    Pokemon = new TeamPokemon()
-                }                
-            };
         }
     }
 }

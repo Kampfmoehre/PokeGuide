@@ -71,6 +71,7 @@
     <Compile Include="Service\TestCalculationHelperService.cs" />
     <Compile Include="Service\TestCalculationService.cs" />
     <Compile Include="Service\TestDataService.cs" />
+    <Compile Include="Service\TestExperienceCalculationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
