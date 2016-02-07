@@ -16,6 +16,8 @@ namespace PokeGuide.Core.Model
         int _earnedExperience;
         bool _holdsExpShare;
         byte _level;
+        bool _hasAffection;
+        bool _couldEvolved;
 
         /// <summary>
         /// Sets and gets the 
@@ -72,6 +74,22 @@ namespace PokeGuide.Core.Model
         {
             get { return _earnedExperience; }
             set { Set(() => EarnedExperience, ref _earnedExperience, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public bool HasAffection
+        {
+            get { return _hasAffection; }
+            set { Set(() => HasAffection, ref _hasAffection, value); }
+        }
+        /// <summary>
+        /// Sets and gets the 
+        /// </summary>
+        public bool CouldEvolved
+        {
+            get { return _couldEvolved; }
+            set { Set(() => CouldEvolved, ref _couldEvolved, value); }
         }
     }
 }

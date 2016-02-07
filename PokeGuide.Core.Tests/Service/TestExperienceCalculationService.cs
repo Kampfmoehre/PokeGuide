@@ -94,5 +94,54 @@ namespace PokeGuide.Core.Tests.Service
         {
             return _service.CalculateExperienceForFifthGen(baseExperience, enemyLevel, ownLevel, participatedPokemon, isWild, tradeState, holdsLuckyEgg, expShareCount, holdsExpShare, expPowerState);
         }
+
+        [TestCase((ushort)59, 29, true, TradeState.Original, false, ExpPower.None, false, false, false, true, ExpectedResult = 244, Description = "Wild Shuppet Level 29 defeated by one Pokémon")]
+        [TestCase((ushort)147, 29, true, TradeState.Original, true, ExpPower.None, false, false, false, true, ExpectedResult = 913, Description = "Wild Linoone Level 29 defeated by one Pokémon holding Lucky Egg")]
+        [TestCase((ushort)138, 28, true, TradeState.TradedNational, false, ExpPower.None, false, false, false, true, ExpectedResult = 828, Description = "Wild Gloom Level 28 defeated by one traded Pokémon")]
+        [TestCase((ushort)44, 2, true, TradeState.TradedInternational, false, ExpPower.None, false, false, false, true, ExpectedResult = 20, Description = "Wild Seedot Level 2 defeated by one international traded Pokémon")]
+        [TestCase((ushort)160, 17, true, TradeState.Original, false, ExpPower.None, false, false, false, true, ExpectedResult = 388, Description = "Wild Zangoose Level 17 defeated by two Pokémon")]
+        [TestCase((ushort)160, 17, true, TradeState.TradedInternational, false, ExpPower.None, false, false, false, true, ExpectedResult = 660, Description = "Wild Zangoose Level 17 defeated by two Pokémon (output from international traded Pokémon)")]
+        [TestCase((ushort)147, 25, false, TradeState.TradedInternational, true, ExpPower.None, false, false, false, true, ExpectedResult = 2007, Description = "Trainer Shelgon Level 25 defeated by three Pokémon (output from international traded Pokémon holding Lucky Egg)")]
+        [TestCase((ushort)147, 25, false, TradeState.TradedNational, false, ExpPower.None, false, false, false, true, ExpectedResult = 1180, Description = "Trainer Shelgon Level 25 defeated by three Pokémon (output from national traded Pokémon)")]
+        [TestCase((ushort)144, 25, false, TradeState.TradedInternational, true, ExpPower.None, false, false, false, true, ExpectedResult = 1966, Description = "Trainer Magcargo Level 25 defeated by two Pokémon (output from international traded Pokémon holding Lucky Egg)")]
+        [TestCase((ushort)144, 25, false, TradeState.TradedNational, false, ExpPower.None, false, false, false, true, ExpectedResult = 1156, Description = "Trainer Magcargo Level 25 defeated by two Pokémon (output from national traded Pokémon)")]
+        [TestCase((ushort)221, 45, false, TradeState.TradedInternational, true, ExpPower.PositiveStageTwo, false, false, false, true, ExpectedResult = 8146, Description = "Trainer Bellossom Level 45 defeated by two Pokémon while Exp Stage 2 O-Power was active (output from international traded Pokémon holding lucky egg)")]
+        [TestCase((ushort)221, 45, false, TradeState.Original, false, ExpPower.PositiveStageTwo, false, false, false, true, ExpectedResult = 3195, Description = "Trainer Bellossom Level 45 defeated by two Pokémon while Exp Stage 2 O-Power was active")]
+        [TestCase((ushort)248, 45, false, TradeState.TradedNational, false, ExpPower.PositiveStageTwo, false, false, false, true, ExpectedResult = 5379, Description = "Trainer Florges Level 45 defeated by two Pokémon while Exp Stage 2 O-Power was active")]
+        [TestCase((ushort)61, 14, true, TradeState.Original, false, ExpPower.None, false, false, false, true, ExpectedResult = 122, Description = "Wild Ducklett Level 14 defeated by one Pokémon")]
+        [TestCase((ushort)137, 46, true, TradeState.Original, false, ExpPower.None, false, false, false, true, ExpectedResult = 900, Description = "Wild Weepinbell Level 46 defeated by two Pokémon")]
+        [TestCase((ushort)151, 48, true, TradeState.Original, false, ExpPower.None, false, false, false, true, ExpectedResult = 1035, Description = "Wild Quagsire Level 48 defeated by three Pokémon")]
+        [TestCase((ushort)142, 23, true, TradeState.TradedNational, false, ExpPower.None, false, false, false, true, ExpectedResult = 699, Description = "Wild Pachirisu Level 23 defeated by one national traded Pokémon")]
+        [TestCase((ushort)63, 24, true, TradeState.TradedInternational, true, ExpPower.None, false, false, false, true, ExpectedResult = 550, Description = "Wild Slowpoke Level 24 defeated by one international traded Pokémon")]
+        [TestCase((ushort)151, 25, false, TradeState.Original, false, ExpPower.None, false, false, false, true, ExpectedResult = 808, Description = "Trainer Lairon Level 25 defeated by two Pokémon")]
+        [TestCase((ushort)144, 25, false, TradeState.TradedNational, false, ExpPower.None, false, false, false, true, ExpectedResult = 1156, Description = "Trainer Sudowoodo Level 25 defeated by one national traded Pokémon")]
+        [TestCase((ushort)56, 15, true, TradeState.TradedInternational, true, ExpPower.PositiveStageOne, false, false, false, true, ExpectedResult = 367, Description = "Wild Meditite Level 15 defeated by one international traded Pokémon holding lucky egg while Exp power 1 was active")]
+        [TestCase((ushort)49, 15, true, TradeState.TradedNational, false, ExpPower.PositiveStageOne, false, false, false, true, ExpectedResult = 188, Description = "Wild Zubat Level 15 defeated by one national traded Pokémon while Exp power 1 was active")]
+        [TestCase((ushort)137, 25, false, TradeState.Original, false, ExpPower.PositiveStageOne, false, false, false, true, ExpectedResult = 879, Description = "Trainer Ledian Level 25 defeated by one Pokémon while Exp power 1 was active")]
+        [TestCase((ushort)161, 25, false, TradeState.Original, false, ExpPower.PositiveStageOne, false, false, false, true, ExpectedResult = 1034, Description = "Trainer Mr. Mime Level 25 defeated by one Pokémon while Exp power 1 was active")]
+        [TestCase((ushort)145, 50, false, TradeState.TradedInternational, true, ExpPower.PositiveStageOne, false, false, false, true, ExpectedResult = 4748, Description = "Trainer Masquerain Level 50 defeated by one international traded Pokémon holding Lucky Egg while Exp power 1 was active")]
+        [TestCase((ushort)185, 50, false, TradeState.TradedInternational, true, ExpPower.PositiveStageOne, false, false, false, true, ExpectedResult = 6062, Description = "Trainer Vivillon Level 50 defeated by one international traded Pokémon holding Lucky Egg while Exp power 1 was active")]
+        [TestCase((ushort)185, 50, false, TradeState.Original, false, ExpPower.PositiveStageOne, false, false, false, true, ExpectedResult = 2377, Description = "Trainer Vivillon Level 50 defeated by one Pokémon while Exp power 1 was active")]
+        [TestCase((ushort)138, 29, true, TradeState.Original, false, ExpPower.None, true, false, false, true, ExpectedResult = 685, Description = "Wild Gloom Level 29 defeated by one Pokémon with affection")]
+        [TestCase((ushort)138, 28, true, TradeState.Original, false, ExpPower.PositiveStageOne, true, false, false, true, ExpectedResult = 794, Description = "Wild Gloom Level 29 defeated by one Pokémon with affection while Exp power 1 was active")]
+        [TestCase((ushort)138, 28, true, TradeState.Original, true, ExpPower.None, true, false, false, true, ExpectedResult = 993, Description = "Wild Gloom Level 29 defeated by one Pokémon with affection while Exp power 1 was active")]
+        [TestCase((ushort)59, 27, true, TradeState.Original, true, ExpPower.PositiveStageOne, true, false, false, true, ExpectedResult = 489, Description = "Wild Gloom Level 29 defeated by one Pokémon with affection while Exp power 1 was active")]
+        [TestCase((ushort)270, 45, false, TradeState.Original, false, ExpPower.PositiveStageTwo, false, false, false, true, ExpectedResult = 3903, Description = "Trainer Goodra Level 45 defeated by three Pokémon")]
+        public int ShouldCalculateExperienceForGen6(ushort baseExperience, byte enemyLevel, bool isWild, TradeState tradeState, bool holdsLuckyEgg, ExpPower expPowerState, bool hasAffection, bool couldEvolve, bool expShareActive, bool isActive)
+        {
+            return _service.CalculateExperienceForSixthGen(baseExperience, enemyLevel, isWild, tradeState, holdsLuckyEgg, expPowerState, hasAffection, couldEvolve, expShareActive, isActive);
+        }
+
+        /*
+        144, 25, false, TradeState.TradedInternational, true, ExpPower.None, false, false, false, true, ExpectedResult = 1966, 1965
+        145, 50, false, TradeState.TradedInternational, true, ExpPower.PositiveStageOne, false, false, false, true, ExpectedResult = 4748, 4749
+        147, 25, false, TradeState.TradedInternational, true, ExpPower.None, false, false, false, true, ExpectedResult = 2007, 2006
+        160, 17, true, TradeState.TradedInternational, false, ExpPower.None, false, false, false, true, ExpectedResult = 660, 659
+        185, 50, false, TradeState.Original, false, ExpPower.PositiveStageOne, false, false, false, true, ExpectedResult = 2377, 2378
+        185, 50, false, TradeState.TradedInternational, true, ExpPower.PositiveStageOne, false, false, false, true, ExpectedResult = 6062, 6063
+        216, 45, false, TradeState.Original, false, ExpPower.PositiveStageTwo, false, false, false, true, ExpectedResult = 3195, 3123
+        216, 45, false, TradeState.TradedInternational, true, ExpPower.PositiveStageTwo, false, false, false, true, ExpectedResult = 8146, 7962
+        49, 15, true, TradeState.TradedNational, false, ExpPower.PositiveStageOne, false, false, false, true, ExpectedResult = 188, 189
+        */
     }
 }

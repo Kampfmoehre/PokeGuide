@@ -146,6 +146,88 @@ namespace PokeGuide.Core.Service
             return Convert.ToInt32(Math.Floor(experience));
         }
         /// <summary>
+        /// Calculates experience points gained from a battle in sixth generation (XY, OrAs, ...)
+        /// </summary>
+        /// <param name="baseExperience">The base experience of the defeated Pokémon</param>
+        /// <param name="enemyLevel">The level of the defeated Pokémon</param>
+        /// <param name="isWild"><c>True</c> if the enemy is a wild Pokémon</param>
+        /// <param name="tradingState">The state of the Pokémon (Owned by Player, traded, traded from another country)</param>
+        /// <param name="holdsLuckyEgg"><c>True</c> if the Pokémon holds a Lucky Egg</param>
+        /// <param name="expPower">The state of Pass Power (5th Gen C-Gear feature)</param>
+        /// <param name="couldEvolve"><c>True</c> if the Pokémon is at a level where it could have evolved but didn't</param>
+        /// <param name="hasAffection"><c>True</c> when the Pokémon has 2 or more hearts in PokémonAmie</param>
+        /// <param name="expShareActive"><c>True</c> when Exp.Share is active</param>
+        /// <param name="isActive"><c>False</c> when the Pokémon was not in the battle and Exp.Share is active, else <c>true</c></param>
+        /// <returns>The calculated experience points for the Pokémon</returns>
+        public int CalculateExperienceForSixthGen(ushort baseExperience, byte enemyLevel, bool isWild, TradeState tradingState, bool holdsLuckyEgg, ExpPower expPower, bool hasAffection, bool couldEvolve, bool expShareActive, bool isActive)
+        {
+            double a = isWild ? 1.0 : 1.5;
+            double b = holdsLuckyEgg ? 1.5 : 1.0;
+            double c = hasAffection ? 1.2 : 1.0;
+            double d = ConvertExpPowerToDouble(expPower);
+            double e = couldEvolve ? 1.2 : 1.0;
+            double f = 1.0;
+            if (tradingState == TradeState.TradedNational)
+                f = 1.5;
+            else if (tradingState == TradeState.TradedInternational)
+                f = 1.7;
+            double g = isActive ? 1.0 : 2.0;
+
+            //double h = (baseExperience * enemyLevel * a * b * c * d * e * f) / (7.0 * g);
+            //return Convert.ToInt32(Math.Round(h, MidpointRounding.AwayFromZero));
+
+            //double decimalPart = experience - Math.Truncate(experience);
+            //if (decimalPart == 0.5)
+            //    return Convert.ToInt32(Math.Floor(experience));
+
+            //return Convert.ToInt32(Math.Floor(h));
+            //return Convert.ToInt32(Math.Round(h, MidpointRounding.AwayFromZero));
+
+            double enemyCount = isActive ? 1.0 : 2.0;
+
+            double experience = Math.Floor((baseExperience * enemyLevel) / (enemyCount * 7.0));
+            if (tradingState != TradeState.Original)
+                experience = Math.Floor(experience * f);
+            if (holdsLuckyEgg)
+                experience = Math.Floor(experience * b);
+            if (!isWild)
+                experience = Math.Floor(experience * a);
+            if (d != 1.0)
+                experience = Math.Floor(experience * d);
+            if (hasAffection)
+                experience = Math.Floor(experience * c);
+            if (couldEvolve)
+                experience = Math.Floor(experience * e);
+            //experience = ApplyExperienceBonus(experience, isWild, holdsLuckyEgg, tradingState, expPower, hasAffection, couldEvolve);
+            //if (!isWild)
+            //    experience = Math.Floor(experience + (experience * 0.5));
+            //double multi = f * b * c * e * d;
+            //experience = experience * multi;
+            //if (tradingState == TradeState.TradedNational)
+            //    experience = Math.Floor(experience * 1.5);
+            //else if (tradingState == TradeState.TradedInternational)
+            //    experience = experience * 1.7;
+            //experience = experience * b;
+            //experience = experience * c;
+            //experience = experience * e;
+            //experience = experience * d;
+
+            return Convert.ToInt32(Math.Floor(experience));
+            //double decimalPart = experience - Math.Truncate(experience);
+            //if (decimalPart == 0.5)
+            //    return Convert.ToInt32(Math.Floor(experience));
+            //return Convert.ToInt32(Math.Round(experience, MidpointRounding.AwayFromZero));
+        }
+
+        double CheckRoundDown(double a)
+        {
+            double decimalPart = a - Math.Truncate(a);
+            if (Math.Round(decimalPart, 1, MidpointRounding.AwayFromZero) == 0.5)
+                return Convert.ToInt32(Math.Floor(a));
+            return a;
+        }
+
+        /// <summary>
         /// Calculates the divisor for experience calculations
         /// </summary>
         /// <param name="participatedPokemon">The number of Pokémon that participated in the battle and did not fainted</param>
@@ -166,9 +248,9 @@ namespace PokeGuide.Core.Service
         /// Takes calculated experience and applies bonus multiplier for some conditions
         /// </summary>
         /// <param name="experience">The experience</param>
-        /// <param name="isWild"><c>True</c> if the Pokémon is a wild Pokémon</param>
-        /// <param name="isTraded"><c>True</c> if the Pokémon has a different Trainer ID then the player</param>
+        /// <param name="isWild"><c>True</c> if the enemy is a wild Pokémon</param>
         /// <param name="holdsLuckyEgg"><c>True</c> if the Pokémon holds a Lucky Egg</param>
+        /// <param name="tradingState">The trading state of the Pokémon</param>
         /// <returns>The experience with applied bonus</returns>
         double ApplyExperienceBonus(double experience, bool isWild, bool holdsLuckyEgg, TradeState tradingState)
         {
@@ -189,9 +271,9 @@ namespace PokeGuide.Core.Service
         /// Takes calculated experience and applies bonus multiplier for some conditions
         /// </summary>
         /// <param name="experience">The experience</param>
-        /// <param name="isWild"><c>True</c> if the Pokémon is a wild Pokémon</param>
-        /// <param name="isTraded"><c>True</c> if the Pokémon has a different Trainer ID then the player</param>
         /// <param name="holdsLuckyEgg"><c>True</c> if the Pokémon holds a Lucky Egg</param>
+        /// <param name="tradingState">The trading state of the Pokémon</param>
+        /// <param name="expPower">The state of Pass Power or O-Power</param>
         /// <returns>The experience with applied bonus</returns>
         double ApplyExperienceBonus(double experience, bool holdsLuckyEgg, TradeState tradingState, ExpPower expPower)
         {
@@ -200,16 +282,44 @@ namespace PokeGuide.Core.Service
 
             // Modifier for traded Pokémon
             if (tradingState == TradeState.TradedNational)
-                experience = experience * 1.5;
+                experience = Math.Floor(experience * 1.5);
             else if (tradingState == TradeState.TradedInternational)
-                experience = experience * 1.7;
+                experience = Math.Floor(experience * 1.7);
 
             if (expPower != ExpPower.None)
             {
                 // Modifier for Exp Point Power
                 double expMod = ConvertExpPowerToDouble(expPower);
-                experience = experience * expMod;
+                experience = Math.Floor(experience * expMod);
             }
+
+            return experience;
+        }
+        /// <summary>
+        /// Takes calculated experience and applies bonus multiplier for some conditions
+        /// </summary>
+        /// <param name="experience">The experience</param>
+        /// <param name="isWild"><c>True</c> if the enemy is a wild Pokémon</param>
+        /// <param name="holdsLuckyEgg"><c>True</c> if the Pokémon holds a Lucky Egg</param>
+        /// <param name="tradingState">The trading state of the Pokémon</param>
+        /// <param name="expPower">The state of Pass Power or O-Power</param>
+        /// <param name="hasAffection"><c>True</c> if the Pokémon has 2 or more hearts in Pokémon-Amie</param>
+        /// <param name="couldEvolve"><c>True</c> if the Pokémon is at a level where it could have evolved but didn't</param>
+        /// <returns>The experience with applied bonus</returns>
+        double ApplyExperienceBonus(double experience, bool isWild, bool holdsLuckyEgg, TradeState tradingState, ExpPower expPower, bool hasAffection, bool couldEvolve)
+        {
+            experience = ApplyExperienceBonus(experience, holdsLuckyEgg, tradingState, expPower);
+            //experience = Math.Round(experience, MidpointRounding.AwayFromZero);
+
+            if (!isWild) // Modifier for Trainer
+                experience = experience * 1.5;
+
+            if (hasAffection) // Modifier for Pokémon-Amie
+                experience = experience * 1.2;
+
+            if (couldEvolve) // Modifier for Pokémon that could have evolved
+                experience = experience * 1.2;
+
             return experience;
         }
         /// <summary>

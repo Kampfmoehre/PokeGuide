@@ -41,6 +41,8 @@ namespace PokeGuide.Core.Service
                     // Calculate experience that is earned directly through actively defeating the enemy
                     if (generation == 1)
                         fighter.EarnedExperience = _experienceCalculator.CalculateExperienceForFirstGen(fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, participated, fightInfo.EnemyIsWild, fighter.TradeState == TradeState.TradedNational, fightInfo.ExpAllActive, 0);
+                    else if (generation == 6)
+                        fighter.EarnedExperience = _experienceCalculator.CalculateExperienceForSixthGen(fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, fightInfo.EnemyIsWild, fighter.TradeState, fighter.HoldsLuckyEgg, fightInfo.ExpPowerState, fighter.HasAffection, fighter.CouldEvolved, fightInfo.ExpAllActive, true);
                     else
                         fighter.EarnedExperience = CalculateExperienceYield(generation, fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, fighter.Level, participated, fightInfo.EnemyIsWild, fighter.TradeState, fighter.HoldsLuckyEgg, expShareCount, false, fightInfo.ExpPowerState);
                 }
@@ -57,6 +59,9 @@ namespace PokeGuide.Core.Service
                 // More tests are needed to evaluate this, maybe Exp Calc is wrong somewhere
                 if (generation == 5 && fighter.HasParticipated && fighter.HoldsExpShare && expShareCount > 1)
                     fighter.EarnedExperience = fighter.EarnedExperience - 1;
+
+                if (generation == 6 && fightInfo.ExpAllActive)
+                    fighter.EarnedExperience = _experienceCalculator.CalculateExperienceForSixthGen(fightInfo.EnemyBaseExperience, fightInfo.EnemyLevel, fightInfo.EnemyIsWild, fighter.TradeState, fighter.HoldsLuckyEgg, fightInfo.ExpPowerState, fighter.HasAffection, fighter.CouldEvolved, fightInfo.ExpAllActive, false);
             }
 
             return fightInfo.Team;
