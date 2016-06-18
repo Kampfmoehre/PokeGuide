@@ -108,8 +108,8 @@ namespace PokeGuide
                 // und die neue Seite konfigurieren, indem die erforderlichen Informationen als Navigationsparameter
                 // übergeben werden
 #if WINDOWS_APP
-                rootFrame.Navigate(typeof(TestPage), e.Arguments);
-                return;
+                //rootFrame.Navigate(typeof(TestPage), e.Arguments);
+                //return;
 #endif
 
                 if (!rootFrame.Navigate(typeof(MainPage), e.Arguments))

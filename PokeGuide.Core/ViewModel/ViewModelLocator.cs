@@ -21,7 +21,8 @@ namespace PokeGuide.Core.ViewModel
         /// </summary>
         public ViewModelLocator()
         {
-            ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+            if (!ServiceLocator.IsLocationProviderSet)
+                ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
             if (ViewModelBase.IsInDesignModeStatic)
             {
@@ -29,7 +30,7 @@ namespace PokeGuide.Core.ViewModel
             }
             else
             {
-                SimpleIoc.Default.Register<IDataService, DataService>();                
+                SimpleIoc.Default.Register<IDataService, DataService>();
             }
 
             SimpleIoc.Default.Register<IMainViewModel, MainViewModel>();

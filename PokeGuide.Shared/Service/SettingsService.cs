@@ -35,8 +35,8 @@ namespace PokeGuide.Service
 
             var result = new Settings();
             var source = new CancellationTokenSource();
-            result.CurrentLanguage = await LoadLanguage(languageId, source.Token);            
-            result.CurrentVersion = await LoadVersion(versionId, languageId, source.Token);
+            //result.CurrentLanguage = await LoadLanguage(languageId, source.Token);            
+            //result.CurrentVersion = await LoadVersion(versionId, languageId, source.Token);
             return result;
         }
 

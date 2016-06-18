@@ -3,7 +3,6 @@ using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Views;
 
 using Microsoft.Practices.ServiceLocation;
-
 using PokeGuide.Core.Service.Interface;
 using PokeGuide.View;
 
@@ -19,13 +18,16 @@ namespace PokeGuide.Service
     {
         static DeviceLocatorService()
         {
-            ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+            if (!ServiceLocator.IsLocationProviderSet)
+                ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+
+
             if (ViewModelBase.IsInDesignModeStatic)
             { }
             else
             {
                 if (!SimpleIoc.Default.IsRegistered<ISettingsService>())
-                    SimpleIoc.Default.Register<ISettingsService, SettingsService>(true);
+                    SimpleIoc.Default.Register<ISettingsService, SettingsService>();
             }
 
             if (!SimpleIoc.Default.IsRegistered<IStorageService>())
