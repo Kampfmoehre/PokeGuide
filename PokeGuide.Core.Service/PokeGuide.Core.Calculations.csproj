@@ -5,11 +5,11 @@
     <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{17AEABE8-7BC6-451D-8921-5EB41992ACE7}</ProjectGuid>
+    <ProjectGuid>{35EA54D0-F3D4-43F9-AFF9-32502A930D9F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PokeGuide.Core</RootNamespace>
-    <AssemblyName>PokeGuide.Core</AssemblyName>
+    <RootNamespace>PokeGuide.Core.Calculations</RootNamespace>
+    <AssemblyName>PokeGuide.Core.Calculations</AssemblyName>
     <DefaultLanguage>de-DE</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -35,11 +35,19 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
+    <ProjectReference Include="..\PokeGuide.Core\PokeGuide.Core.csproj">
+      <Project>{17aeabe8-7bc6-451d-8921-5eb41992ace7}</Project>
+      <Name>PokeGuide.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Enum\ExpPower.cs" />
-    <Compile Include="Enum\TradeState.cs" />
+    <Compile Include="ExperienceCalculationService.cs" />
+    <Compile Include="IExperienceCalculationService.cs" />
+    <Compile Include="IIvCalculationService.cs" />
+    <Compile Include="IStatCalculationService.cs" />
+    <Compile Include="IvCalculationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StatCalculationService.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

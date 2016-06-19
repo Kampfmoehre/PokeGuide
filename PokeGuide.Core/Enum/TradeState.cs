@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PokeGuide.Core.Enum
+﻿namespace PokeGuide.Core.Enum
 {
     /// <summary>
     /// Indicates the trading state of a Pokémon
