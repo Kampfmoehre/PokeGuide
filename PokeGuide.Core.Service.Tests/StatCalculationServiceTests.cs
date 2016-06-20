@@ -22,6 +22,7 @@ namespace PokeGuide.Core.Calculations.Tests
         [TestCase((byte)45, (byte)100, (ushort)0, (byte)15, (byte)2, ExpectedResult = 230, Description = "HitPoints of Level 100 Chikorita with 15 HP IV in Gen II")]
         [TestCase((byte)108, (byte)78, (ushort)74, (byte)24, (byte)3, ExpectedResult = 289, Description = "HitPoints of Level 78 Garchomp in Gen III")]
         [TestCase((byte)95, (byte)100, (ushort)156, (byte)31, (byte)4, ExpectedResult = 370, Description = "HitPoints of Level 100 Gyarados in Gen IV")]
+        [TestCase((byte)40, (byte)96, (ushort)70, (byte)8, (byte)4, ExpectedResult = 206, Description = "HitPoints of Level 96 Kadabra in Gen IV")]
         public ushort ShouldCalculateHitPointsCorrect(byte baseHitPoints, byte level, ushort ev, byte hpIv, byte generation)
         {
             return _service.CalculateHitPoints(baseHitPoints, level, ev, hpIv, generation);
@@ -66,8 +67,8 @@ namespace PokeGuide.Core.Calculations.Tests
         [TestCase((byte)90, (byte)32, (ushort)0, (byte)10, (byte)2, 1.0, ExpectedResult = 69, Description = "Calculate Speed of Level 32 Crobat (Shiny) in Gen II")]
         [TestCase((byte)90, (byte)81, (ushort)24795, (byte)5, (byte)2, 1.0, ExpectedResult = 190, Description = "Calculate Speed of Level 81 Pikachu in Gen II")]
         [TestCase((byte)135, (byte)100, (ushort)252, (byte)31, (byte)3, 1.1, ExpectedResult = 405, Description = "Calculate Attack of Level 100 Salamence with Adamant nature in Gen III")]
-        [TestCase((byte)95, (byte)78, (ushort)86, (byte)30, (byte)4, 1.0, ExpectedResult = 193, Description = "Calculate Defense of Level 78 Garchomp in Gen IV")]
-        [TestCase((byte)80, (byte)78, (ushort)48, (byte)16, (byte)5, 0.9, ExpectedResult = 136, Description = "Calculate Attack of Level 78 Garchomp with Adamant nature in Gen V")]
+        [TestCase((byte)95, (byte)78, (ushort)86, (byte)30, (byte)4, 1.0, ExpectedResult = 192, Description = "Calculate Defense of Level 78 Garchomp in Gen IV")]
+        [TestCase((byte)80, (byte)78, (ushort)48, (byte)16, (byte)5, 0.9, ExpectedResult = 135, Description = "Calculate Attack of Level 78 Garchomp with Adamant nature in Gen V")]
         public ushort ShouldCalculateStatCorrect(byte baseStat, byte level, ushort ev, byte iv, byte generation, double natureMod)
         {
             return _service.CalculateStat(baseStat, level, ev, iv, generation, natureMod);

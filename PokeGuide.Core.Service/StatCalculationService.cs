@@ -84,10 +84,9 @@ namespace PokeGuide.Core.Calculations
         /// <returns>The calculated Hit Points</returns>
         ushort CalculateHitPoints(byte baseHitPoints, byte level, ushort ev, byte iv)
         {
-            double stat = CalculateLaterGenStat(baseHitPoints, level, ev, iv);
-            stat = stat + level + 10.0;
-
-            return Convert.ToUInt16(Math.Floor(stat));
+            if (iv > 31)
+                throw new ArgumentOutOfRangeException(nameof(iv), iv, "IV can not be higher than 31");
+            return (ushort)((iv + 2 * baseHitPoints + (int)ev / 4 + 100) * (int)level / 100 + 10);
         }
         /// <summary>
         /// Calculates a stat value for first and secind generation
@@ -114,10 +113,27 @@ namespace PokeGuide.Core.Calculations
         /// <returns>The calculated stat value</returns>
         ushort CalculateStat(byte baseStat, byte level, byte ev, byte iv, double natureMod)
         {
-            double stat = CalculateLaterGenStat(baseStat, level, ev, iv);
-            stat = (stat + 5.0) * natureMod;
+            if (iv > 31)
+                throw new ArgumentOutOfRangeException(nameof(iv), iv, "IV can not be higher than 31");
 
-            return Convert.ToUInt16(Math.Floor(stat));
+            ushort result = (ushort)(((iv + 2 * baseStat + ev / 4) * level / 100 + 5) * natureMod);
+
+            //if (natureMod == 0.9)
+            //{
+            //    result *= 9;
+            //    result /= 10;
+            //}
+            //if (natureMod == 1.1)
+            //{
+            //    result *= 11;
+            //    result /= 10;
+            //}
+
+            return result;
+            //double stat = CalculateLaterGenStat(baseStat, level, ev, iv);
+            //stat = (stat + 5.0) * natureMod;
+
+            //return Convert.ToUInt16(Math.Floor(stat));
         }
         /// <summary>
         /// Performs base calculation for generation &lt; 3
@@ -153,7 +169,7 @@ namespace PokeGuide.Core.Calculations
             if (iv > 31)
                 throw new ArgumentOutOfRangeException(nameof(iv), iv, "IV can not be higher than 31");
 
-            double a = (baseStat * 2.0) + iv + (ev / 4.0);
+            double a = (baseStat * 2.0) + iv + Math.Floor((ev / 4.0));
             return ((a * level) / 100.0);
         }
     }
