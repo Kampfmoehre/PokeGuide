@@ -25,14 +25,14 @@ namespace PokeGuide.Core.Calculations.Tests
         [TestCase((byte)40, (byte)96, (ushort)70, (byte)8, (byte)4, ExpectedResult = 206, Description = "HitPoints of Level 96 Kadabra in Gen IV")]
         public ushort ShouldCalculateHitPointsCorrect(byte baseHitPoints, byte level, ushort ev, byte hpIv, byte generation)
         {
-            return _service.CalculateHitPoints(baseHitPoints, level, ev, hpIv, generation);
+            return _service.CalculateStat(baseHitPoints, level, ev, hpIv, generation, 1.0, true);
         }
 
         [Test]
         public void CalculateHitPointsShouldThrowExceptionIfWrongGeneration()
         {
             byte wrongGen = 7;
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateHitPoints(1, 2, 3, 4, wrongGen));
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateStat(1, 2, 3, 4, wrongGen, 1.0, true));
             // Todo find out how to remove default .NET exception that is added to the custom message
             Assert.True(exception.Message.StartsWith("Generation must be between 1 and 6"));
             Assert.AreEqual("generation", exception.ParamName);
@@ -43,7 +43,7 @@ namespace PokeGuide.Core.Calculations.Tests
         public void CalculateHitPointsShouldThrowExceptionIfWrongDvSecondGen()
         {
             byte wrongIv = 16;
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateHitPoints(1, 2, 3, wrongIv, 2));
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateStat(1, 2, 3, wrongIv, 2, 1.0, true));
             // Todo find out how to remove default .NET exception that is added to the custom message
             Assert.True(exception.Message.StartsWith("DV for 1st and 2nd generation can not be higher than 15"));
             Assert.AreEqual("dv", exception.ParamName);
@@ -54,7 +54,7 @@ namespace PokeGuide.Core.Calculations.Tests
         public void CalculateHitPointsShouldThrowExceptionIfWrongDvFourthGen()
         {
             byte wrongIv = 32;
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateHitPoints(1, 2, 3, wrongIv, 4));
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateStat(1, 2, 3, wrongIv, 4, 1.0, true));
             // Todo find out how to remove default .NET exception that is added to the custom message
             Assert.True(exception.Message.StartsWith("IV can not be higher than 31"));
             Assert.AreEqual("iv", exception.ParamName);
@@ -71,14 +71,14 @@ namespace PokeGuide.Core.Calculations.Tests
         [TestCase((byte)80, (byte)78, (ushort)48, (byte)16, (byte)5, 0.9, ExpectedResult = 135, Description = "Calculate Attack of Level 78 Garchomp with Adamant nature in Gen V")]
         public ushort ShouldCalculateStatCorrect(byte baseStat, byte level, ushort ev, byte iv, byte generation, double natureMod)
         {
-            return _service.CalculateStat(baseStat, level, ev, iv, generation, natureMod);
+            return _service.CalculateStat(baseStat, level, ev, iv, generation, natureMod, false);
         }
 
         [Test]
         public void CalculateStatShouldThrowExceptionIfWrongGeneration()
         {
             byte wrongGen = 7;
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateStat(1, 2, 3, 4, wrongGen, 1));
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateStat(1, 2, 3, 4, wrongGen, 1, false));
             // Todo find out how to remove default .NET exception that is added to the custom message
             Assert.True(exception.Message.StartsWith("Generation must be between 1 and 6"));
             Assert.AreEqual("generation", exception.ParamName);
@@ -89,7 +89,7 @@ namespace PokeGuide.Core.Calculations.Tests
         public void CalculateStatShouldThrowExceptionIfWrongDvSecondGen()
         {
             byte wrongIv = 16;
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateStat(1, 2, 3, wrongIv, 2, 1));
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateStat(1, 2, 3, wrongIv, 2, 1, false));
             // Todo find out how to remove default .NET exception that is added to the custom message
             Assert.True(exception.Message.StartsWith("DV for 1st and 2nd generation can not be higher than 15"));
             Assert.AreEqual("dv", exception.ParamName);
@@ -100,7 +100,7 @@ namespace PokeGuide.Core.Calculations.Tests
         public void CalculateStatShouldThrowExceptionIfWrongIvFourthGen()
         {
             byte wrongIv = 32;
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateStat(1, 2, 3, wrongIv, 4, 1));
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => _service.CalculateStat(1, 2, 3, wrongIv, 4, 1, false));
             // Todo find out how to remove default .NET exception that is added to the custom message
             Assert.True(exception.Message.StartsWith("IV can not be higher than 31"));
             Assert.AreEqual("iv", exception.ParamName);

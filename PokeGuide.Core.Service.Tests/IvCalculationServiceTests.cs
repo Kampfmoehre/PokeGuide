@@ -19,43 +19,43 @@ namespace PokeGuide.Core.Calculations.Tests
         [Test]
         public void TestCalculateHitPointsIv_Level92Rhydon()
         {
-            List<byte> result = _service.CalculateHitPointsIv(105, 348, 92, 12345, oldIvs, 1);
+            List<byte> result = _service.CalculateIv(105, 348, 92, 12345, oldIvs, 1, 1.0, true);
             Assert.AreEqual(new List<byte> { 15 }, result);
         }
         [Test]
         public void TestCalculateHitPointsIv_Level96Voltorb()
         {
-            List<byte> result = _service.CalculateHitPointsIv(40, 219, 96, 9543, oldIvs, 1);
+            List<byte> result = _service.CalculateIv(40, 219, 96, 9543, oldIvs, 1, 1.0, true);
             Assert.AreEqual(new List<byte> { 7 }, result);
         }
         [Test]
         public void TestCalculateHitPointsIv_Level20Lapras()
         {
-            List<byte> result = _service.CalculateHitPointsIv(130, 82, 20, 123, oldIvs, 1);
+            List<byte> result = _service.CalculateIv(130, 82, 20, 123, oldIvs, 1, 1.0, true);
             Assert.AreEqual(new List<byte> { 0 }, result);
         }
         [Test]
         public void TestCalculateHitPointsIv_Level53Ariados()
         {
-            List<byte> result = _service.CalculateHitPointsIv(70, 150, 53, 4576, oldIvs, 2);
+            List<byte> result = _service.CalculateIv(70, 150, 53, 4576, oldIvs, 2, 1.0, true);
             Assert.AreEqual(new List<byte> { 4 }, result);
         }
         [Test]
         public void TestCalculateHitPointsIv_Level78Sunflora()
         {
-            List<byte> result = _service.CalculateHitPointsIv(75, 265, 78, 56213, oldIvs, 2);
+            List<byte> result = _service.CalculateIv(75, 265, 78, 56213, oldIvs, 2, 1.0, true);
             Assert.AreEqual(new List<byte> { 9 }, result);
         }
         [Test]
         public void TestCalculateHitPointsIv_Level24Lunatone()
         {
-            List<byte> result = _service.CalculateHitPointsIv(70, 76, 24, 16, newIvs, 3);
+            List<byte> result = _service.CalculateIv(70, 76, 24, 16, newIvs, 3, 1.0, true);
             Assert.AreEqual(new List<byte> { 31 }, result);
         }
         [Test]
         public void TestCalculateHitPointsIv_Level96Kadabra()
         {
-            List<byte> result = _service.CalculateHitPointsIv(40, 207, 96, 70, newIvs, 4);
+            List<byte> result = _service.CalculateIv(40, 207, 96, 70, newIvs, 4, 1.0, true);
             Assert.AreEqual(new List<byte> { 9 }, result);
         }
 
