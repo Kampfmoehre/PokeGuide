@@ -1,0 +1,22 @@
+﻿<Application
+    x:Class="PokeGuide.Mobile.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PokeGuide.Mobile"
+    xmlns:vm="using:PokeGuide.Mobile.Common.ViewModel"
+    xmlns:deviceService="using:PokeGuide.Mobile.Service"
+    xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    >
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <deviceService:DeviceLocatorService x:Key="Locator.W8"/>
+            <vm:ViewModelLocator x:Key="Locator"/>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/MainStyles.xaml"/>
+                <ResourceDictionary Source="Themes/Templates.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+</Application>
